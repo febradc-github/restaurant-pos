@@ -20,11 +20,11 @@ items:
     title: "Table Layout Editor"
     type: story
     parent: C-1
-    status: todo
+    status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: backend Table model/migration/CRUD API under /api/tables, GET open, mutations owner-gated via role:owner middleware, 13 new feature tests (29/29 total passing, independently re-verified, migration applied cleanly to live pos_dev Postgres). work pass 2: frontend TableLayoutEditor (drag/resize/add/delete on positioned-div canvas), API client, Vitest+RTL test harness added, 12/12 tests passing, typecheck and build clean, all independently re-verified. review: PASS -- all 5 criteria met with genuine assertions (403/401+DB non-mutation on backend, absent controls on frontend)."
 
   - id: C-4
     title: "Menu Management"

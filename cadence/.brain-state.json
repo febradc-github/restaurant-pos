@@ -2,6 +2,7 @@
   "notes": {
     "brain/pos-launch-session-2026-07-14": 1783959790991.8323,
     "brain/sanctum-requestguard-memoization-testing-gotcha": 1783961304778.4497,
+    "brain/verify-subagent-reports-independently": 1783964887153.395,
     "decisions/adr-001-postgresql-over-sqlite": 1783959303191.0735,
     "decisions/adr-002-no-message-broker": 1783959310360.1946,
     "decisions/adr-003-local-escpos-print-agent": 1783959317142.4365,
@@ -10,15 +11,28 @@
     "decisions/adr-006-custom-build-vs-odoo": 1783959341989.3286,
     "decisions/adr-007-sanctum-bearer-tokens": 1783961484087.2983,
     "architecture/AR-POS-core": 1783959296617.0298,
+    "code/app-enums-tableshape-php": 1783967210629.2998,
     "code/app-enums-userrole-php": 1783961278616.1602,
     "code/app-http-controllers-api-authcontroller-php": 1783961281565.6511,
     "code/app-http-controllers-api-cashiercontroller-php": 1783961288313.3225,
     "code/app-http-controllers-api-ownercontroller-php": 1783961286534.8503,
     "code/app-http-controllers-api-statuscontroller-php": 1783961290374.3098,
+    "code/app-http-controllers-api-tablecontroller-php": 1783967222743.4458,
     "code/app-http-middleware-ensureuserhasrole-php": 1783961284443.7234,
+    "code/app-models-table-php": 1783967214680.876,
+    "code/database-factories-tablefactory-php": 1783967218018.3774,
+    "code/database-migrations-2026_07_14_000003_create_tables_table-php": 1783967206929.9236,
     "code/database-migrations-2026-07-14-000001-create-personal-access-tokens-table-php": 1783961295984.3364,
     "code/database-migrations-2026-07-14-000002-add-role-to-users-table-php": 1783961297608.0437,
-    "code/routes-api-php": 1783961293917.266
+    "code/package-json": 1783967261305.4512,
+    "code/routes-api-php": 1783967227224.344,
+    "code/src-api-tables-ts": 1783967240418.9646,
+    "code/src-app-tsx": 1783967267551.0122,
+    "code/src-components-tablelayouteditor-tsx": 1783967250513.558,
+    "code/src-test-setup-ts": 1783967254349.4966,
+    "code/src-types-table-ts": 1783967245123.4453,
+    "code/tests-feature-tables-tablelayouttest-php": 1783967231303.199,
+    "code/vite-config-ts": 1783967257898.6067
   },
-  "updatedAt": "2026-07-13T17:31:30.467Z"
+  "updatedAt": "2026-07-13T18:27:55.006Z"
 }
