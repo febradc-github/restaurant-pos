@@ -1,0 +1,35 @@
+.kitchen-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.kitchen-display__error {
+  color: #b91c1c;
+}
+
+.kitchen-display__list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+}
+
+.kitchen-display__order {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 12rem;
+  padding: 0.5rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background: #fffbea;
+}
+
+.kitchen-display__line-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

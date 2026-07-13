@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\InventoryItemController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\MenuItemInventoryItemController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\TableController;
@@ -68,3 +69,10 @@ Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
     Route::post('/menu-items/{menuItem}/inventory-items', [MenuItemInventoryItemController::class, 'store']);
     Route::delete('/menu-items/{menuItem}/inventory-items/{inventoryItem}', [MenuItemInventoryItemController::class, 'destroy']);
 });
+
+// Order taking & Kitchen Display (C-6). Both Server (order-taking) and
+// Kitchen (ready/done + reconnect catch-up) are no-login devices, same
+// access pattern as tables, menu items, and inventory items above.
+Route::get('/orders', [OrderController::class, 'index']);
+Route::post('/orders', [OrderController::class, 'store']);
+Route::patch('/orders/{order}/ready', [OrderController::class, 'markReady']);

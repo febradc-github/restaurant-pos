@@ -20,11 +20,11 @@ items:
     title: "Order Taking & Kitchen Display"
     type: story
     parent: C-1
-    status: todo
+    status: done
     points: 6
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: backend Order/OrderItem models/migrations, no-auth create/list/mark-ready endpoints, OrderPlaced/OrderStatusUpdated broadcast events on public 'kitchen' channel via Reverb, integrates C-5's decrementStock() per order line, 9 new feature tests (98/98 total, independently re-verified incl. real Reverb server boot check, migrations applied to live pos_dev Postgres, 2 real mutation checks). work pass 2: frontend OrderTaking (Server, no-auth) + KitchenDisplay (fetch-on-mount for reconnect safety + live WebSocket updates via laravel-echo/pusher-js, no polling), 20 new tests (48/48 total, typecheck/build clean, 2 real mutation checks), all independently re-verified. review: PASS -- all 5 criteria met, reviewer specifically confirmed the broadcastAs() dot-prefix event-name match and reconnect-fetch independence from WS state."
 
   - id: C-8
     title: "Local Print Agent & Hardware Integration"
