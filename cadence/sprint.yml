@@ -20,8 +20,8 @@ items:
     title: "On-Premise Deployment Setup"
     type: story
     parent: C-1
-    status: todo
+    status: done
     points: 3
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: PM2 ecosystem.config.js supervising all 4 app processes (Laravel serve, Reverb, print-agent, static SPA server), setup.sh, README; resolved the recorded env-config blocker via PM2's native env mechanism instead of .env; found and fixed a real LAN bug (Reverb host was hardcoded to 127.0.0.1 in the frontend, would have broken real-time updates for any non-host device). Verified end-to-end: all 4 processes online, health-checked on both loopback and real LAN IP, restart-recovery proven via pm2 kill + pm2 resurrect, build-time env baking confirmed via grep on the built bundle. Honest limits: no literal OS reboot, no second physical device, no real printer. work pass 2: removed hardcoded real secrets (DB password, Reverb app id/key/secret) and a personal Windows path from the committed ecosystem.config.js, replaced with env-var-driven values (POS_* names) and a loud fail-fast if unset; re-verified full stack still starts correctly. work pass 3: documented and then corrected a PM2-daemon-PATH-caching gotcha in the README (verified the corrected wording against the actual code, not just re-stated the prior claim). review: PASS -- reviewer independently ran the full stack, hit real LAN IP endpoints, and ran its own pm2 save/kill/resurrect restart-recovery cycle. This was the last ticket in epic C-1."

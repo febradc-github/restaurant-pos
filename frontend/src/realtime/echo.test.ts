@@ -25,4 +25,22 @@ describe('getReverbConfig', () => {
     expect(config.port).toBe(8080)
     expect(config.forceTLS).toBe(false)
   })
+
+  it('uses VITE_REVERB_HOST/PORT/SCHEME when set, so a built SPA can reach Reverb on the deployment machine\'s LAN IP', () => {
+    vi.stubEnv('VITE_REVERB_HOST', '192.168.31.5')
+    vi.stubEnv('VITE_REVERB_PORT', '8080')
+    vi.stubEnv('VITE_REVERB_SCHEME', 'http')
+
+    const config = getReverbConfig()
+
+    expect(config.host).toBe('192.168.31.5')
+    expect(config.port).toBe(8080)
+    expect(config.forceTLS).toBe(false)
+  })
+
+  it('sets forceTLS when VITE_REVERB_SCHEME is https', () => {
+    vi.stubEnv('VITE_REVERB_SCHEME', 'https')
+
+    expect(getReverbConfig().forceTLS).toBe(true)
+  })
 })

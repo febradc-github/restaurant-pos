@@ -4,7 +4,7 @@ tags: [deployment, code/backend]
 aliases: []
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[US-6]]", "[[US-9]]"]
+related: ["[[US-6]]", "[[US-9]]", "[[deploy-ecosystem-config-js]]"]
 sources: []
 ---
 
@@ -22,11 +22,14 @@ C-6 introduced Reverb (WebSocket broadcasting) to the project with an explicit c
    - `REVERB_HOST`, `REVERB_PORT`, `REVERB_SCHEME`
    - `VITE_REVERB_APP_KEY`, `VITE_REVERB_HOST`, `VITE_REVERB_PORT`, `VITE_REVERB_SCHEME`
 
-## Open question for C-9 (On-Premise Deployment)
+## Resolution in C-9 (On-Premise Deployment)
 
-On an actual restaurant's on-premise machine, these env vars cannot be OS User-scope variables. C-9 needs to define:
-- How are these variables configured during deployment setup?
-- Where do they live on the production/on-premise machine?
-- How do they persist across restarts?
+For on-premise deployment where OS User-scope variables aren't practical, C-9 resolved this by adopting **PM2 as process supervisor** with environment variables defined natively in `ecosystem.config.js` (PM2's own mechanism, not .env). The 4 processes (pos-backend, pos-reverb, pos-print-agent, pos-frontend) each have their env block defined in the ecosystem config, with secrets reading from POS_DB_PASSWORD, POS_REVERB_APP_ID/KEY/SECRET environment variables at PM2 startup time, falling back to obvious placeholder values if unset. PHP directory is resolved via POS_PHP_DIR or PATH detection, failing loudly at config-load time if unavailable.
 
-This is a **blocker decision** for C-9's deployment strategy (see [[US-9]]).
+This approach:
+- Avoids .env files entirely (preserves the original constraint)
+- Centralizes process management, startup order, and restart recovery
+- Allows secrets to be injected at deploy time without committing them
+- Platform-agnostic (Unix systemd/launchd-equivalent via pm2-startup; Windows via pm2-windows-startup)
+
+See [[deploy-ecosystem-config-js]] for implementation.

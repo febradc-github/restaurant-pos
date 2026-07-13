@@ -4,7 +4,7 @@ tags: [backend, infrastructure]
 aliases: ["Print agent architecture", "Polyglot system", "Three-process deployment"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[AR-POS-core]]", "[[adr-003-local-escpos-print-agent]]", "[[US-8]]", "[[US-7]]", "[[US-9]]"]
+related: ["[[AR-POS-core]]", "[[adr-003-local-escpos-print-agent]]", "[[US-8]]", "[[US-7]]", "[[US-9]]", "[[deploy-ecosystem-config-js]]"]
 sources: []
 ---
 
@@ -26,14 +26,17 @@ The print-agent (C-8, [[US-8]]) is the first genuinely polyglot component of the
 
 C-7 (Checkout, [[US-7]]) calls this service's HTTP API when a payment is confirmed: `POST http://127.0.0.1:4000/print` (port configurable via PRINT_AGENT_PORT) with a ReceiptRequest body. Laravel's HTTP client (or similar) makes the call from the checkout flow. Success (200) triggers receipt printing and drawer open; non-2xx should surface an error to the Cashier instead of treating as success (400 = bad request shape, 502 = printer unreachable).
 
-## Deployment Implication for US-9
+## Deployment in C-9: THREE Processes Orchestrated
 
-The system now runs THREE separate processes on the on-premise local machine:
-1. Laravel backend (PHP)
-2. Laravel Reverb WebSocket server
-3. Print-agent (Node.js)
+**RESOLVED**: C-9 (On-Premise Deployment Setup, [[US-9]]) implemented PM2-based process supervision for all three processes:
+1. Laravel backend (PHP) — `php artisan serve --host=0.0.0.0 --port=8000`
+2. Laravel Reverb WebSocket server — `php artisan reverb:start --host=0.0.0.0 --port=8080`
+3. Print-agent (Node.js) — runs bundled dist/index.js on port 4000 (configurable)
+4. Static frontend server (Node.js) — serves built React SPA on port 3000
 
-C-9 (On-Premise Deployment Setup, [[US-9]]) must account for all three when packaging the self-hosted deployment, startup order, restart recovery, and process supervision (systemd services, Docker orchestration, or equivalent).
+All four defined in `ecosystem.config.js` with startup order, restart recovery (via pm2 startup/save and pm2-windows-startup on Windows), and environment isolation per process. Verified: all processes start on loopback and LAN IP, Reverb WebSocket port confirmed open, print-agent full pipeline proven (502 on printer-unreachable path verifies the flow runs), restart recovery simulated via `pm2 kill` + `pm2 resurrect`, and Windows boot-time persistence via registry Run-key entry.
+
+See [[deploy-ecosystem-config-js]] for implementation.
 
 ## Technology Choice
 

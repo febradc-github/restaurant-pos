@@ -8,6 +8,11 @@ import type { Order } from '../types/order'
 /** Fallback Reverb app key for local dev when VITE_REVERB_APP_KEY is not set. */
 export const DEFAULT_REVERB_APP_KEY = 'local-reverb-key'
 
+/** Fallback Reverb host/port/scheme for local dev when the VITE_REVERB_* env vars are not set. */
+export const DEFAULT_REVERB_HOST = '127.0.0.1'
+export const DEFAULT_REVERB_PORT = 8080
+export const DEFAULT_REVERB_SCHEME = 'http'
+
 export interface ReverbConfig {
   key: string
   host: string
@@ -16,17 +21,22 @@ export interface ReverbConfig {
 }
 
 /**
- * Resolves the Reverb connection config. The app key is overridable via
- * VITE_REVERB_APP_KEY (same pattern as VITE_API_BASE_URL in the API
- * clients); host/port/scheme match the self-hosted Reverb server described
- * in the C-6 spec (127.0.0.1:8080, plain http, for local dev).
+ * Resolves the Reverb connection config. All four values are overridable via
+ * VITE_REVERB_APP_KEY / VITE_REVERB_HOST / VITE_REVERB_PORT /
+ * VITE_REVERB_SCHEME (same pattern as VITE_API_BASE_URL in the API
+ * clients), baked in at build time -- see deploy/README.md. Defaults match
+ * the self-hosted Reverb server described in the C-6 spec (127.0.0.1:8080,
+ * plain http, for local dev). On-premise deployment (C-9) sets
+ * VITE_REVERB_HOST to the deployment machine's LAN IP so devices other than
+ * the host itself can open the WebSocket connection.
  */
 export function getReverbConfig(): ReverbConfig {
+  const scheme = import.meta.env.VITE_REVERB_SCHEME ?? DEFAULT_REVERB_SCHEME
   return {
     key: import.meta.env.VITE_REVERB_APP_KEY ?? DEFAULT_REVERB_APP_KEY,
-    host: '127.0.0.1',
-    port: 8080,
-    forceTLS: false,
+    host: import.meta.env.VITE_REVERB_HOST ?? DEFAULT_REVERB_HOST,
+    port: Number(import.meta.env.VITE_REVERB_PORT ?? DEFAULT_REVERB_PORT),
+    forceTLS: scheme === 'https',
   }
 }
 

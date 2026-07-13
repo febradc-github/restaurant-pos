@@ -2,7 +2,7 @@ items:
   - id: C-1
     title: "Restaurant POS System"
     type: epic
-    status: idea
+    status: done
     points: 30
     assignee: claude
     created: 2026-07-14
