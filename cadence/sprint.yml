@@ -30,8 +30,8 @@ items:
     title: "Local Print Agent & Hardware Integration"
     type: story
     parent: C-1
-    status: todo
+    status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: standalone Node.js/TypeScript print-agent service (sibling to backend/frontend), PrinterTransport interface with TCP and Fake implementations, ESC/POS receipt builder incl. standard drawer-kick sequence, HTTP POST /print (400 on invalid body, 502 with descriptive error on printer-unreachable, 200 on success), 16 tests, 2 real mutation checks, independently re-verified incl. real curl smoke tests against the built server showing genuine 502-on-unreachable-printer behavior. No physical printer available -- transport is pluggable/mocked, hardware testing explicitly flagged as needing on-site verification. review: PASS -- reviewer independently ran its own live smoke test confirming the 502-unreachable-printer path and validated the drawer-kick bytes are a real Epson-compatible command, not a placeholder."

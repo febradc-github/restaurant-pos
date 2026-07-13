@@ -4,7 +4,7 @@ tags: [pos, backend, infrastructure]
 aliases: ["POS core system", "system shape"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]"]
+related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]"]
 ---
 
 # POS Core Architecture
@@ -39,6 +39,7 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 - Receives print requests (receipts) and cash-drawer commands from web app
 - Sends raw ESC/POS commands directly to thermal receipt printer
 - Avoids per-transaction print dialogs, controls formatting, reliably triggers drawer
+- See [[AR-print-agent-polyglot]] for implementation details and deployment implications
 
 ## Roles
 

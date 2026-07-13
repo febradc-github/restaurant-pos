@@ -4,7 +4,7 @@ tags: [infrastructure, deployment]
 aliases: ["Self-hosted", "On-premise vs cloud"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[EP-1]]", "[[AR-POS-core]]", "[[pos-launch-session-2026-07-14]]"]
+related: ["[[EP-1]]", "[[AR-POS-core]]", "[[AR-print-agent-polyglot]]", "[[US-9]]", "[[pos-launch-session-2026-07-14]]"]
 ---
 
 # ADR-004: On-Premise Self-Hosted Deployment Over Cloud
@@ -28,6 +28,10 @@ The client is a single restaurant in the Philippines, opening soon. They need th
 ## Alternatives Rejected
 
 **Cloud hosting (AWS, GCP, Azure):** Recurring costs, internet dependency for core operations, data leaves the restaurant, simpler scaling if product grows to multi-restaurant chains (future consideration, not v1). Rejected because client's stated priority is cost + independence.
+
+## Deployment Note
+
+As of C-8 ([[US-8]]), the on-premise deployment now runs THREE separate processes: Laravel backend, Laravel Reverb WebSocket server, and print-agent (Node.js). See [[AR-print-agent-polyglot]] for the polyglot implications and [[US-9]] for the integration work needed.
 
 ## Revisit Trigger
 

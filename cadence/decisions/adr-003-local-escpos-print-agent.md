@@ -4,7 +4,7 @@ tags: [backend, infrastructure]
 aliases: ["ESC/POS print agent", "Receipt printing", "Cash drawer control"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[EP-1]]", "[[AR-POS-core]]", "[[pos-launch-session-2026-07-14]]"]
+related: ["[[EP-1]]", "[[AR-POS-core]]", "[[AR-print-agent-polyglot]]", "[[US-8]]", "[[pos-launch-session-2026-07-14]]"]
 ---
 
 # ADR-003: Local ESC/POS Print Agent Over Browser-Native Printing
@@ -28,6 +28,10 @@ The system must reliably print receipts and trigger the cash drawer via the ther
 ## Alternatives Rejected
 
 **Browser-native printing (window.print()):** Simpler to code (no separate service), but adds per-transaction friction, fragile cash-drawer triggering, and loss of receipt formatting control.
+
+## Implementation
+
+See [[AR-print-agent-polyglot]] for architecture details and polyglot deployment implications.
 
 ## Revisit Trigger
 
