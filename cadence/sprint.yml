@@ -10,11 +10,11 @@ items:
     title: "Authentication & Role-Based Access"
     type: story
     parent: C-1
-    status: in_progress
+    status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: implemented Sanctum-based login/logout for Owner/Cashier, role middleware enforcing per-role API access, owner-only/cashier-only/no-auth example routes, 16 passing feature tests"
+    notes: "work pass 1: implemented Sanctum-based login/logout for Owner/Cashier, role middleware enforcing per-role API access, owner-only/cashier-only/no-auth example routes, 16 passing feature tests. work pass 2: fixed User.php/UserFactory.php/bootstrap/app.php which were not actually saved in pass 1 despite an inaccurate 'all passed' report; independently re-verified 16/16 tests genuinely pass. review 1: FAIL -- spec wording ambiguity on Server/Kitchen role differentiation. SP-2 revised per user decision to match DS-2's actual design. review 2: PASS -- all 5 criteria met, 16/16 tests genuinely verified by the reviewer."
 
   - id: C-3
     title: "Table Layout Editor"
