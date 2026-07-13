@@ -30,8 +30,8 @@ items:
     title: "Menu Management"
     type: story
     parent: C-1
-    status: todo
+    status: done
     points: 3
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: backend Category/MenuItem models/migrations/CRUD API, owner-gated mutations, restrict-on-delete for categories with items, 30 new feature tests (59/59 total, independently re-verified, migration applied to live pos_dev Postgres, real mutation check). work pass 2: frontend MenuManager (category+item CRUD, availability toggle, 409 error surfaced), 18 new tests (30/30 total, typecheck/build clean, real mutation checks), all independently re-verified. review: PASS -- all 4 criteria met, genuine GET-after-mutation tests for immediacy, genuine 401/403+DB-unchanged for gating."

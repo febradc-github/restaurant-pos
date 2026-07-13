@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashierController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\TableController;
@@ -30,4 +32,22 @@ Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
     Route::put('/tables/{table}', [TableController::class, 'update']);
     Route::patch('/tables/{table}', [TableController::class, 'update']);
     Route::delete('/tables/{table}', [TableController::class, 'destroy']);
+});
+
+// Menu management (C-4). Reading categories and menu items is open to any
+// device, same as tables above -- Server and Kitchen views read the menu
+// without a login. Only the Owner may edit it.
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/menu-items', [MenuItemController::class, 'index']);
+
+Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{category}', [CategoryController::class, 'update']);
+    Route::patch('/categories/{category}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+
+    Route::post('/menu-items', [MenuItemController::class, 'store']);
+    Route::put('/menu-items/{menuItem}', [MenuItemController::class, 'update']);
+    Route::patch('/menu-items/{menuItem}', [MenuItemController::class, 'update']);
+    Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy']);
 });
