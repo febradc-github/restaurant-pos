@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Events\OrderPlaced;
 use App\Events\OrderStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\MenuItem;
 use App\Models\Order;
+use App\Services\Checkout\PaymentConfirmationService;
+use App\Services\Receipts\PrintAgentClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +18,11 @@ use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private readonly PaymentConfirmationService $paymentConfirmation,
+        private readonly PrintAgentClient $printAgent,
+    ) {}
+
     /**
      * List orders, optionally filtered by status. Open to any device --
      * Kitchen has no login, same as the /api/tables and /api/menu-items
@@ -108,6 +116,67 @@ class OrderController extends Controller
         $order->load(['table', 'items.menuItem']);
 
         event(new OrderStatusUpdated($order));
+
+        return response()->json($order);
+    }
+
+    /**
+     * Cashier checks an order out: confirms a payment method (cash, QR Ph,
+     * or GCash) was received and marks the order paid (C-7). Role-gated to
+     * Cashier -- unlike the no-login Server/Kitchen endpoints above, this
+     * is a real transaction the Cashier is accountable for.
+     *
+     * An already-paid or already-cancelled order can't be checked out
+     * again -- 409, there's nothing sensible left to confirm.
+     *
+     * On success, hands a receipt built from the order's line items off to
+     * the print-agent (C-8) for physical printing. A failed print never
+     * rolls back the payment -- the money was already received -- but the
+     * response's `print_status` tells the Cashier-facing frontend whether
+     * the receipt actually printed, so it can prompt a manual reprint if
+     * not.
+     */
+    public function checkout(Request $request, Order $order): JsonResponse
+    {
+        if (in_array($order->status, [OrderStatus::Paid, OrderStatus::Cancelled], true)) {
+            return response()->json([
+                'message' => "Order is already {$order->status->value}.",
+            ], 409);
+        }
+
+        $data = $request->validate([
+            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
+        ]);
+
+        $order = $this->paymentConfirmation->confirm($order, PaymentMethod::from($data['payment_method']));
+        $order->load(['table', 'items.menuItem']);
+
+        $printed = $this->printAgent->print($order);
+
+        return response()->json($order->toArray() + [
+            'print_status' => $printed ? 'printed' : 'failed',
+        ]);
+    }
+
+    /**
+     * Cashier cancels an order, removing it from active orders (C-7).
+     * Role-gated to Cashier, same as checkout above.
+     *
+     * A paid order can't be cancelled -- the money was already received --
+     * and an already-cancelled order can't be cancelled again; both are
+     * 409.
+     */
+    public function cancel(Order $order): JsonResponse
+    {
+        if (in_array($order->status, [OrderStatus::Paid, OrderStatus::Cancelled], true)) {
+            return response()->json([
+                'message' => "Order is already {$order->status->value}.",
+            ], 409);
+        }
+
+        $order->update(['status' => OrderStatus::Cancelled]);
+
+        $order->load(['table', 'items.menuItem']);
 
         return response()->json($order);
     }

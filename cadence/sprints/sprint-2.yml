@@ -1,0 +1,37 @@
+sprint:
+  name: "Sprint 2"
+  number: 2
+  goal: "Inventory tracking, order taking with live kitchen display, and the local print agent -- unblock the core ordering flow"
+  started: 2026-07-14
+  ends: 2026-07-28
+  status: completed
+items:
+  - id: C-5
+    title: "Inventory Tracking"
+    type: story
+    parent: C-1
+    status: done
+    points: 3
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: InventoryItem model/migration, menu_item<->inventory_item pivot with quantity_required, owner-gated CRUD + link/unlink API, decrementStock() with auto-resync of linked menu items' availability (unavailable if any linked item hits zero), 30 new feature tests (89/89 total, independently re-verified, migrations applied to live pos_dev Postgres, 2 real mutation checks). Backend-only per DS-5 (no UI mandated, unlike C-3/C-4). review: PASS -- all 4 criteria met, reviewer confirmed backend-only scoping is correct per DS-5."
+
+  - id: C-6
+    title: "Order Taking & Kitchen Display"
+    type: story
+    parent: C-1
+    status: done
+    points: 6
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: backend Order/OrderItem models/migrations, no-auth create/list/mark-ready endpoints, OrderPlaced/OrderStatusUpdated broadcast events on public 'kitchen' channel via Reverb, integrates C-5's decrementStock() per order line, 9 new feature tests (98/98 total, independently re-verified incl. real Reverb server boot check, migrations applied to live pos_dev Postgres, 2 real mutation checks). work pass 2: frontend OrderTaking (Server, no-auth) + KitchenDisplay (fetch-on-mount for reconnect safety + live WebSocket updates via laravel-echo/pusher-js, no polling), 20 new tests (48/48 total, typecheck/build clean, 2 real mutation checks), all independently re-verified. review: PASS -- all 5 criteria met, reviewer specifically confirmed the broadcastAs() dot-prefix event-name match and reconnect-fetch independence from WS state."
+
+  - id: C-8
+    title: "Local Print Agent & Hardware Integration"
+    type: story
+    parent: C-1
+    status: done
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: standalone Node.js/TypeScript print-agent service (sibling to backend/frontend), PrinterTransport interface with TCP and Fake implementations, ESC/POS receipt builder incl. standard drawer-kick sequence, HTTP POST /print (400 on invalid body, 502 with descriptive error on printer-unreachable, 200 on success), 16 tests, 2 real mutation checks, independently re-verified incl. real curl smoke tests against the built server showing genuine 502-on-unreachable-printer behavior. No physical printer available -- transport is pluggable/mocked, hardware testing explicitly flagged as needing on-site verification. review: PASS -- reviewer independently ran its own live smoke test confirming the 502-unreachable-printer path and validated the drawer-kick bytes are a real Epson-compatible command, not a placeholder."

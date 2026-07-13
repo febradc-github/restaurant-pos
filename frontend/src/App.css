@@ -1,3 +1,9 @@
+.app__session {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

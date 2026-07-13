@@ -4,18 +4,20 @@ tags: [code/backend]
 aliases: ["app/Enums/OrderStatus.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-models-order-php]]"]
+related: ["[[app-models-order-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[app-services-checkout-paymentconfirmationservice-php]]", "[[US-6]]", "[[US-7]]"]
 sources: []
 ---
 
 # app/Enums/OrderStatus.php
 
-Enumeration for order states, deliberately minimal to support C-6 (Order Taking & Kitchen Display) without premature generalization.
+Enumeration for order states.
 
 ## Exports
-- `Pending` -- initial order state
-- `Ready` -- order marked complete in kitchen; timing/sequencing out of scope for C-6
+- `Pending` -- initial order state (C-6)
+- `Ready` -- order marked complete in kitchen (C-6)
+- `Paid` -- payment confirmed and captured (C-7)
+- `Cancelled` -- order cancelled by cashier (C-7)
 
 ## Design rationale
 
-Only two states for now. Partial-order readiness (mark individual items as ready) and delivery-to-table sequencing are not included; they're flagged as future work if needed. Current model: an order becomes ready as a whole when the kitchen marks it so.
+C-6 introduced Pending and Ready. C-7 added Paid and Cancelled to support checkout flow. Partial-order readiness (mark individual items as ready) and delivery-to-table sequencing are out of scope.

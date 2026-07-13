@@ -4,24 +4,26 @@ tags: [code/frontend]
 aliases: ["src/App.tsx"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[src-components-tablelayouteditor-tsx]]", "[[src-components-menumanager-tsx]]", "[[src-components-ordertaking-tsx]]", "[[src-components-kitchendisplay-tsx]]", "[[US-3]]", "[[US-4]]", "[[US-6]]"]
+related: ["[[src-components-login-tsx]]", "[[src-components-checkout-tsx]]", "[[src-components-tablelayouteditor-tsx]]", "[[src-components-menumanager-tsx]]", "[[src-types-auth-ts]]", "[[US-7]]", "[[US-3]]", "[[US-4]]", "[[c3-c4-retroactive-auth-usability]]"]
 sources: []
 ---
 
 # src/App.tsx
 
-React application entry point. Renders TableLayoutEditor, MenuManager (owner-facing, gated by OWNER_AUTH_TOKEN), OrderTaking, and KitchenDisplay (no auth, server/kitchen pattern from C-2). No login screen exists (future ticket).
+App root: session-driven route/role dispatch. Replaced hardcoded `OWNER_AUTH_TOKEN = null` (since C-3, repeatedly deferred TODO) with real `useState<AuthSession|null>`. Logged-out users see Login component. Logged-in owner sees TableLayoutEditor and MenuManager with real token (these were gate-checked for auth but had no way to get a real token until now). Logged-in cashier sees Checkout. OrderTaking and KitchenDisplay remain always-visible (no-login server/kitchen views). Added logout button.
 
 ## Exports
-- `App` component (React.FC)
+- `App()` -- root component: session state, role-based rendering, logout control
 
 ## Imports
-- `src/components/TableLayoutEditor`
-- `src/components/MenuManager`
-- `src/components/OrderTaking`
-- `src/components/KitchenDisplay`
-- React, useState hooks
+- [[src-components-login-tsx|src/components/Login.tsx]] -- logout form
+- [[src-components-checkout-tsx|src/components/Checkout.tsx]] -- cashier checkout UI
+- [[src-components-tablelayouteditor-tsx|src/components/TableLayoutEditor.tsx]] -- owner-only
+- [[src-components-menumanager-tsx|src/components/MenuManager.tsx]] -- owner-only
+- [[src-components-ordertaking-tsx|src/components/OrderTaking.tsx]] -- always visible
+- [[src-components-kitchendisplay-tsx|src/components/KitchenDisplay.tsx]] -- always visible
+- [[src-types-auth-ts|src/types/auth.ts]] -- AuthSession, AuthRole types
+- `react` -- hooks, JSX
 
-## C-6 change
-
-OrderTaking and KitchenDisplay added side-by-side with existing owner-facing components. Neither is given an auth token (matches C-2's server/kitchen device assumption).
+## Used by
+- main.tsx -- entry point

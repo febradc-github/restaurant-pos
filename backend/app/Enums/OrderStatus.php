@@ -3,16 +3,19 @@
 namespace App\Enums;
 
 /**
- * Where an order stands in the kitchen workflow.
+ * Where an order stands in the kitchen/checkout workflow.
  *
- * Only two states exist -- Pending (not yet ready) and Ready (done) --
- * because that's the only distinction C-6 needs: the Kitchen Display's
- * reconnect-catch-up fetch asks for everything not yet ready. Course/timing
- * sequencing and post-ready states (e.g. "served") are explicitly out of
- * scope for this ticket.
+ * Pending and Ready are C-6's kitchen states -- the Kitchen Display's
+ * reconnect-catch-up fetch asks for everything not yet ready. Paid and
+ * Cancelled are C-7's checkout states: Paid once the Cashier confirms
+ * payment was received, Cancelled if the order is scrapped instead.
+ * Course/timing sequencing and post-ready states (e.g. "served") remain out
+ * of scope.
  */
 enum OrderStatus: string
 {
     case Pending = 'pending';
     case Ready = 'ready';
+    case Paid = 'paid';
+    case Cancelled = 'cancelled';
 }

@@ -1,8 +1,12 @@
 import type { MenuItem } from './menu'
 import type { Table } from './table'
 
-/** Where an order stands in the kitchen workflow. Mirrors the backend's OrderStatus enum. */
-export type OrderStatus = 'pending' | 'ready'
+/**
+ * Where an order stands in the kitchen/checkout workflow. Mirrors the
+ * backend's OrderStatus enum. Pending/Ready are C-6's kitchen states; Paid/
+ * Cancelled are C-7's checkout states.
+ */
+export type OrderStatus = 'pending' | 'ready' | 'paid' | 'cancelled'
 
 /** A single line item on an order, as returned by the API with its menu item loaded. */
 export interface OrderLineItem {

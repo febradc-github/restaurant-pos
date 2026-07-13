@@ -108,4 +108,38 @@ describe('createOrdersApi', () => {
 
     await expect(api.list()).rejects.toThrow(/500/)
   })
+
+  it('checks an order out via PATCH to /api/orders/{id}/checkout, splitting print_status out of the order', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ ...sampleOrder, status: 'paid', print_status: 'printed' }),
+    )
+
+    const api = createOrdersApi({ baseUrl: 'http://api.test', token: 'cashier-token' })
+    const result = await api.checkout(1, 'gcash')
+
+    expect(result.print_status).toBe('printed')
+    expect(result.order).toEqual({ ...sampleOrder, status: 'paid' })
+    const [calledUrl, calledInit] = vi.mocked(fetch).mock.calls[0]
+    expect(calledUrl).toBe('http://api.test/api/orders/1/checkout')
+    expect(calledInit).toMatchObject({
+      method: 'PATCH',
+      headers: expect.objectContaining({ Authorization: 'Bearer cashier-token' }),
+    })
+    expect(JSON.parse(calledInit!.body as string)).toEqual({ payment_method: 'gcash' })
+  })
+
+  it('cancels an order via POST to /api/orders/{id}/cancel with a Bearer token', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ ...sampleOrder, status: 'cancelled' }))
+
+    const api = createOrdersApi({ baseUrl: 'http://api.test', token: 'cashier-token' })
+    const result = await api.cancel(1)
+
+    expect(result.status).toBe('cancelled')
+    const [calledUrl, calledInit] = vi.mocked(fetch).mock.calls[0]
+    expect(calledUrl).toBe('http://api.test/api/orders/1/cancel')
+    expect(calledInit).toMatchObject({
+      method: 'POST',
+      headers: expect.objectContaining({ Authorization: 'Bearer cashier-token' }),
+    })
+  })
 })

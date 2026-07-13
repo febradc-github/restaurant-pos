@@ -4,21 +4,28 @@ tags: [code/backend]
 aliases: ["app/Http/Controllers/Api/OrderController.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-models-order-php]]", "[[app-events-orderplaced-php]]", "[[app-events-orderstatusupdated-php]]"]
+related: ["[[app-services-checkout-paymentconfirmationservice-php]]", "[[app-services-receipts-printagentclient-php]]", "[[app-models-order-php]]", "[[app-enums-orderstatus-php]]", "[[US-7]]"]
 sources: []
 ---
 
 # app/Http/Controllers/Api/OrderController.php
 
-API controller for order operations, no authentication required (Server/Kitchen device pattern from C-2).
+REST controller for orders. Constructor-injects PaymentConfirmationService and PrintAgentClient. Added two actions for C-7:
+- `checkout(PATCH /api/orders/{order}/checkout)`: requires role:cashier, validates payment_method enum, confirms payment, sends receipt, returns order + print_status ('printed'|'failed'). 409 if already Paid/Cancelled. 422 on invalid method.
+- `cancel(POST /api/orders/{order}/cancel)`: requires role:cashier, marks status=Cancelled. 409 if already Paid/Cancelled.
 
 ## Exports
-- `index()` -- GET /api/orders, optional `?status=` query filter (e.g. `?status=pending`), serves as reconnect-catch-up endpoint
-- `store()` -- POST /api/orders, transactional creation of order + items, decrements inventory per C-5's contract using `quantity_required × ordered_quantity`, fires OrderPlaced event
-- `markReady()` -- PATCH /api/orders/{order}/ready, marks entire order ready, fires OrderStatusUpdated event
+- `checkout(Order $order, Request $request): JsonResponse` -- payment confirmation + receipt
+- `cancel(Order $order): JsonResponse` -- order cancellation
 
-## Design notes
+## Imports
+- [[app-services-checkout-paymentconfirmationservice-php|app/Services/Checkout/PaymentConfirmationService.php]] -- payment logic
+- [[app-services-receipts-printagentclient-php|app/Services/Receipts/PrintAgentClient.php]] -- receipt printing
+- `app/Models/Order` -- Eloquent model
+- `app/Enums/PaymentMethod` -- validated against request
+- `app/Enums/OrderStatus` -- status transitions
+- `Illuminate/Http/Request`, `JsonResponse` -- Laravel HTTP
 
-- No authentication; any caller can place orders or change status (matches C-2's server/kitchen device assumption)
-- Inventory decrement happens in store() via MenuItem's quantity tracking interface
-- No partial-order-readiness support; order.markReady() is all-or-nothing (timing/sequencing out of scope for C-6)
+## Used by
+- routes/api.php -- checkout and cancel routes mapped
+- Frontend via POST /api/orders/{id}/checkout, POST /api/orders/{id}/cancel

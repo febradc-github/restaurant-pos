@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // The standalone print-agent service (C-8) -- a same-machine local
+    // process, not a remote API. See AR-print-agent-polyglot.md.
+    'print_agent' => [
+        'port' => env('PRINT_AGENT_PORT', 4000),
+    ],
+
 ];

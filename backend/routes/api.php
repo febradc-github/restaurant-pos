@@ -76,3 +76,11 @@ Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
 Route::get('/orders', [OrderController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
 Route::patch('/orders/{order}/ready', [OrderController::class, 'markReady']);
+
+// Checkout, payment confirmation & cancellation (C-7). Unlike Server/
+// Kitchen above, this is a real transaction the Cashier is accountable
+// for, so it's role-gated rather than open to any device.
+Route::middleware(['auth:sanctum', 'role:cashier'])->group(function () {
+    Route::patch('/orders/{order}/checkout', [OrderController::class, 'checkout']);
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
+});

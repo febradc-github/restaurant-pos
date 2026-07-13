@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,9 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * An order a Server placed for a table: which table it's for, its line
- * items, and whether the Kitchen has marked it ready yet.
+ * items, whether the Kitchen has marked it ready yet, and -- once the
+ * Cashier checks it out (C-7) -- how it was paid and when.
  */
-#[Fillable(['table_id', 'status'])]
+#[Fillable(['table_id', 'status', 'payment_method', 'paid_at'])]
 class Order extends Model
 {
     /** @use HasFactory<OrderFactory> */
@@ -29,6 +31,8 @@ class Order extends Model
     {
         return [
             'status' => OrderStatus::class,
+            'payment_method' => PaymentMethod::class,
+            'paid_at' => 'datetime',
         ];
     }
 

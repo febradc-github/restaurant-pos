@@ -1,0 +1,44 @@
+.checkout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkout__error {
+  color: #b91c1c;
+}
+
+.checkout__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+}
+
+.checkout__order {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.checkout__line-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.checkout__total {
+  font-weight: 600;
+}
+
+.checkout__paid {
+  color: #15803d;
+}
+
+.checkout__print-warning {
+  color: #b45309;
+}
