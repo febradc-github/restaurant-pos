@@ -1,0 +1,59 @@
+items:
+  - id: C-1
+    title: "Restaurant POS System"
+    type: epic
+    status: idea
+    points: 30
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-5
+    title: "Inventory Tracking"
+    type: story
+    parent: C-1
+    status: ready
+    points: 3
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-6
+    title: "Order Taking & Kitchen Display"
+    type: story
+    parent: C-1
+    status: ready
+    points: 6
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-7
+    title: "Checkout, Payment Confirmation & Cancellation"
+    type: story
+    parent: C-1
+    status: ready
+    points: 4
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-8
+    title: "Local Print Agent & Hardware Integration"
+    type: story
+    parent: C-1
+    status: ready
+    points: 5
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-9
+    title: "On-Premise Deployment Setup"
+    type: story
+    parent: C-1
+    status: ready
+    points: 3
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14

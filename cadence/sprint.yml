@@ -1,0 +1,37 @@
+sprint:
+  name: "Sprint 1"
+  number: 1
+  goal: "Stand up auth/roles, table layout, and menu management -- the foundation the rest of the POS depends on"
+  started: 2026-07-14
+  ends: 2026-07-28
+  status: active
+items:
+  - id: C-2
+    title: "Authentication & Role-Based Access"
+    type: story
+    parent: C-1
+    status: in_progress
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: implemented Sanctum-based login/logout for Owner/Cashier, role middleware enforcing per-role API access, owner-only/cashier-only/no-auth example routes, 16 passing feature tests"
+
+  - id: C-3
+    title: "Table Layout Editor"
+    type: story
+    parent: C-1
+    status: todo
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: ""
+
+  - id: C-4
+    title: "Menu Management"
+    type: story
+    parent: C-1
+    status: todo
+    points: 3
+    assignee: claude
+    carryovers: 0
+    notes: ""

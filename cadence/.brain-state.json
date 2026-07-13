@@ -1,0 +1,24 @@
+{
+  "notes": {
+    "brain/pos-launch-session-2026-07-14": 1783959790991.8323,
+    "brain/sanctum-requestguard-memoization-testing-gotcha": 1783961304778.4497,
+    "decisions/adr-001-postgresql-over-sqlite": 1783959303191.0735,
+    "decisions/adr-001-sanctum-bearer-tokens": 1783961310326.8176,
+    "decisions/adr-002-no-message-broker": 1783959310360.1946,
+    "decisions/adr-003-local-escpos-print-agent": 1783959317142.4365,
+    "decisions/adr-004-onpremise-deployment": 1783959325240.4912,
+    "decisions/adr-005-manual-payment-confirmation": 1783959333501.6812,
+    "decisions/adr-006-custom-build-vs-odoo": 1783959341989.3286,
+    "architecture/AR-POS-core": 1783959296617.0298,
+    "code/app-enums-userrole-php": 1783961278616.1602,
+    "code/app-http-controllers-api-authcontroller-php": 1783961281565.6511,
+    "code/app-http-controllers-api-cashiercontroller-php": 1783961288313.3225,
+    "code/app-http-controllers-api-ownercontroller-php": 1783961286534.8503,
+    "code/app-http-controllers-api-statuscontroller-php": 1783961290374.3098,
+    "code/app-http-middleware-ensureuserhasrole-php": 1783961284443.7234,
+    "code/database-migrations-2026-07-14-000001-create-personal-access-tokens-table-php": 1783961295984.3364,
+    "code/database-migrations-2026-07-14-000002-add-role-to-users-table-php": 1783961297608.0437,
+    "code/routes-api-php": 1783961293917.266
+  },
+  "updatedAt": "2026-07-13T16:48:44.082Z"
+}
