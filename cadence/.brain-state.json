@@ -2,6 +2,7 @@
   "notes": {
     "brain/c3-c4-retroactive-auth-usability": 1783973415450.5332,
     "brain/c6-inventory-decrement-integration": 1783969504802.5154,
+    "brain/infrastructure-tickets-verification-cycles": 1783975384493.0818,
     "brain/inventory-unlink-and-delete-behavior": 1783969584617.57,
     "brain/laravel-decimal-json-serialization-gotcha": 1783968202599.8674,
     "brain/laravel-reverb-broadcastas-dot-prefix-gotcha": 1783971062443.1604,
@@ -103,5 +104,5 @@
     "code/tests-feature-tables-tablelayouttest-php": 1783967231303.199,
     "code/vite-config-ts": 1783967257898.6067
   },
-  "updatedAt": "2026-07-13T20:40:50.447Z"
+  "updatedAt": "2026-07-13T20:43:07.711Z"
 }
