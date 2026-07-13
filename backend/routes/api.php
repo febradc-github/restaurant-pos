@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashierController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\InventoryItemController;
 use App\Http\Controllers\Api\MenuItemController;
+use App\Http\Controllers\Api\MenuItemInventoryItemController;
 use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\TableController;
@@ -50,4 +52,19 @@ Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
     Route::put('/menu-items/{menuItem}', [MenuItemController::class, 'update']);
     Route::patch('/menu-items/{menuItem}', [MenuItemController::class, 'update']);
     Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy']);
+});
+
+// Inventory tracking (C-5). Reading inventory items is open to any device,
+// same as menu items and categories above. Only the Owner may create/edit/
+// delete inventory items, adjust stock, or link/unlink them to menu items.
+Route::get('/inventory-items', [InventoryItemController::class, 'index']);
+
+Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
+    Route::post('/inventory-items', [InventoryItemController::class, 'store']);
+    Route::put('/inventory-items/{inventoryItem}', [InventoryItemController::class, 'update']);
+    Route::patch('/inventory-items/{inventoryItem}', [InventoryItemController::class, 'update']);
+    Route::delete('/inventory-items/{inventoryItem}', [InventoryItemController::class, 'destroy']);
+
+    Route::post('/menu-items/{menuItem}/inventory-items', [MenuItemInventoryItemController::class, 'store']);
+    Route::delete('/menu-items/{menuItem}/inventory-items/{inventoryItem}', [MenuItemInventoryItemController::class, 'destroy']);
 });

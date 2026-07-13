@@ -1,0 +1,37 @@
+sprint:
+  name: "Sprint 1"
+  number: 1
+  goal: "Stand up auth/roles, table layout, and menu management -- the foundation the rest of the POS depends on"
+  started: 2026-07-14
+  ends: 2026-07-28
+  status: completed
+items:
+  - id: C-2
+    title: "Authentication & Role-Based Access"
+    type: story
+    parent: C-1
+    status: done
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: implemented Sanctum-based login/logout for Owner/Cashier, role middleware enforcing per-role API access, owner-only/cashier-only/no-auth example routes, 16 passing feature tests. work pass 2: fixed User.php/UserFactory.php/bootstrap/app.php which were not actually saved in pass 1 despite an inaccurate 'all passed' report; independently re-verified 16/16 tests genuinely pass. review 1: FAIL -- spec wording ambiguity on Server/Kitchen role differentiation. SP-2 revised per user decision to match DS-2's actual design. review 2: PASS -- all 5 criteria met, 16/16 tests genuinely verified by the reviewer."
+
+  - id: C-3
+    title: "Table Layout Editor"
+    type: story
+    parent: C-1
+    status: done
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: backend Table model/migration/CRUD API under /api/tables, GET open, mutations owner-gated via role:owner middleware, 13 new feature tests (29/29 total passing, independently re-verified, migration applied cleanly to live pos_dev Postgres). work pass 2: frontend TableLayoutEditor (drag/resize/add/delete on positioned-div canvas), API client, Vitest+RTL test harness added, 12/12 tests passing, typecheck and build clean, all independently re-verified. review: PASS -- all 5 criteria met with genuine assertions (403/401+DB non-mutation on backend, absent controls on frontend)."
+
+  - id: C-4
+    title: "Menu Management"
+    type: story
+    parent: C-1
+    status: done
+    points: 3
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: backend Category/MenuItem models/migrations/CRUD API, owner-gated mutations, restrict-on-delete for categories with items, 30 new feature tests (59/59 total, independently re-verified, migration applied to live pos_dev Postgres, real mutation check). work pass 2: frontend MenuManager (category+item CRUD, availability toggle, 409 error surfaced), 18 new tests (30/30 total, typecheck/build clean, real mutation checks), all independently re-verified. review: PASS -- all 4 criteria met, genuine GET-after-mutation tests for immediacy, genuine 401/403+DB-unchanged for gating."
