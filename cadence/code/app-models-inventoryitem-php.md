@@ -21,5 +21,5 @@ Eloquent model for inventory items. Fillable: name, stock. Casts: stock to integ
 
 ## Used by
 - [[app-http-controllers-api-inventoryitemcontroller-php]] -- CRUD and stock adjustment
-- [[app-http-controllers-api-menuiteминventoryitemcontroller-php]] -- link/unlink to menu items
+- [[app-http-controllers-api-menuiteminventoryitemcontroller-php]] -- link/unlink to menu items
 - [[app-models-menuitem-php]] -- syncAvailability() listens to InventoryItem's updated event

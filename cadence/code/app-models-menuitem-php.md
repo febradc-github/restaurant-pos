@@ -4,7 +4,7 @@ tags: [code/backend]
 aliases: ["app/Models/MenuItem.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-http-controllers-api-menuitemcontroller-php]]", "[[database-migrations-2026_07_14_000005_create_menu_items_table-php]]", "[[laravel-decimal-json-serialization-gotcha]]", "[[app-models-inventoryitem-php]]", "[[app-http-controllers-api-menuiteминventoryitemcontroller-php]]", "[[US-4]]", "[[US-5]]"]
+related: ["[[app-http-controllers-api-menuitemcontroller-php]]", "[[database-migrations-2026_07_14_000005_create_menu_items_table-php]]", "[[laravel-decimal-json-serialization-gotcha]]", "[[app-models-inventoryitem-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[US-4]]", "[[US-5]]"]
 sources: []
 ---
 

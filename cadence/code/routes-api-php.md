@@ -4,7 +4,7 @@ tags: [code/backend]
 aliases: ["routes/api.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-http-controllers-api-tablecontroller-php]]", "[[app-http-controllers-api-categorycontroller-php]]", "[[app-http-controllers-api-menuitemcontroller-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-menuiteминventoryitemcontroller-php]]", "[[US-3]]", "[[US-4]]", "[[US-5]]"]
+related: ["[[app-http-controllers-api-tablecontroller-php]]", "[[app-http-controllers-api-categorycontroller-php]]", "[[app-http-controllers-api-menuitemcontroller-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[US-3]]", "[[US-4]]", "[[US-5]]"]
 sources: []
 ---
 

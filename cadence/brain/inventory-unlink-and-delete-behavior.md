@@ -4,7 +4,7 @@ tags: [backend/database]
 aliases: []
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[US-5]]", "[[app-models-menuitem-php]]", "[[app-models-inventoryitem-php]]", "[[app-http-controllers-api-menuiteминventoryitemcontroller-php]]"]
+related: ["[[US-5]]", "[[app-models-menuitem-php]]", "[[app-models-inventoryitem-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]"]
 sources: []
 ---
 

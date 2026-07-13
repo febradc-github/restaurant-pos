@@ -4,7 +4,7 @@ tags: [code/backend]
 aliases: ["tests/Feature/Inventory/MenuItemInventoryLinkTest.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-models-menuitem-php]]", "[[app-models-inventoryitem-php]]", "[[app-http-controllers-api-menuiteминventoryitemcontroller-php]]", "[[US-5]]"]
+related: ["[[app-models-menuitem-php]]", "[[app-models-inventoryitem-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[US-5]]"]
 sources: []
 ---
 
