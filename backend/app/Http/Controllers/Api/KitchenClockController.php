@@ -34,7 +34,10 @@ class KitchenClockController extends Controller
             ->where('pin', $data['pin'])
             ->first();
 
-        if (! $user) {
+        // A deactivated Kitchen employee (C-21) gets the exact same
+        // rejection as a PIN that matches nobody -- reuses the same
+        // branch so the response can't be used to tell the two apart.
+        if (! $user || ! $user->active) {
             throw ValidationException::withMessages([
                 'pin' => 'Invalid PIN.',
             ]);

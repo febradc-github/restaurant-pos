@@ -1,37 +1,27 @@
 sprint:
-  name: "Sprint 6"
-  number: 6
-  goal: "Finish the C-14 role-based page architecture redesign -- Cashier, Take-Orders, and Kitchen pages"
+  name: "Sprint 7"
+  number: 7
+  goal: "Ship Owner Employee Management -- real employee registration, role assignment, and deactivation, closing out the C-20 epic"
   started: 2026-07-14
   ends: 2026-07-28
   status: active
 items:
-  - id: C-17
-    title: "Cashier Page"
+  - id: C-21
+    title: "Employee Management API"
     type: story
-    parent: C-14
+    parent: C-20
     status: done
-    points: 4
+    points: 5
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: CashierPage.tsx (thin Layout/Content wrapper around rebuilt Checkout, mirrors OwnerPage naming), mounted at /cashier inside existing RoleRoute cashier gate (unchanged). Checkout fully rebuilt: Row/Col Card grid (one per open order), Radio.Group button-style payment method selector, full-width primary Confirm button + visually subordinate danger/text Cancel button below it, Tag+CheckCircleOutlined for Paid state, Alert type=warning (never error) for print-failure distinct from genuine errors. All API interaction points (list/checkout/cancel) and state tracking preserved exactly. 88/88 frontend tests passing (+4), typecheck/lint clean; App.test.tsx route-gating re-confirmed for /cashier. Gotchas for C-18/19: antd Radio.Button's native input has pointer-events:none (antd's own CSS) -- userEvent.click must target the visible label, not the role=radio element, or jsdom throws; antd v6 Space deprecated `direction` prop in favor of `orientation`."
+    notes: "work pass 1: users.active column (default true, not hidden so Owner UI can read it); EmployeeController (index/store/update/deactivate/reactivate) under auth:sanctum+role:owner; store/update validate role-conditionally (email+password for login roles, unique 6-digit pin for Kitchen); deactivate rejects self-deactivation and deactivating the last active Owner (422, errors.user); AuthController::login and KitchenClockController::clock both extended to reject inactive users via the exact same rejection branch/response as wrong-password / invalid-PIN (byte-for-byte identical, verified by test). Kitchen employees get an internal never-exposed placeholder email+password (schema predates PIN-only auth, NOT NULL columns) -- email is always null and password never returned in any response for non-login roles. Response shape for C-22: {id, name, email, role, active, has_pin} uniformly across index/store/update/deactivate/reactivate. 191/191 backend tests passing (538 assertions), Pint clean. Flagged for follow-up: password validation uses a generic min:8 rule, no pre-existing password-strength convention in this codebase to match -- worth confirming stronger rules aren't wanted before C-22 ships a UI around it."
 
-  - id: C-18
-    title: "Take-Orders Page"
+  - id: C-22
+    title: "Employee Management UI"
     type: story
-    parent: C-14
-    status: done
-    points: 4
+    parent: C-20
+    status: todo
+    points: 6
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: TakeOrdersPage.tsx (thin Layout/Content wrapper around rebuilt OrderTaking, mirrors CashierPage). OrderTaking rebuilt: searchable large Select for table choice as first control, Card with +/-/InputNumber Space.Compact quantity stepper per menu item (large touch targets, - disabled at 0), full-width primary Button with loading state for Place order, Alert type=error for validation/fetch failures, Alert type=success role=status (explicit role override -- antd Alert hardcodes role=alert by default but spreads restProps after, so an explicit role prop wins) for the confirmation. All original behavior (fetch-on-mount no auth header, available-only filtering, quantity delete-on-zero, validation, ordersApi.create payload, reset-on-success) preserved byte-for-byte. Avoided antd List (deprecated in v6.5.1, emits runtime warning) in favor of a plain div grid. 91/91 frontend tests passing (+6 net), typecheck/lint clean; App.test.tsx route-gating re-confirmed for /take-orders. Notes for C-19: antd Select's non-aria DOM props (e.g. data-testid) land on the root wrapper not the portal dropdown, useful for scoping queries; broad regex getByLabelText matches are a trap when a stepper's +/- buttons share substrings with the input's own label (anchor with ^...$)."
-
-  - id: C-19
-    title: "Kitchen Page"
-    type: story
-    parent: C-14
-    status: done
-    points: 4
-    assignee: claude
-    carryovers: 0
-    notes: "work pass 1: KitchenPage.tsx -- pure presentational Layout/Content wrapper (apiBaseUrl only, no auth/session import anywhere), replaces the bare KitchenDisplay render at /kitchen with no RoleRoute, no gate. KitchenDisplay rebuilt: Row/Col grid of large Cards (bigger type/padding for at-a-distance kitchen legibility), Tag status badge, large block Mark-ready Button; fetch-on-mount, WebSocket subscription lifecycle, upsertPendingOrder, handleMarkReady all untouched, all 8 existing tests pass against new markup unmodified. KitchenClockPad rebuilt: large Buttons for toggle+keypad digits (3.5rem min touch target for wet/gloved hands), Card panel, Alert role=status override for confirmation; PIN logic and independence from KitchenDisplay state unchanged, all 7 existing tests pass unmodified. 92/93 full-suite tests passing -- the 1 failure (MenuManager edit-save) reproduced identically against the pre-C-19 codebase via git stash, confirming it's a pre-existing full-suite resource-contention flake unrelated to this ticket (passes 9/9 in isolation). typecheck/lint clean. This completes epic C-14 -- all 5 stories (C-15 through C-19) now done."
+    notes: ""

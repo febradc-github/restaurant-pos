@@ -156,6 +156,87 @@ class LoginTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function test_a_deactivated_owner_cannot_log_in(): void
+    {
+        User::factory()->owner()->create([
+            'email' => 'owner@example.com',
+            'password' => bcrypt('secret-password'),
+            'active' => false,
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'identifier' => 'owner@example.com',
+            'password' => 'secret-password',
+        ]);
+
+        $response->assertUnprocessable();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    public function test_a_deactivated_cashier_cannot_log_in(): void
+    {
+        User::factory()->cashier()->create([
+            'email' => 'cashier@example.com',
+            'password' => bcrypt('secret-password'),
+            'active' => false,
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'identifier' => 'cashier@example.com',
+            'password' => 'secret-password',
+        ]);
+
+        $response->assertUnprocessable();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertDatabaseCount('time_entries', 0);
+    }
+
+    public function test_a_deactivated_server_cannot_log_in(): void
+    {
+        User::factory()->server()->create([
+            'email' => 'server@example.com',
+            'password' => bcrypt('secret-password'),
+            'active' => false,
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'identifier' => 'server@example.com',
+            'password' => 'secret-password',
+        ]);
+
+        $response->assertUnprocessable();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertDatabaseCount('time_entries', 0);
+    }
+
+    public function test_a_deactivated_users_login_rejection_is_identical_to_a_wrong_password_rejection(): void
+    {
+        User::factory()->owner()->create([
+            'email' => 'deactivated@example.com',
+            'password' => bcrypt('secret-password'),
+            'active' => false,
+        ]);
+        User::factory()->owner()->create([
+            'email' => 'active@example.com',
+            'password' => bcrypt('secret-password'),
+            'active' => true,
+        ]);
+
+        $deactivated = $this->postJson('/api/login', [
+            'identifier' => 'deactivated@example.com',
+            'password' => 'secret-password',
+        ]);
+        $wrongPassword = $this->postJson('/api/login', [
+            'identifier' => 'active@example.com',
+            'password' => 'not-the-password',
+        ]);
+
+        $deactivated->assertUnprocessable();
+        $wrongPassword->assertUnprocessable();
+        $this->assertSame($wrongPassword->getStatusCode(), $deactivated->getStatusCode());
+        $this->assertSame($wrongPassword->json(), $deactivated->json());
+    }
+
     public function test_session_persists_across_requests_using_the_issued_token(): void
     {
         User::factory()->owner()->create([

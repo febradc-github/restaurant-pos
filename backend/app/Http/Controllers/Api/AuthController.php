@@ -33,7 +33,11 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['identifier'])->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        // A deactivated employee (C-21) gets the exact same rejection as a
+        // wrong password -- the response never reveals whether an account
+        // exists but is deactivated versus the credentials just being
+        // wrong.
+        if (! $user || ! Hash::check($credentials['password'], $user->password) || ! $user->active) {
             throw ValidationException::withMessages([
                 'identifier' => __('auth.failed'),
             ]);

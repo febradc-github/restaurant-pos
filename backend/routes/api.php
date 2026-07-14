@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashierController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\InventoryItemController;
 use App\Http\Controllers\Api\KitchenClockController;
 use App\Http\Controllers\Api\MenuItemController;
@@ -97,3 +98,15 @@ Route::post('/kitchen/clock', [KitchenClockController::class, 'clock']);
 // the not-yet-built Owner analytics dashboard epic -- no aggregation or
 // reporting UI here.
 Route::middleware(['auth:sanctum', 'role:owner'])->get('/time-entries', [TimeEntryController::class, 'index']);
+
+// Employee management (C-21). Owner-only, same role-gate pattern as the
+// other Owner-only endpoints above. Deactivating/reactivating an employee
+// never deletes the users row, so their historical time_entries and orders
+// rows are untouched.
+Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
+    Route::get('/employees', [EmployeeController::class, 'index']);
+    Route::post('/employees', [EmployeeController::class, 'store']);
+    Route::patch('/employees/{user}', [EmployeeController::class, 'update']);
+    Route::patch('/employees/{user}/deactivate', [EmployeeController::class, 'deactivate']);
+    Route::patch('/employees/{user}/reactivate', [EmployeeController::class, 'reactivate']);
+});

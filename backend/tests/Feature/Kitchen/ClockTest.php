@@ -110,6 +110,19 @@ class ClockTest extends TestCase
         $this->assertSame($unrecognized->json('message'), $malformed->json('message'));
     }
 
+    public function test_a_deactivated_kitchen_employees_pin_is_rejected_identically_to_an_unrecognized_pin(): void
+    {
+        User::factory()->kitchen('123456')->create(['active' => false]);
+
+        $deactivated = $this->postJson('/api/kitchen/clock', ['pin' => '123456']);
+        $unrecognized = $this->postJson('/api/kitchen/clock', ['pin' => '999999']);
+
+        $deactivated->assertUnprocessable();
+        $this->assertSame($unrecognized->getStatusCode(), $deactivated->getStatusCode());
+        $this->assertSame($unrecognized->json(), $deactivated->json());
+        $this->assertDatabaseCount('time_entries', 0);
+    }
+
     public function test_a_pin_belonging_to_a_non_kitchen_user_is_rejected(): void
     {
         // Owner/Cashier/Server rows have no pin at all, but guard against a
