@@ -1,27 +1,37 @@
 sprint:
-  name: "Sprint 5"
-  number: 5
-  goal: "Lay the Ant Design + routing foundation and rebuild the Owner page -- the first two stories of the C-14 role-based page architecture redesign"
+  name: "Sprint 6"
+  number: 6
+  goal: "Finish the C-14 role-based page architecture redesign -- Cashier, Take-Orders, and Kitchen pages"
   started: 2026-07-14
   ends: 2026-07-28
   status: active
 items:
-  - id: C-15
-    title: "Foundation: Routing, Ant Design & Brand Theme"
+  - id: C-17
+    title: "Cashier Page"
     type: story
     parent: C-14
     status: done
-    points: 5
+    points: 4
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: added react-router-dom + antd + @ant-design/icons; routes for /login, /owner, /cashier, /take-orders, /kitchen replacing App.tsx's inline conditionals via a RoleRoute guard (redirects to /login unless role matches; /kitchen has no guard, preserving adr-008); shared ConfigProvider theme (frontend/src/theme.ts: terracotta #C2410C primary distinct from true-red #DC2626 error, neutral colorBgLayout, Plus Jakarta Sans, 16px/8px radius) applied at app root; Login.tsx rebuilt with antd Form/Input/Alert/Button preserving exact behavior; login navigates to role's home route, logout redirects to /login. Added window.matchMedia stub to test setup (antd's breakpoint observer needs it in jsdom -- will matter for every subsequent antd-heavy story's tests). 77/77 frontend tests passing (+4 new route-gating regression tests incl. explicit adr-008 no-redirect-on-/kitchen check), typecheck/lint/build clean. Flagged: antd bundles whole into main chunk (795kB/254kB gzipped) -- not fixed here, candidate for route-based code-splitting later if tablet/kitchen-display load time becomes a concern. For C-16-19: page components already render at their correct routes unstyled; build layout/nav around what's mounted rather than re-plumbing routing; ConfigProvider theme is global, no per-page provider needed."
+    notes: "work pass 1: CashierPage.tsx (thin Layout/Content wrapper around rebuilt Checkout, mirrors OwnerPage naming), mounted at /cashier inside existing RoleRoute cashier gate (unchanged). Checkout fully rebuilt: Row/Col Card grid (one per open order), Radio.Group button-style payment method selector, full-width primary Confirm button + visually subordinate danger/text Cancel button below it, Tag+CheckCircleOutlined for Paid state, Alert type=warning (never error) for print-failure distinct from genuine errors. All API interaction points (list/checkout/cancel) and state tracking preserved exactly. 88/88 frontend tests passing (+4), typecheck/lint clean; App.test.tsx route-gating re-confirmed for /cashier. Gotchas for C-18/19: antd Radio.Button's native input has pointer-events:none (antd's own CSS) -- userEvent.click must target the visible label, not the role=radio element, or jsdom throws; antd v6 Space deprecated `direction` prop in favor of `orientation`."
 
-  - id: C-16
-    title: "Owner Page"
+  - id: C-18
+    title: "Take-Orders Page"
     type: story
     parent: C-14
-    status: done
-    points: 6
+    status: todo
+    points: 4
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: OwnerPage.tsx -- antd Layout with collapsible Sider/Menu (data-driven nav array, one-line-extensible), Header showing active section, Content hosting nested routes /owner/tables + /owner/menu (index redirects to tables), mounted at /owner/* inside the existing RoleRoute owner gate (gating logic untouched). MenuManager fully rebuilt: Card per section (Categories, Menu Items), inline Form add-row above antd Table, editable-cell pattern for row edit (Save/Cancel replace Edit/Delete), Switch for availability, 409-on-delete message preserved. TableLayoutEditor toolbar restyled to antd Form/Card; canvas markup and pointer-event drag/resize/add/delete logic byte-for-byte unchanged. Real bug found+fixed: nested <Routes> under a /owner/* splat resolves relative navigate() against the full matched pathname (not just the static prefix), causing navigate('menu') from /owner/tables to become /owner/tables/menu then infinite-redirect-loop via the catch-all -- fixed by making all OwnerPage navigation targets absolute; this would have hung in a real browser too, not just tests. Added ResizeObserver stub to test setup (antd Select/overlay components need it in jsdom, same pattern as C-15's matchMedia stub). 84/84 frontend tests passing (+14 net), typecheck/lint clean. Notes for C-17-19: editable-cell worked well for 2-3 field rows but reconsider modal+Form for more fields; any nested-route layout under a splat route must use absolute navigate() targets or risk the same silent infinite-loop hang; sibling antd Forms sharing a field name silently collide on auto-generated DOM id unless each Form gets its own name prop."
+    notes: ""
+
+  - id: C-19
+    title: "Kitchen Page"
+    type: story
+    parent: C-14
+    status: todo
+    points: 4
+    assignee: claude
+    carryovers: 0
+    notes: ""

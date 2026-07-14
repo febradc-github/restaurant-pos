@@ -33,15 +33,28 @@ sources: []
 - [[src-api-orders-ts]]
 - [[frontend-src-api-kitchenclock-ts]]
 
-## Components
+## Pages & Components
+- [[src-components-ownerpage-tsx]]
+- [[src-components-ownerpage-css]]
+- [[src-components-ownerpage-test-tsx]]
+- [[src-components-cashierpage-tsx]]
+- [[src-components-cashierpage-css]]
+- [[src-components-cashierpage-test-tsx]]
+- [[src-components-checkout-tsx]]
+- [[src-components-checkout-css]]
+- [[src-components-checkout-test-tsx]]
 - [[src-components-login-tsx]]
 - [[src-components-login-css]]
-- [[src-components-checkout-tsx]]
 - [[src-components-tablelayouteditor-tsx]]
+- [[src-components-tablelayouteditor-css]]
+- [[src-components-tablelayouteditor-test-tsx]]
 - [[src-components-menumanager-tsx]]
+- [[src-components-menumanager-css]]
+- [[src-components-menumanager-test-tsx]]
 - [[src-components-ordertaking-tsx]]
 - [[src-components-kitchendisplay-tsx]]
 - [[frontend-src-components-kitchenclocpad-tsx]]
+- [[frontend-src-components-kitchenclocpad-test-tsx]]
 
 ## Realtime
 - [[src-realtime-echo-ts]]
@@ -49,4 +62,10 @@ sources: []
 ## Testing
 - [[src-test-setup-ts]]
 - [[src-app-test-tsx]]
-- [[frontend-src-components-kitchenclocpad-test-tsx]]
+
+## Gotchas & Patterns
+- [[antd-jsdom-test-gotcha]]
+- [[antd-radio-button-pointer-events-gotcha]]
+- [[antd-v6-space-component-deprecation]]
+- [[c-16-19-page-pattern-guidance]]
+- [[c3-c4-retroactive-auth-usability]]

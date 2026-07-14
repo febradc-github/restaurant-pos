@@ -6,7 +6,7 @@ import { OwnerPage } from './components/OwnerPage'
 import { OrderTaking } from './components/OrderTaking'
 import { KitchenDisplay } from './components/KitchenDisplay'
 import { Login } from './components/Login'
-import { Checkout } from './components/Checkout'
+import { CashierPage } from './components/CashierPage'
 import { createAuthApi } from './api/auth'
 import type { AuthRole, AuthSession } from './types/auth'
 import { theme } from './theme'
@@ -121,7 +121,7 @@ function App() {
               path="/cashier"
               element={
                 <RoleRoute session={session} role="cashier" onLogout={handleLogout}>
-                  {(active) => <Checkout authToken={active.token} />}
+                  {(active) => <CashierPage authToken={active.token} />}
                 </RoleRoute>
               }
             />

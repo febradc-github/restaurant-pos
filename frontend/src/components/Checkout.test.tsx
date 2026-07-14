@@ -66,7 +66,11 @@ describe('Checkout', () => {
     render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
 
     const orderRow = await screen.findByTestId('checkout-order-1')
-    await user.selectOptions(within(orderRow).getByLabelText(/payment method/i), 'gcash')
+    // antd's Radio.Button hides the native input (pointer-events: none) and
+    // relies on label-click delegation, so the click target is the visible
+    // label text rather than the `radio` role itself.
+    await user.click(within(orderRow).getByText('GCash'))
+    expect(within(orderRow).getByRole('radio', { name: /gcash/i })).toBeChecked()
     await user.click(within(orderRow).getByRole('button', { name: /confirm payment/i }))
 
     await waitFor(() => expect(within(orderRow).getByRole('status')).toHaveTextContent(/paid/i))
@@ -94,6 +98,22 @@ describe('Checkout', () => {
 
     expect(await within(orderRow).findByRole('alert')).toHaveTextContent(/receipt failed to print/i)
     expect(within(orderRow).getByRole('status')).toHaveTextContent(/paid/i)
+  })
+
+  it('renders the print-failure notice as a warning, not an error, so it never reads as a failed payment', async () => {
+    const user = userEvent.setup()
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse([pendingOrder]))
+      .mockResolvedValueOnce(jsonResponse({ ...pendingOrder, status: 'paid', print_status: 'failed' }))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-1')
+    await user.click(within(orderRow).getByRole('button', { name: /confirm payment/i }))
+
+    const printWarning = await within(orderRow).findByRole('alert')
+    expect(printWarning.className).toMatch(/ant-alert-warning/)
+    expect(printWarning.className).not.toMatch(/ant-alert-error/)
   })
 
   it('cancels an order, calling the cancel endpoint and removing it from the open list', async () => {

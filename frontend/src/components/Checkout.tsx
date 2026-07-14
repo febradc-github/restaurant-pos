@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Alert, Button, Card, Col, Radio, Row, Space, Tag, Typography } from 'antd'
+import { CheckCircleOutlined } from '@ant-design/icons'
 import { createOrdersApi } from '../api/orders'
 import type { Order } from '../types/order'
 import type { PaymentMethod, PrintStatus } from '../types/checkout'
@@ -39,6 +41,13 @@ function orderTotal(order: Order): string {
  * lets the Cashier confirm a payment method per order or cancel it outright
  * (C-7). A confirmed payment that failed to print is flagged distinctly
  * from a normal success so the Cashier knows to check the printer.
+ *
+ * Rebuilt on Ant Design (C-17): one Card per open order in a responsive
+ * grid -- cards scan faster than table rows for a "scan and act" checkout
+ * flow, and give the payment buttons room for comfortable touch targets.
+ * Confirm is a full-width primary button; Cancel is deliberately smaller
+ * and visually subordinate (destructive-action separation) so it never
+ * competes with Confirm.
  */
 export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
   const isCashier = Boolean(authToken)
@@ -91,60 +100,60 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
   if (!isCashier) {
     return (
       <div className="checkout">
-        <h2>Checkout</h2>
-        <p>Log in as a Cashier to confirm payments or cancel orders.</p>
+        <Typography.Title level={2}>Checkout</Typography.Title>
+        <Typography.Paragraph>Log in as a Cashier to confirm payments or cancel orders.</Typography.Paragraph>
       </div>
     )
   }
 
   return (
     <div className="checkout">
-      <h2>Checkout</h2>
+      <Typography.Title level={2}>Checkout</Typography.Title>
 
-      {error && (
-        <p className="checkout__error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <Alert type="error" showIcon message={error} className="checkout__error" />}
 
       {orders === null ? (
-        <p>Loading…</p>
+        <Typography.Text>Loading…</Typography.Text>
       ) : orders.length === 0 ? (
-        <p>No open orders.</p>
+        <Typography.Text>No open orders.</Typography.Text>
       ) : (
-        <ul className="checkout__list">
+        <Row gutter={[16, 16]}>
           {orders.map((order) => {
             const isPaid = order.status === 'paid'
             const printStatus = printStatusByOrderId[order.id]
             return (
-              <li key={order.id} className="checkout__order" data-testid={`checkout-order-${order.id}`}>
-                <h3>{order.table.label}</h3>
-                <ul className="checkout__line-items">
-                  {order.items.map((lineItem) => (
-                    <li key={lineItem.id}>
-                      {lineItem.quantity}x {lineItem.menu_item.name}
-                    </li>
-                  ))}
-                </ul>
-                <p className="checkout__total">Total: {orderTotal(order)}</p>
+              <Col key={order.id} xs={24} md={12} lg={8}>
+                <Card data-testid={`checkout-order-${order.id}`}>
+                  <Typography.Title level={4}>{order.table.label}</Typography.Title>
+                  <ul className="checkout__line-items">
+                    {order.items.map((lineItem) => (
+                      <li key={lineItem.id}>
+                        {lineItem.quantity}x {lineItem.menu_item.name}
+                      </li>
+                    ))}
+                  </ul>
+                  <Typography.Text strong className="checkout__total">
+                    Total: {orderTotal(order)}
+                  </Typography.Text>
 
-                {isPaid ? (
-                  <>
-                    <p className="checkout__paid" role="status">
-                      Paid.
-                    </p>
-                    {printStatus === 'failed' && (
-                      <p className="checkout__print-warning" role="alert">
-                        Payment confirmed, but the receipt failed to print -- check the printer.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <label>
-                      Payment method
-                      <select
+                  {isPaid ? (
+                    <Space orientation="vertical" size="small" className="checkout__paid-block">
+                      <Tag icon={<CheckCircleOutlined />} color="success" role="status">
+                        Paid
+                      </Tag>
+                      {printStatus === 'failed' && (
+                        <Alert
+                          type="warning"
+                          showIcon
+                          message="Payment confirmed, but the receipt failed to print -- check the printer."
+                        />
+                      )}
+                    </Space>
+                  ) : (
+                    <Space orientation="vertical" size="middle" className="checkout__actions">
+                      <Radio.Group
                         aria-label={`Payment method for ${order.table.label}`}
+                        optionType="button"
                         value={paymentMethods[order.id] ?? 'cash'}
                         onChange={(event) =>
                           setPaymentMethods((prev) => ({
@@ -154,24 +163,30 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
                         }
                       >
                         {PAYMENT_METHODS.map((method) => (
-                          <option key={method.value} value={method.value}>
+                          <Radio.Button key={method.value} value={method.value}>
                             {method.label}
-                          </option>
+                          </Radio.Button>
                         ))}
-                      </select>
-                    </label>
-                    <button type="button" onClick={() => handleConfirmPayment(order)}>
-                      Confirm payment
-                    </button>
-                    <button type="button" onClick={() => handleCancel(order)}>
-                      Cancel order
-                    </button>
-                  </>
-                )}
-              </li>
+                      </Radio.Group>
+                      <Button type="primary" block onClick={() => handleConfirmPayment(order)}>
+                        Confirm payment
+                      </Button>
+                      <Button
+                        danger
+                        type="text"
+                        size="small"
+                        className="checkout__cancel"
+                        onClick={() => handleCancel(order)}
+                      >
+                        Cancel order
+                      </Button>
+                    </Space>
+                  )}
+                </Card>
+              </Col>
             )
           })}
-        </ul>
+        </Row>
       )}
     </div>
   )
