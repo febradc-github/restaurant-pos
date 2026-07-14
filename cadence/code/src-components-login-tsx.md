@@ -4,21 +4,24 @@ tags: [code/frontend]
 aliases: ["src/components/Login.tsx"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[src-app-tsx]]", "[[src-api-auth-ts]]", "[[src-types-auth-ts]]", "[[US-7]]"]
+related: ["[[src-app-tsx]]", "[[src-components-login-css]]", "[[src-api-auth-ts]]", "[[src-types-auth-ts]]", "[[US-15]]", "[[US-7]]"]
 sources: []
 ---
 
 # src/components/Login.tsx
 
-Login form component: identifier + password input, calls onLogin(session) callback on success, displays error feedback on auth failure. This is the first real auth UI in the project (App.tsx previously had hardcoded null token).
+Login form component rebuilt with Ant Design (`Card`, `Typography.Title`, `Form`, `Form.Item`, `Input`, `Input.Password`, `Alert`, `Button`, user/lock icons from `@ant-design/icons`), replacing the old plain HTML form. Behavior unchanged: identifier + password submit, error shown via `Alert` (renders `role="alert"` natively—existing test queries needed no changes), disabled + loading while submitting. On success now navigates to the logged-in role's home route (owner → `/owner`, cashier → `/cashier`, server → `/take-orders`) instead of just calling a callback.
 
 ## Exports
-- `Login(props: {onLogin: (session: AuthSession) => void})` -- renders auth form, calls callback on login success
+- `Login()` -- antd-based form component with role-aware navigation on success
 
 ## Imports
-- [[src-api-auth-ts|src/api/auth.ts]] -- uses createAuthApi().login()
+- `antd` -- Card, Typography, Form, Input, Alert, Button, Spin
+- `@ant-design/icons` -- UserOutlined, LockOutlined
+- [[src-api-auth-ts|src/api/auth.ts]] -- createAuthApi().login()
 - [[src-types-auth-ts|src/types/auth.ts]] -- AuthSession type
+- `react-router-dom` -- useNavigate
 - `react` -- hooks, JSX
 
 ## Used by
-- [[src-app-tsx|src/App.tsx]] -- renders when logged out
+- [[src-app-tsx|src/App.tsx]] -- renders when logged out or at `/login` route

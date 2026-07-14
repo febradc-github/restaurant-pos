@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import App from './App'
 import type { AuthSession } from './types/auth'
 import type { KitchenChannelHandlers } from './realtime/echo'
@@ -27,7 +28,7 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   })
 }
 
-/** Answers every request the always-mounted screens might issue, keyed by path suffix. */
+/** Answers every request the routed screens might issue, keyed by path suffix. */
 function stubFetch(loginSession: AuthSession) {
   vi.stubGlobal(
     'fetch',
@@ -40,6 +41,15 @@ function stubFetch(loginSession: AuthSession) {
       if (url.endsWith('/api/menu-items')) return Promise.resolve(jsonResponse([]))
       throw new Error(`Unexpected fetch in test: ${init?.method ?? 'GET'} ${url}`)
     }),
+  )
+}
+
+/** Renders the full app router tree starting at `initialEntry`, the way main.tsx's BrowserRouter would. */
+function renderApp(initialEntry: string) {
+  return render(
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <App />
+    </MemoryRouter>,
   )
 }
 
@@ -57,7 +67,7 @@ describe('App', () => {
   it('shows the login screen and no Take-Orders or Checkout screen when logged out', () => {
     stubFetch(serverSession)
 
-    render(<App />)
+    renderApp('/login')
 
     expect(screen.getByRole('heading', { name: /log in/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /take order/i })).not.toBeInTheDocument()
@@ -68,7 +78,7 @@ describe('App', () => {
     stubFetch(serverSession)
     const user = userEvent.setup()
 
-    render(<App />)
+    renderApp('/login')
     await logIn(user)
 
     expect(await screen.findByRole('heading', { name: /take order/i })).toBeInTheDocument()
@@ -85,10 +95,34 @@ describe('App', () => {
     stubFetch(cashierSession)
     const user = userEvent.setup()
 
-    render(<App />)
+    renderApp('/login')
     await logIn(user)
 
     expect(await screen.findByRole('heading', { name: /checkout/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /take order/i })).not.toBeInTheDocument()
+  })
+
+  describe('route gating', () => {
+    // Regression check against adr-008-server-login-kitchen-pin-attendance:
+    // Kitchen must stay reachable with no session at all.
+    it('renders the Kitchen Display at /kitchen with no session, with no redirect to /login', () => {
+      stubFetch(serverSession)
+
+      renderApp('/kitchen')
+
+      expect(screen.getByRole('heading', { name: /kitchen display/i })).toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: /log in/i })).not.toBeInTheDocument()
+    })
+
+    it.each(['/owner', '/cashier', '/take-orders'])(
+      'redirects %s to /login when there is no session',
+      (path) => {
+        stubFetch(serverSession)
+
+        renderApp(path)
+
+        expect(screen.getByRole('heading', { name: /log in/i })).toBeInTheDocument()
+      },
+    )
   })
 })

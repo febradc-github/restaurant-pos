@@ -4,7 +4,7 @@ tags: [pos, backend, infrastructure]
 aliases: ["POS core system", "system shape"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]", "[[EP-10]]", "[[adr-008-server-login-kitchen-pin-attendance]]"]
+related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]", "[[AR-frontend-design-system]]", "[[EP-10]]", "[[adr-008-server-login-kitchen-pin-attendance]]"]
 sources: []
 ---
 
@@ -33,6 +33,7 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 - Device-level instances: Kitchen order display (no auth, gate-free per [[adr-008-server-login-kitchen-pin-attendance]])
 - Kitchen staff clock in/out via lightweight PIN-pad overlay (no session token)
 - Responsive web app, runs in browser on any device (desktop terminal, tablet, kitchen display)
+- Frontend routing and design system (C-14): See [[AR-frontend-design-system]] for the routing architecture and Ant Design integration
 
 **Laravel Reverb (WebSocket server):**
 - First-party, self-hosted, bundled with Laravel 11+
@@ -48,7 +49,7 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 ## Roles
 
 | Role | Auth | Capabilities |
-|------|------|--------------| 
+|------|------|--------------|
 | Owner | Yes (Sanctum) | Full access: config, staff, menu, inventory, reports, payments |
 | Cashier | Yes (Sanctum) | Checkout, confirm/void payments, view orders; login/logout records attendance |
 | Server | Yes (Sanctum) | Take orders, select tables/items, send to kitchen; login/logout records attendance |

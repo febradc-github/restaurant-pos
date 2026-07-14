@@ -1,37 +1,27 @@
 sprint:
-  name: "Sprint 4"
-  number: 4
-  goal: "Ship attendance tracking -- Server & Cashier login-based time tracking, Kitchen PIN clock-in/out, and forgotten-clockout auto-close -- completing the C-10 Attendance & Extended RBAC epic"
+  name: "Sprint 5"
+  number: 5
+  goal: "Lay the Ant Design + routing foundation and rebuild the Owner page -- the first two stories of the C-14 role-based page architecture redesign"
   started: 2026-07-14
   ends: 2026-07-28
   status: active
 items:
-  - id: C-11
-    title: "Server & Cashier Login-Based Time Tracking"
+  - id: C-15
+    title: "Foundation: Routing, Ant Design & Brand Theme"
     type: story
-    parent: C-10
+    parent: C-14
     status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: backend time_entries migration/model/factory, added missing UserRole::Server case (enum only had Owner/Cashier), AuthController::login/logout hooked to create/close time_entries rows for Cashier+Server only (Owner excluded), TimeEntry scopeForUser/scopeForRole for querying, 126/126 backend tests passing (345 assertions), Pint clean. Frontend: Take-Orders page gated behind login same as Checkout, AuthRole extended with 'server', 65/65 frontend tests passing, typecheck+lint clean. KitchenDisplay left untouched (no-login, per C-12). Notes for later tickets: Kitchen still has no UserRole case/User rows (needed for C-12); role column on time_entries is a plain string snapshot so 'kitchen' fits without migration change; auto_closed already defaults false, ready for C-13's job to set true. Coder flagged PHP was not on PATH in this environment -- had to invoke a winget-installed php.exe directly by full path."
+    notes: "work pass 1: added react-router-dom + antd + @ant-design/icons; routes for /login, /owner, /cashier, /take-orders, /kitchen replacing App.tsx's inline conditionals via a RoleRoute guard (redirects to /login unless role matches; /kitchen has no guard, preserving adr-008); shared ConfigProvider theme (frontend/src/theme.ts: terracotta #C2410C primary distinct from true-red #DC2626 error, neutral colorBgLayout, Plus Jakarta Sans, 16px/8px radius) applied at app root; Login.tsx rebuilt with antd Form/Input/Alert/Button preserving exact behavior; login navigates to role's home route, logout redirects to /login. Added window.matchMedia stub to test setup (antd's breakpoint observer needs it in jsdom -- will matter for every subsequent antd-heavy story's tests). 77/77 frontend tests passing (+4 new route-gating regression tests incl. explicit adr-008 no-redirect-on-/kitchen check), typecheck/lint/build clean. Flagged: antd bundles whole into main chunk (795kB/254kB gzipped) -- not fixed here, candidate for route-based code-splitting later if tablet/kitchen-display load time becomes a concern. For C-16-19: page components already render at their correct routes unstyled; build layout/nav around what's mounted rather than re-plumbing routing; ConfigProvider theme is global, no per-page provider needed."
 
-  - id: C-12
-    title: "Kitchen PIN Clock-In/Out"
+  - id: C-16
+    title: "Owner Page"
     type: story
-    parent: C-10
-    status: done
-    points: 5
+    parent: C-14
+    status: todo
+    points: 6
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: added missing UserRole::Kitchen case, users.pin migration (nullable unique string), UserFactory->kitchen(pin) state, User.pin marked Fillable+Hidden. New no-auth POST /api/kitchen/clock endpoint (KitchenClockController) toggling time_entries clock-in/clock-out by PIN lookup; malformed and unrecognized PINs both return the same generic 422 so PIN validity can't be enumerated. Frontend: KitchenClockPad numeric-entry overlay wired into KitchenDisplay as an additional element, order-fetch/WebSocket/mark-ready logic untouched (proven by coexistence + unmodified pre-existing KitchenDisplay tests). 135/135 backend tests passing (376 assertions), Pint clean; 73/73 frontend tests passing, typecheck+lint clean. Confirmed for C-13: both C-11's Sanctum-login flow and this PIN flow write to the same time_entries table, so a single `whereNull('clock_out')` query finds every forgotten clock-out regardless of origin; auto_closed remains untouched here, reserved for C-13's job."
-
-  - id: C-13
-    title: "Forgotten Clock-Out Auto-Close & Attendance Queries"
-    type: story
-    parent: C-10
-    status: done
-    points: 3
-    assignee: claude
-    carryovers: 0
-    notes: "work pass 1: config/attendance.php (time_entry_auto_close_cutoff, env-driven, default 00:00), new Artisan command time-entries:auto-close (CloseForgottenTimeEntries) closing every open time_entries row whose applicable per-entry cutoff has passed (cutoff-time-agnostic: computed as next occurrence of configured time-of-day at/after clock_in), registered on the schedule in routes/console.php (Laravel 11/13 routes/console.php convention, no Kernel.php in this app). TimeEntry::scopeClockedInBetween added alongside existing forUser/forRole. New GET /api/time-entries (TimeEntryController, role:owner-gated) filtering by user_id/role/from/to, returning auto_closed per row -- query surface for the future analytics dashboard. 151/151 backend tests passing (412 assertions), Pint clean. Confirmed auto_closed distinguishes job-closed vs normal-closed rows; boundary-tested with travelTo including a non-default 02:00 cutoff."
+    notes: ""

@@ -17,3 +17,42 @@ items:
     created: 2026-07-14
     updated: 2026-07-14
 
+  - id: C-14
+    title: "Role-Based Page Architecture & Ant Design Redesign"
+    type: epic
+    status: idea
+    points: 21
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-17
+    title: "Cashier Page"
+    type: story
+    parent: C-14
+    status: ready
+    points: 4
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-18
+    title: "Take-Orders Page"
+    type: story
+    parent: C-14
+    status: ready
+    points: 4
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
+  - id: C-19
+    title: "Kitchen Page"
+    type: story
+    parent: C-14
+    status: ready
+    points: 4
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
