@@ -3,8 +3,8 @@ type: file
 tags: [code/backend]
 aliases: ["app/Models/Order.php"]
 created: 2026-07-14
-updated: 2026-07-14
-related: ["[[app-models-orderitem-php]]", "[[database-migrations-2026_07_14_000008_create_orders_table-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[app-http-controllers-api-analyticscontroller-php]]", "[[app-services-checkout-paymentconfirmationservice-php]]", "[[app-services-receipts-printagentclient-php]]", "[[AR-chainable-query-scopes-for-analytics]]", "[[US-7]]", "[[US-24]]"]
+updated: 2026-07-15
+related: ["[[app-models-orderitem-php]]", "[[database-migrations-2026_07_14_000008_create_orders_table-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[app-http-controllers-api-analyticscontroller-php]]", "[[app-services-checkout-paymentconfirmationservice-php]]", "[[app-services-receipts-printagentclient-php]]", "[[backend-database-seeders-databaseseeder-php]]", "[[AR-chainable-query-scopes-for-analytics]]", "[[US-7]]", "[[US-24]]"]
 sources: []
 ---
 

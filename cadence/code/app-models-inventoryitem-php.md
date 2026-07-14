@@ -4,7 +4,7 @@ tags: [code/backend]
 aliases: ["app/Models/InventoryItem.php"]
 created: 2026-07-14
 updated: 2026-07-15
-related: ["[[database-migrations-2026_07_14_000006_create_inventory_items_table-php]]", "[[database-migrations-2026_07_14_000014_add_threshold_to_inventory_items_table-php]]", "[[app-models-menuitem-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-restockcontroller-php]]", "[[US-5]]", "[[US-6]]", "[[US-25]]"]
+related: ["[[database-migrations-2026_07_14_000006_create_inventory_items_table-php]]", "[[database-migrations-2026_07_14_000014_add_threshold_to_inventory_items_table-php]]", "[[app-models-menuitem-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-restockcontroller-php]]", "[[backend-database-seeders-databaseseeder-php]]", "[[US-5]]", "[[US-6]]", "[[US-25]]"]
 sources: []
 ---
 

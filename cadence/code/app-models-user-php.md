@@ -3,8 +3,8 @@ type: file
 tags: [code/backend]
 aliases: ["backend/app/Models/User.php"]
 created: 2026-07-14
-updated: 2026-07-14
-related: ["[[app-enums-userrole-php]]", "[[US-2]]", "[[US-11]]", "[[US-12]]", "[[US-21]]", "[[EP-10]]", "[[EP-20]]"]
+updated: 2026-07-15
+related: ["[[app-enums-userrole-php]]", "[[backend-database-seeders-databaseseeder-php]]", "[[US-2]]", "[[US-11]]", "[[US-12]]", "[[US-21]]", "[[EP-10]]", "[[EP-20]]"]
 sources: []
 ---
 

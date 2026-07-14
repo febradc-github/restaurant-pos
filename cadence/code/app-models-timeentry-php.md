@@ -3,8 +3,8 @@ type: file
 tags: [code/backend]
 aliases: ["backend/app/Models/TimeEntry.php"]
 created: 2026-07-14
-updated: 2026-07-14
-related: ["[[database-migrations-2026_07_14_000011_create_time_entries_table-php]]", "[[database-factories-timeentryfactory-php]]", "[[app-http-controllers-api-authcontroller-php]]", "[[backend-app-http-controllers-api-kitchenclockcontroller-php]]", "[[app-http-controllers-api-timeentrycontroller-php]]", "[[backend-console-commands-closeforgottentimeentries-php]]", "[[AR-time-entries-unified-pattern]]", "[[US-11]]", "[[US-12]]", "[[US-13]]", "[[EP-10]]"]
+updated: 2026-07-15
+related: ["[[database-migrations-2026_07_14_000011_create_time_entries_table-php]]", "[[database-factories-timeentryfactory-php]]", "[[app-http-controllers-api-authcontroller-php]]", "[[backend-app-http-controllers-api-kitchenclockcontroller-php]]", "[[app-http-controllers-api-timeentrycontroller-php]]", "[[backend-console-commands-closeforgottentimeentries-php]]", "[[backend-database-seeders-databaseseeder-php]]", "[[AR-time-entries-unified-pattern]]", "[[US-11]]", "[[US-12]]", "[[US-13]]", "[[EP-10]]"]
 sources: []
 ---
 
