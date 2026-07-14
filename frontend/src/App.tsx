@@ -2,8 +2,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { App as AntdApp, Button, ConfigProvider, Typography } from 'antd'
-import { TableLayoutEditor } from './components/TableLayoutEditor'
-import { MenuManager } from './components/MenuManager'
+import { OwnerPage } from './components/OwnerPage'
 import { OrderTaking } from './components/OrderTaking'
 import { KitchenDisplay } from './components/KitchenDisplay'
 import { Login } from './components/Login'
@@ -110,15 +109,10 @@ function App() {
             <Route path="/login" element={<LoginRoute session={session} onLogin={setSession} />} />
 
             <Route
-              path="/owner"
+              path="/owner/*"
               element={
                 <RoleRoute session={session} role="owner" onLogout={handleLogout}>
-                  {(active) => (
-                    <>
-                      <TableLayoutEditor authToken={active.token} />
-                      <MenuManager authToken={active.token} />
-                    </>
-                  )}
+                  {(active) => <OwnerPage authToken={active.token} />}
                 </RoleRoute>
               }
             />

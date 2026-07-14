@@ -20,8 +20,8 @@ items:
     title: "Owner Page"
     type: story
     parent: C-14
-    status: todo
+    status: done
     points: 6
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: OwnerPage.tsx -- antd Layout with collapsible Sider/Menu (data-driven nav array, one-line-extensible), Header showing active section, Content hosting nested routes /owner/tables + /owner/menu (index redirects to tables), mounted at /owner/* inside the existing RoleRoute owner gate (gating logic untouched). MenuManager fully rebuilt: Card per section (Categories, Menu Items), inline Form add-row above antd Table, editable-cell pattern for row edit (Save/Cancel replace Edit/Delete), Switch for availability, 409-on-delete message preserved. TableLayoutEditor toolbar restyled to antd Form/Card; canvas markup and pointer-event drag/resize/add/delete logic byte-for-byte unchanged. Real bug found+fixed: nested <Routes> under a /owner/* splat resolves relative navigate() against the full matched pathname (not just the static prefix), causing navigate('menu') from /owner/tables to become /owner/tables/menu then infinite-redirect-loop via the catch-all -- fixed by making all OwnerPage navigation targets absolute; this would have hung in a real browser too, not just tests. Added ResizeObserver stub to test setup (antd Select/overlay components need it in jsdom, same pattern as C-15's matchMedia stub). 84/84 frontend tests passing (+14 net), typecheck/lint clean. Notes for C-17-19: editable-cell worked well for 2-3 field rows but reconsider modal+Form for more fields; any nested-route layout under a splat route must use absolute navigate() targets or risk the same silent infinite-loop hang; sibling antd Forms sharing a field name silently collide on auto-generated DOM id unless each Form gets its own name prop."

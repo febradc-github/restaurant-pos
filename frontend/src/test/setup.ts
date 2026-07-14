@@ -18,6 +18,18 @@ if (!window.matchMedia) {
   })
 }
 
+// jsdom doesn't implement ResizeObserver either; Ant Design's Select (and
+// other overlay-positioned components) observe their trigger element's size
+// via rc-resize-observer, which throws on mount without this stub -- needed
+// starting with C-16's Select usage in MenuManager/TableLayoutEditor.
+if (!window.ResizeObserver) {
+  window.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}
+
 afterEach(() => {
   cleanup()
 })

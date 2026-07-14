@@ -4,7 +4,7 @@ tags: [code/frontend]
 aliases: ["src/theme.ts"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[src-app-tsx]]", "[[US-15]]", "[[DS-15]]", "[[EP-14]]"]
+related: ["[[src-app-tsx]]", "[[index-html]]", "[[US-15]]", "[[DS-15]]", "[[EP-14]]"]
 sources: []
 ---
 

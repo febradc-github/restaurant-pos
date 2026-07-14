@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MenuManager } from './MenuManager'
 import type { Category, MenuItem } from '../types/menu'
@@ -35,6 +35,13 @@ function mockInitialLoad(categories: Category[], menuItems: MenuItem[]) {
   })
 }
 
+/** Selects an antd Select option by opening its dropdown then clicking the option's text. */
+async function selectAntOption(user: ReturnType<typeof userEvent.setup>, combobox: HTMLElement, optionText: string) {
+  await user.click(combobox)
+  const option = await screen.findByTitle(optionText)
+  await user.click(option)
+}
+
 describe('MenuManager', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())
@@ -67,7 +74,7 @@ describe('MenuManager', () => {
     expect(screen.queryByRole('button', { name: /add item/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^edit/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^delete/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
     expect(screen.getByText('Available')).toBeInTheDocument()
   })
 
@@ -90,6 +97,28 @@ describe('MenuManager', () => {
     expect(JSON.parse(createCall![1]!.body as string)).toEqual({ name: 'Desserts' })
   })
 
+  it('lets the owner edit and save a category name', async () => {
+    const user = userEvent.setup()
+    mockInitialLoad([appetizers], [])
+
+    render(<MenuManager apiBaseUrl={BASE_URL} authToken="owner-token" />)
+    await screen.findByTestId('category-1')
+
+    const updated: Category = { id: 1, name: 'Starters' }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(updated))
+
+    await user.click(screen.getByRole('button', { name: /edit appetizers/i }))
+    const nameInput = within(screen.getByTestId('category-1')).getByRole('textbox')
+    await user.clear(nameInput)
+    await user.type(nameInput, 'Starters')
+    await user.click(screen.getByRole('button', { name: /save/i }))
+
+    expect(await screen.findByTestId('category-1')).toHaveTextContent('Starters')
+    const updateCall = vi.mocked(fetch).mock.calls.find(([, init]) => init?.method === 'PATCH')
+    expect(updateCall?.[0]).toBe(`${BASE_URL}/api/categories/1`)
+    expect(JSON.parse(updateCall![1]!.body as string)).toEqual({ name: 'Starters' })
+  })
+
   it('lets the owner create a menu item with name/price/category, calling the API and rendering the result', async () => {
     const user = userEvent.setup()
     const created: MenuItem = { id: 2, name: 'Soda', price: '2.5', category_id: 2, available: true }
@@ -102,7 +131,7 @@ describe('MenuManager', () => {
 
     await user.type(screen.getByLabelText(/^name$/i), 'Soda')
     await user.type(screen.getByLabelText(/^price$/i), '2.50')
-    await user.selectOptions(screen.getByLabelText(/^category$/i), 'Drinks')
+    await selectAntOption(user, screen.getByLabelText(/^category$/i), 'Drinks')
     await user.click(screen.getByRole('button', { name: /add item/i }))
 
     expect(await screen.findByTestId('item-2')).toHaveTextContent('Soda')
@@ -113,6 +142,33 @@ describe('MenuManager', () => {
       price: '2.5',
       category_id: 2,
       available: true,
+    })
+  })
+
+  it('lets the owner edit and save a menu item, calling the update endpoint', async () => {
+    const user = userEvent.setup()
+    mockInitialLoad([appetizers, drinks], [springRolls])
+
+    render(<MenuManager apiBaseUrl={BASE_URL} authToken="owner-token" />)
+    await screen.findByText('Spring Rolls')
+
+    const updated: MenuItem = { id: 1, name: 'Egg Rolls', price: '6.50', category_id: 2, available: true }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(updated))
+
+    await user.click(screen.getByRole('button', { name: /edit spring rolls/i }))
+    const row = screen.getByTestId('item-1')
+    const nameInput = within(row).getByLabelText(/edit name/i)
+    await user.clear(nameInput)
+    await user.type(nameInput, 'Egg Rolls')
+    await user.click(screen.getByRole('button', { name: /save/i }))
+
+    expect(await screen.findByTestId('item-1')).toHaveTextContent('Egg Rolls')
+    const updateCall = vi.mocked(fetch).mock.calls.find(([, init]) => init?.method === 'PATCH')
+    expect(updateCall?.[0]).toBe(`${BASE_URL}/api/menu-items/1`)
+    expect(JSON.parse(updateCall![1]!.body as string)).toEqual({
+      name: 'Egg Rolls',
+      price: '5.99',
+      category_id: 1,
     })
   })
 

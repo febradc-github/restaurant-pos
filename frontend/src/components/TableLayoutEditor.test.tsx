@@ -99,7 +99,8 @@ describe('TableLayoutEditor', () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
 
     await user.type(screen.getByLabelText(/label/i), 'New Table')
-    await user.selectOptions(screen.getByLabelText(/shape/i), 'rectangular')
+    await user.click(screen.getByLabelText(/shape/i))
+    await user.click(await screen.findByTitle('Rectangular'))
     await user.clear(screen.getByLabelText(/capacity/i))
     await user.type(screen.getByLabelText(/capacity/i), '6')
     await user.click(screen.getByRole('button', { name: /add table/i }))

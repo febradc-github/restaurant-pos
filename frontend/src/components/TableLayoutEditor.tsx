@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { FormEvent, PointerEvent as ReactPointerEvent } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
+import { Alert, Button, Card, Form, Input, InputNumber, Select, Typography } from 'antd'
 import { createTablesApi } from '../api/tables'
 import type { NewTable, Table, TableShape } from '../types/table'
 import './TableLayoutEditor.css'
@@ -13,6 +14,12 @@ const SHAPE_DEFAULTS: Record<TableShape, { width: number; height: number }> = {
   square: { width: 80, height: 80 },
   rectangular: { width: 120, height: 80 },
 }
+
+const SHAPE_OPTIONS: { value: TableShape; label: string }[] = [
+  { value: 'round', label: 'Round' },
+  { value: 'square', label: 'Square' },
+  { value: 'rectangular', label: 'Rectangular' },
+]
 
 function clamp(value: number, min: number, max: number): number {
   if (max < min) return min
@@ -45,6 +52,12 @@ interface ResizeState {
   currentHeight: number
 }
 
+interface AddTableValues {
+  label?: string
+  shape: TableShape
+  capacity: number
+}
+
 export interface TableLayoutEditorProps {
   /** Backend origin. Defaults to VITE_API_BASE_URL / localhost. */
   apiBaseUrl?: string
@@ -70,9 +83,7 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
   const [tables, setTables] = useState<Table[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const [newLabel, setNewLabel] = useState('')
-  const [newShape, setNewShape] = useState<TableShape>('square')
-  const [newCapacity, setNewCapacity] = useState(4)
+  const [addTableForm] = Form.useForm<AddTableValues>()
 
   const dragState = useRef<DragState | null>(null)
   const resizeState = useRef<ResizeState | null>(null)
@@ -93,14 +104,14 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
     }
   }, [api])
 
-  async function handleAddTable(event: FormEvent) {
-    event.preventDefault()
+  async function handleAddTable(values: AddTableValues) {
     const index = tables?.length ?? 0
-    const { width, height } = SHAPE_DEFAULTS[newShape]
+    const shape = values.shape ?? 'square'
+    const { width, height } = SHAPE_DEFAULTS[shape]
     const payload: NewTable = {
-      label: newLabel.trim() || `Table ${index + 1}`,
-      shape: newShape,
-      capacity: newCapacity,
+      label: values.label?.trim() || `Table ${index + 1}`,
+      shape,
+      capacity: values.capacity ?? 4,
       x: 20 + (index % 5) * 100,
       y: 20 + Math.floor(index / 5) * 100,
       width,
@@ -110,8 +121,7 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
     try {
       const created = await api.create(payload)
       setTables((prev) => [...(prev ?? []), created])
-      setNewLabel('')
-      setNewCapacity(4)
+      addTableForm.resetFields()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add table')
     }
@@ -225,43 +235,36 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
 
   return (
     <div className="table-layout-editor">
-      <h2>Floor Plan</h2>
+      <Typography.Title level={2}>Floor Plan</Typography.Title>
 
-      {error && (
-        <p className="table-layout-editor__error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <Alert className="table-layout-editor__error" type="error" message={error} showIcon />}
 
       {isOwner && (
-        <form className="table-layout-editor__toolbar" onSubmit={handleAddTable}>
-          <label>
-            Label
-            <input
-              value={newLabel}
-              onChange={(event) => setNewLabel(event.target.value)}
-              placeholder={`Table ${(tables?.length ?? 0) + 1}`}
-            />
-          </label>
-          <label>
-            Shape
-            <select value={newShape} onChange={(event) => setNewShape(event.target.value as TableShape)}>
-              <option value="round">Round</option>
-              <option value="square">Square</option>
-              <option value="rectangular">Rectangular</option>
-            </select>
-          </label>
-          <label>
-            Capacity
-            <input
-              type="number"
-              min={1}
-              value={newCapacity}
-              onChange={(event) => setNewCapacity(Number(event.target.value))}
-            />
-          </label>
-          <button type="submit">Add table</button>
-        </form>
+        <Card className="table-layout-editor__toolbar-card" size="small">
+          <Form<AddTableValues>
+            form={addTableForm}
+            name="add-table"
+            layout="inline"
+            className="table-layout-editor__toolbar"
+            initialValues={{ shape: 'square', capacity: 4 }}
+            onFinish={handleAddTable}
+          >
+            <Form.Item label="Label" name="label">
+              <Input placeholder={`Table ${(tables?.length ?? 0) + 1}`} />
+            </Form.Item>
+            <Form.Item label="Shape" name="shape">
+              <Select options={SHAPE_OPTIONS} style={{ minWidth: 140 }} />
+            </Form.Item>
+            <Form.Item label="Capacity" name="capacity">
+              <InputNumber min={1} />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Add table
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
       )}
 
       {tables === null ? (
