@@ -1,5 +1,5 @@
 /** The set of authenticated user roles. Mirrors the backend's UserRole enum. */
-export type AuthRole = 'owner' | 'cashier'
+export type AuthRole = 'owner' | 'cashier' | 'server'
 
 /** An authenticated Owner or Cashier, as returned by the login endpoint. */
 export interface AuthUser {

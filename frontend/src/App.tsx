@@ -51,8 +51,12 @@ function App() {
 
       {session?.user.role === 'cashier' && <Checkout authToken={session.token} />}
 
-      {/* Server and Kitchen have no login per the C-6 design -- neither view takes or uses an auth token. */}
-      <OrderTaking />
+      {/* Server now requires login (C-11) -- gated the same way Checkout is
+          gated behind Cashier above. The order-taking API calls themselves
+          stay unauthenticated (no login gate change there), only access to
+          this screen is gated. Kitchen still has no login per the C-6
+          design -- unaffected by this ticket (PIN-based clock-in is C-12). */}
+      {session?.user.role === 'server' && <OrderTaking />}
       <KitchenDisplay />
     </main>
   )

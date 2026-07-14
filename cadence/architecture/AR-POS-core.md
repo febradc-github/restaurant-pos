@@ -4,7 +4,8 @@ tags: [pos, backend, infrastructure]
 aliases: ["POS core system", "system shape"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]"]
+related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]", "[[EP-10]]", "[[adr-008-server-login-kitchen-pin-attendance]]"]
+sources: []
 ---
 
 # POS Core Architecture
@@ -14,11 +15,12 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 ## Components
 
 **Laravel API backend (PHP):**
-- Authentication (Owner/Cashier only; Server/Kitchen are device-level, no login)
+- Authentication: Owner/Cashier via Sanctum bearer tokens ([[adr-007-sanctum-bearer-tokens]]); Server via Sanctum (added in C-10, [[adr-008-server-login-kitchen-pin-attendance]]); Kitchen staff via lightweight 6-digit PIN endpoint for attendance only
 - Orders CRUD with real-time push via WebSocket
 - Menu and inventory management
 - Table layout configuration
 - Role-based access control
+- Time entries tracking for attendance/payroll (new in C-10)
 
 **PostgreSQL datastore:**
 - Primary database for all persistent state
@@ -27,7 +29,9 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 
 **React SPA frontend:**
 - Decoupled from backend, communicates over REST/JSON API
-- Owned terminal (Owner/Cashier login) and device-level instances (Server/Kitchen, no auth)
+- Authenticated terminals: Owner/Cashier login, Server login (added in C-10)
+- Device-level instances: Kitchen order display (no auth, gate-free per [[adr-008-server-login-kitchen-pin-attendance]])
+- Kitchen staff clock in/out via lightweight PIN-pad overlay (no session token)
 - Responsive web app, runs in browser on any device (desktop terminal, tablet, kitchen display)
 
 **Laravel Reverb (WebSocket server):**
@@ -44,11 +48,15 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 ## Roles
 
 | Role | Auth | Capabilities |
-|------|------|--------------|
-| Owner | Yes (username/PIN) | Full access: config, staff, menu, inventory, reports, payments |
-| Cashier | Yes (username/PIN) | Checkout, confirm/void payments, view orders |
-| Server | No (device-level) | Take orders, select tables/items, send to kitchen |
-| Kitchen | No (device-level) | View live order display, mark items ready |
+|------|------|--------------| 
+| Owner | Yes (Sanctum) | Full access: config, staff, menu, inventory, reports, payments |
+| Cashier | Yes (Sanctum) | Checkout, confirm/void payments, view orders; login/logout records attendance |
+| Server | Yes (Sanctum) | Take orders, select tables/items, send to kitchen; login/logout records attendance |
+| Kitchen | PIN only (no session) | View live order display (no auth required); clock in/out via 6-digit PIN for attendance tracking |
+
+## Key Architectural Decisions
+
+- **Attendance tracking (C-10):** Time-in/time-out is now tracked across all authenticated staff via a `time_entries` table. Server added real Sanctum login to support this. Kitchen order display remains gate-free, but Kitchen staff authenticate separately via PIN for clock-in/out only (no session issued). See [[adr-008-server-login-kitchen-pin-attendance]] for the reasoning on this partial reversal of the original "no login" design.
 
 ## Network & Durability
 

@@ -17,6 +17,7 @@ sources: []
 - [[app-models-table-php]]
 - [[app-models-category-php]]
 - [[app-models-menuitem-php]]
+- [[app-models-timeentry-php]]
 
 ## Controllers
 - [[app-http-controllers-api-statuscontroller-php]]
@@ -40,13 +41,19 @@ sources: []
 - [[database-migrations-2026_07_14_000003_create_tables_table-php]]
 - [[database-migrations-2026_07_14_000004_create_categories_table-php]]
 - [[database-migrations-2026_07_14_000005_create_menu_items_table-php]]
+- [[database-migrations-2026_07_14_000011_create_time_entries_table-php]]
 
 ## Factories
 - [[database-factories-tablefactory-php]]
 - [[database-factories-categoryfactory-php]]
 - [[database-factories-menuitemfactory-php]]
+- [[database-factories-userfactory-php]]
+- [[database-factories-timeentryfactory-php]]
 
 ## Tests
 - [[tests-feature-tables-tablelayouttest-php]]
 - [[tests-feature-menu-categorytest-php]]
 - [[tests-feature-menu-menuitemtest-php]]
+- [[tests-feature-auth-logintest-php]]
+- [[tests-feature-auth-logouttest-php]]
+- [[tests-feature-timeentries-timeentrytest-php]]

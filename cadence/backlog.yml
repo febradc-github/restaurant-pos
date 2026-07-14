@@ -7,3 +7,13 @@ items:
     assignee: claude
     created: 2026-07-14
     updated: 2026-07-14
+
+  - id: C-10
+    title: "Attendance & Extended RBAC"
+    type: epic
+    status: idea
+    points: 13
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+

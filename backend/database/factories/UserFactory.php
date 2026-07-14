@@ -64,4 +64,14 @@ class UserFactory extends Factory
             'role' => UserRole::Cashier,
         ]);
     }
+
+    /**
+     * Indicate that the model is a Server.
+     */
+    public function server(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => UserRole::Server,
+        ]);
+    }
 }

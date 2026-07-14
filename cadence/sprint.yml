@@ -1,27 +1,37 @@
 sprint:
-  name: "Sprint 3"
-  number: 3
-  goal: "Checkout/payment confirmation and on-premise deployment packaging -- close out the Restaurant POS System epic"
+  name: "Sprint 4"
+  number: 4
+  goal: "Ship attendance tracking -- Server & Cashier login-based time tracking, Kitchen PIN clock-in/out, and forgotten-clockout auto-close -- completing the C-10 Attendance & Extended RBAC epic"
   started: 2026-07-14
   ends: 2026-07-28
   status: active
 items:
-  - id: C-7
-    title: "Checkout, Payment Confirmation & Cancellation"
+  - id: C-11
+    title: "Server & Cashier Login-Based Time Tracking"
     type: story
-    parent: C-1
+    parent: C-10
     status: done
-    points: 4
+    points: 5
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: backend PaymentMethod enum, OrderStatus extended with Paid/Cancelled, PaymentConfirmationService (distinct unit per adr-005) + PrintAgentClient (HTTP call to C-8, never throws so print failure doesn't roll back payment), cashier-gated checkout/cancel endpoints, 16 new tests (114/114 total, independently re-verified, migration applied to live pos_dev Postgres, 2 real mutation checks). work pass 2: scope expanded to include a login screen (none existed in the project -- OWNER_AUTH_TOKEN had been hardcoded null since C-3), real auth state wired into App.tsx for the first time, Cashier-facing Checkout UI (payment method selection, print-failure surfaced distinctly from success, cancel), 60/60 tests total, typecheck/build clean, 2 real mutation checks, all independently re-verified. review: PASS -- reviewer specifically confirmed print-failure doesn't roll back payment and role-based post-login routing works correctly."
+    notes: "work pass 1: backend time_entries migration/model/factory, added missing UserRole::Server case (enum only had Owner/Cashier), AuthController::login/logout hooked to create/close time_entries rows for Cashier+Server only (Owner excluded), TimeEntry scopeForUser/scopeForRole for querying, 126/126 backend tests passing (345 assertions), Pint clean. Frontend: Take-Orders page gated behind login same as Checkout, AuthRole extended with 'server', 65/65 frontend tests passing, typecheck+lint clean. KitchenDisplay left untouched (no-login, per C-12). Notes for later tickets: Kitchen still has no UserRole case/User rows (needed for C-12); role column on time_entries is a plain string snapshot so 'kitchen' fits without migration change; auto_closed already defaults false, ready for C-13's job to set true. Coder flagged PHP was not on PATH in this environment -- had to invoke a winget-installed php.exe directly by full path."
 
-  - id: C-9
-    title: "On-Premise Deployment Setup"
+  - id: C-12
+    title: "Kitchen PIN Clock-In/Out"
     type: story
-    parent: C-1
-    status: done
+    parent: C-10
+    status: todo
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: ""
+
+  - id: C-13
+    title: "Forgotten Clock-Out Auto-Close & Attendance Queries"
+    type: story
+    parent: C-10
+    status: todo
     points: 3
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: PM2 ecosystem.config.js supervising all 4 app processes (Laravel serve, Reverb, print-agent, static SPA server), setup.sh, README; resolved the recorded env-config blocker via PM2's native env mechanism instead of .env; found and fixed a real LAN bug (Reverb host was hardcoded to 127.0.0.1 in the frontend, would have broken real-time updates for any non-host device). Verified end-to-end: all 4 processes online, health-checked on both loopback and real LAN IP, restart-recovery proven via pm2 kill + pm2 resurrect, build-time env baking confirmed via grep on the built bundle. Honest limits: no literal OS reboot, no second physical device, no real printer. work pass 2: removed hardcoded real secrets (DB password, Reverb app id/key/secret) and a personal Windows path from the committed ecosystem.config.js, replaced with env-var-driven values (POS_* names) and a loud fail-fast if unset; re-verified full stack still starts correctly. work pass 3: documented and then corrected a PM2-daemon-PATH-caching gotcha in the README (verified the corrected wording against the actual code, not just re-stated the prior claim). review: PASS -- reviewer independently ran the full stack, hit real LAN IP endpoints, and ran its own pm2 save/kill/resurrect restart-recovery cycle. This was the last ticket in epic C-1."
+    notes: ""

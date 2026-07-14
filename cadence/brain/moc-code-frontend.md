@@ -18,6 +18,7 @@ sources: []
 ## Types
 - [[src-types-table-ts]]
 - [[src-types-menu-ts]]
+- [[src-types-auth-ts]]
 
 ## API clients
 - [[src-api-tables-ts]]
@@ -29,3 +30,4 @@ sources: []
 
 ## Testing
 - [[src-test-setup-ts]]
+- [[src-app-test-tsx]]
