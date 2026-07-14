@@ -74,4 +74,19 @@ class UserFactory extends Factory
             'role' => UserRole::Server,
         ]);
     }
+
+    /**
+     * Indicate that the model is a Kitchen employee, identified by PIN
+     * rather than password (C-12). Accepts an explicit PIN so tests can
+     * predict/control it -- a hardcoded default would collide across
+     * multiple kitchen() users in the same test, tripping the unique
+     * constraint on `pin`.
+     */
+    public function kitchen(?string $pin = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => UserRole::Kitchen,
+            'pin' => $pin ?? fake()->unique()->numerify('######'),
+        ]);
+    }
 }

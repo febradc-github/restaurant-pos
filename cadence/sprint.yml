@@ -20,11 +20,11 @@ items:
     title: "Kitchen PIN Clock-In/Out"
     type: story
     parent: C-10
-    status: todo
+    status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: added missing UserRole::Kitchen case, users.pin migration (nullable unique string), UserFactory->kitchen(pin) state, User.pin marked Fillable+Hidden. New no-auth POST /api/kitchen/clock endpoint (KitchenClockController) toggling time_entries clock-in/clock-out by PIN lookup; malformed and unrecognized PINs both return the same generic 422 so PIN validity can't be enumerated. Frontend: KitchenClockPad numeric-entry overlay wired into KitchenDisplay as an additional element, order-fetch/WebSocket/mark-ready logic untouched (proven by coexistence + unmodified pre-existing KitchenDisplay tests). 135/135 backend tests passing (376 assertions), Pint clean; 73/73 frontend tests passing, typecheck+lint clean. Confirmed for C-13: both C-11's Sanctum-login flow and this PIN flow write to the same time_entries table, so a single `whereNull('clock_out')` query finds every forgotten clock-out regardless of origin; auto_closed remains untouched here, reserved for C-13's job."
 
   - id: C-13
     title: "Forgotten Clock-Out Auto-Close & Attendance Queries"

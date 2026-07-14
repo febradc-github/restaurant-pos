@@ -1,0 +1,42 @@
+.kitchen-clock-pad {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+.kitchen-clock-pad__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 12rem;
+}
+
+.kitchen-clock-pad__display {
+  text-align: center;
+  font-size: 1.25rem;
+  letter-spacing: 0.25rem;
+  margin: 0;
+}
+
+.kitchen-clock-pad__error {
+  color: #b91c1c;
+  margin: 0;
+}
+
+.kitchen-clock-pad__message {
+  color: #15803d;
+  margin: 0;
+}
+
+.kitchen-clock-pad__keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}

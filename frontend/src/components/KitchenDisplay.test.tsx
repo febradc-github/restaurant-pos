@@ -159,4 +159,29 @@ describe('KitchenDisplay', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/500/)
   })
+
+  // C-12: the PIN clock-in/out overlay is an independent addition to this
+  // screen. This is the explicit regression check that it coexists with the
+  // order list -- it doesn't replace it, navigate away from it, or require
+  // any change to how orders are fetched or updated.
+  it('renders the PIN clock-in/out overlay alongside the live order list, and a successful PIN entry does not disturb it', async () => {
+    const user = userEvent.setup()
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse([pendingOrder]))
+      .mockResolvedValueOnce(jsonResponse({ action: 'clocked_in', employee: { id: 9, name: 'Kitchen Kev' } }))
+
+    render(<KitchenDisplay apiBaseUrl={BASE_URL} />)
+    await screen.findByText('Table 1')
+
+    await user.click(screen.getByRole('button', { name: /clock in.*out/i }))
+    for (const digit of '123456') {
+      await user.click(screen.getByRole('button', { name: digit }))
+    }
+    await user.click(screen.getByRole('button', { name: /submit/i }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent(/Kitchen Kev.*clocked in/i)
+    // The order list is untouched -- still there, no navigation, no re-fetch.
+    expect(screen.getByText('Table 1')).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
 })

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createOrdersApi } from '../api/orders'
 import { subscribeToKitchenChannel } from '../realtime/echo'
+import { KitchenClockPad } from './KitchenClockPad'
 import type { Order } from '../types/order'
 import './KitchenDisplay.css'
 
@@ -28,6 +29,11 @@ function upsertPendingOrder(orders: Order[], order: Order): Order[] {
  * after the initial fetch, the list is driven entirely by order.placed /
  * order.updated broadcasts (plus the local update applied right after a
  * "mark ready" click).
+ *
+ * Also renders the PIN clock-in/out overlay (C-12) as an independent,
+ * fixed-position panel -- it owns its own PIN entry/confirmation state and
+ * never touches the order list's fetch, WebSocket subscription, or
+ * mark-ready logic above.
  */
 export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
   const api = useMemo(() => createOrdersApi({ baseUrl: apiBaseUrl }), [apiBaseUrl])
@@ -106,6 +112,8 @@ export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
           ))}
         </ul>
       )}
+
+      <KitchenClockPad apiBaseUrl={apiBaseUrl} />
     </div>
   )
 }

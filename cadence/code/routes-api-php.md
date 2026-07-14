@@ -4,13 +4,13 @@ tags: [code/backend]
 aliases: ["routes/api.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-http-controllers-api-tablecontroller-php]]", "[[app-http-controllers-api-categorycontroller-php]]", "[[app-http-controllers-api-menuitemcontroller-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[US-3]]", "[[US-4]]", "[[US-5]]", "[[US-6]]"]
+related: ["[[app-http-controllers-api-tablecontroller-php]]", "[[app-http-controllers-api-categorycontroller-php]]", "[[app-http-controllers-api-menuitemcontroller-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[backend-app-http-controllers-api-kitchenclockcontroller-php]]", "[[US-3]]", "[[US-4]]", "[[US-5]]", "[[US-6]]", "[[US-12]]"]
 sources: []
 ---
 
 # routes/api.php
 
-API route definitions. Defines public GET endpoints and Owner-gated mutations in role:owner group for POST/PATCH/DELETE, using auth:sanctum + role middleware (C-2/C-3 pattern). All controllers follow same grouping. C-6 adds no-auth order endpoints (server/kitchen device pattern).
+API route definitions. Defines public GET endpoints and Owner-gated mutations in role:owner group for POST/PATCH/DELETE, using auth:sanctum + role middleware (C-2/C-3 pattern). All controllers follow same grouping. C-6 adds no-auth order endpoints (server/kitchen device pattern). C-12 adds kitchen clock endpoint.
 
 ## Exports
 - GET /api/tables → TableController@index (open)
@@ -34,6 +34,7 @@ API route definitions. Defines public GET endpoints and Owner-gated mutations in
 - GET /api/orders → OrderController@index (no auth, supports ?status= filter)
 - POST /api/orders → OrderController@store (no auth)
 - PATCH /api/orders/{order}/ready → OrderController@markReady (no auth)
+- POST /api/kitchen/clock → KitchenClockController@clock (no auth, C-12)
 
 ## Imports
 - app/Http/Controllers/Api/TableController
@@ -42,3 +43,4 @@ API route definitions. Defines public GET endpoints and Owner-gated mutations in
 - app/Http/Controllers/Api/InventoryItemController
 - app/Http/Controllers/Api/MenuItemInventoryItemController
 - app/Http/Controllers/Api/OrderController
+- app/Http/Controllers/Api/KitchenClockController

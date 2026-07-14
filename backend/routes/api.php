@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashierController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\InventoryItemController;
+use App\Http\Controllers\Api\KitchenClockController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\MenuItemInventoryItemController;
 use App\Http\Controllers\Api\OrderController;
@@ -84,3 +85,8 @@ Route::middleware(['auth:sanctum', 'role:cashier'])->group(function () {
     Route::patch('/orders/{order}/checkout', [OrderController::class, 'checkout']);
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
 });
+
+// Kitchen PIN clock-in/out (C-12). No login, no Sanctum token, same
+// no-auth pattern as /status and /orders above -- identified purely by a
+// PIN submitted with each request, not by a session.
+Route::post('/kitchen/clock', [KitchenClockController::class, 'clock']);
