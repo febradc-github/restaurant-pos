@@ -20,8 +20,8 @@ items:
     title: "Employee Management UI"
     type: story
     parent: C-20
-    status: todo
+    status: done
     points: 6
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Employees nav entry + /owner/employees route added to OwnerPage's data-driven NAV_ENTRIES (no restructuring of Table Layout/Menu Management). EmployeeManager: Card+Table listing name/role/active status; inline Add-Employee Form with role-conditional credential reveal (Form.useWatch swaps PIN vs email+password field by selected role); edit via Modal+Form (chosen over editable-cell since the credential field's identity must react live to an in-progress role selection) for role change + credential reset; deactivate (Popconfirm-gated) / reactivate per row. Backend 422 errors.user (self-deactivation, last-active-Owner) parsed and surfaced via Alert. Closed the C-21 review gap client-side: edit modal makes the new credential field required whenever the selected role crosses the login/Kitchen boundary from the employee's current role, blocking submission until filled. New api/employees.ts + types/employee.ts mirroring api/menu.ts's factory pattern, exact C-21 field/method contract. Scope decision: edit modal does not expose email (only role + role-conditional credential) -- avoids a stale-resend bug, not required by acceptance criteria. 115/116 full-suite tests passing -- the 1 failure (MenuManager edit-save) reproduced identically against the pre-C-22 tree via git stash, confirming the now-familiar pre-existing full-suite resource-contention flake, unrelated to this ticket. New suites all green in isolation (employees.test.ts 8/8, EmployeeManager.test.tsx 13/13, OwnerPage.test.tsx 7/7 incl. 2 new nav tests). typecheck/lint clean. This closes epic C-20."

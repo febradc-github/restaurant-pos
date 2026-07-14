@@ -2,10 +2,11 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import type { MenuProps } from 'antd'
-import { AppstoreOutlined, TableOutlined } from '@ant-design/icons'
+import { AppstoreOutlined, TableOutlined, TeamOutlined } from '@ant-design/icons'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { TableLayoutEditor } from './TableLayoutEditor'
 import { MenuManager } from './MenuManager'
+import { EmployeeManager } from './EmployeeManager'
 import './OwnerPage.css'
 
 export interface OwnerPageProps {
@@ -32,6 +33,7 @@ interface OwnerNavEntry {
 const NAV_ENTRIES: OwnerNavEntry[] = [
   { key: 'tables', icon: <TableOutlined />, label: 'Table Layout', path: 'tables' },
   { key: 'menu', icon: <AppstoreOutlined />, label: 'Menu Management', path: 'menu' },
+  { key: 'employees', icon: <TeamOutlined />, label: 'Employees', path: 'employees' },
 ]
 
 /**
@@ -92,6 +94,7 @@ export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
             <Route index element={<Navigate to={ownerPath('tables')} replace />} />
             <Route path="tables" element={<TableLayoutEditor apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
             <Route path="menu" element={<MenuManager apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
+            <Route path="employees" element={<EmployeeManager apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
             <Route path="*" element={<Navigate to={ownerPath('tables')} replace />} />
           </Routes>
         </Layout.Content>

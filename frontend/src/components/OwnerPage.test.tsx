@@ -21,6 +21,7 @@ function stubFetch() {
       if (url.includes('/api/tables')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/api/categories')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/api/menu-items')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/api/employees')) return Promise.resolve(jsonResponse([]))
       throw new Error(`Unexpected fetch in test: ${url}`)
     }),
   )
@@ -46,11 +47,31 @@ describe('OwnerPage', () => {
     vi.unstubAllGlobals()
   })
 
-  it('shows a nav entry for Table Layout and one for Menu Management', async () => {
+  it('shows a nav entry for Table Layout, Menu Management, and Employees', async () => {
     renderOwnerPage('/owner')
 
     expect(await screen.findByRole('menuitem', { name: /table layout/i })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /menu management/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /employees/i })).toBeInTheDocument()
+  })
+
+  it('renders the Employees section directly at /owner/employees', async () => {
+    renderOwnerPage('/owner/employees')
+
+    expect(await screen.findByRole('heading', { name: /employees/i })).toBeInTheDocument()
+    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+  })
+
+  it('switches to the Employees section when its nav item is clicked', async () => {
+    const user = userEvent.setup()
+    renderOwnerPage('/owner')
+
+    await screen.findByRole('heading', { name: /floor plan/i })
+
+    await user.click(screen.getByRole('menuitem', { name: /employees/i }))
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: /employees/i })).toBeInTheDocument())
+    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
   })
 
   it('defaults /owner to the Table Layout section', async () => {

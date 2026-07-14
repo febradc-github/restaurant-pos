@@ -4,7 +4,7 @@ tags: [code/backend]
 aliases: ["backend/app/Http/Controllers/Api/EmployeeController.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-models-user-php]]", "[[routes-api-php]]", "[[US-21]]", "[[EP-20]]"]
+related: ["[[app-models-user-php]]", "[[routes-api-php]]", "[[src-api-employees-ts]]", "[[src-components-employeemanager-tsx]]", "[[US-21]]", "[[US-22]]", "[[EP-20]]"]
 sources: []
 ---
 

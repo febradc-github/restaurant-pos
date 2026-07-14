@@ -1,0 +1,18 @@
+.employee-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.employee-manager__section .employee-manager__toolbar {
+  margin-bottom: 1rem;
+}
+
+.employee-manager__row-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.employee-manager__cancel-edit {
+  margin-left: 0.5rem;
+}

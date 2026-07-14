@@ -4,7 +4,7 @@ tags: [backend/database]
 aliases: []
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[US-21]]", "[[EP-20]]", "[[backend-app-http-controllers-api-employeecontroller-php]]", "[[app-models-user-php]]"]
+related: ["[[src-types-employee-ts]]", "[[frontend-employee-credential-crossing-validation-gap]]", "[[US-21]]", "[[US-22]]", "[[EP-20]]", "[[backend-app-http-controllers-api-employeecontroller-php]]", "[[app-models-user-php]]"]
 sources: []
 ---
 

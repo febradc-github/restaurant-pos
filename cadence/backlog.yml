@@ -29,7 +29,7 @@ items:
   - id: C-20
     title: "Owner Employee Management"
     type: epic
-    status: idea
+    status: done
     points: 11
     assignee: claude
     created: 2026-07-14

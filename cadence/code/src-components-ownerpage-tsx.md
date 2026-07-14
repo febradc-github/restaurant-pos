@@ -4,22 +4,23 @@ tags: [code/frontend]
 aliases: ["src/components/OwnerPage.tsx"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[src-components-ownerpage-css]]", "[[src-components-ownerpage-test-tsx]]", "[[src-components-menumanager-tsx]]", "[[src-components-tablelayouteditor-tsx]]", "[[src-app-tsx]]", "[[US-16]]", "[[EP-14]]"]
+related: ["[[src-components-ownerpage-css]]", "[[src-components-ownerpage-test-tsx]]", "[[src-components-menumanager-tsx]]", "[[src-components-tablelayouteditor-tsx]]", "[[src-components-employeemanager-tsx]]", "[[src-app-tsx]]", "[[US-16]]", "[[US-22]]", "[[EP-14]]", "[[EP-20]]"]
 sources: []
 ---
 
 # src/components/OwnerPage.tsx
 
-Owner page shell: Ant Design Layout with collapsible Sider/Menu. Nav items defined as NAV_ENTRIES data array (not hardcoded JSX), so adding future Employee Management / Analytics Dashboard nav item is a one-line addition. Layout.Header shows the active section's title. Layout.Content hosts nested Routes: `/owner/tables` (TableLayoutEditor) and `/owner/menu` (MenuManager); `/owner` index redirects to `/owner/tables`. Mounted in App.tsx at `path="/owner/*"` inside existing RoleRoute owner gate (RoleRoute itself and gating logic unchanged).
+Owner page shell: Ant Design Layout with collapsible Sider/Menu. Nav items defined as NAV_ENTRIES data array (not hardcoded JSX), so adding future Analytics Dashboard nav item is a one-line addition. Layout.Header shows the active section's title. Layout.Content hosts nested Routes: `/owner/tables` (TableLayoutEditor), `/owner/menu` (MenuManager), and `/owner/employees` (EmployeeManager, added in C-22); `/owner` index redirects to `/owner/tables`. Mounted in App.tsx at `path="/owner/*"` inside existing RoleRoute owner gate (RoleRoute itself and gating logic unchanged).
 
 ## Exports
 - `OwnerPage` component (React.FC<{session: AuthSession}>)
 
 ## Imports
 - `src/types/auth` -- AuthSession type
-- `antd` -- Layout, Sider, Menu, Button, Typography
+- `antd` -- Layout, Sider, Menu, Button, Typography, TeamOutlined (icon for Employees nav)
 - [[src-components-menumanager-tsx|src/components/MenuManager.tsx]] -- menu management route
 - [[src-components-tablelayouteditor-tsx|src/components/TableLayoutEditor.tsx]] -- table management route
+- [[src-components-employeemanager-tsx|src/components/EmployeeManager.tsx]] -- employee management route (C-22)
 - [[src-components-ownerpage-css|src/components/OwnerPage.css]] -- styling
 - react-router-dom -- Routes, Route, useLocation, useNavigate
 - React, useState
