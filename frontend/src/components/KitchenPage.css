@@ -1,0 +1,7 @@
+.kitchen-page {
+  min-height: 100vh;
+}
+
+.kitchen-page__content {
+  padding: 1.5rem;
+}

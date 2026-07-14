@@ -1,35 +1,33 @@
 .kitchen-display {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-.kitchen-display__error {
-  color: #b91c1c;
+.kitchen-display__status-text {
+  font-size: 1.25rem;
 }
 
-.kitchen-display__list {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 0;
-  margin: 0;
+/* Sized for at-a-distance reading (a wall/counter display), not a
+   tablet-in-hand density -- generous padding and large type throughout. */
+.kitchen-display__card .ant-card-body {
+  padding: 1.5rem;
 }
 
-.kitchen-display__order {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-width: 12rem;
-  padding: 0.5rem;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  background: #fffbea;
+.kitchen-display__table-label {
+  margin-bottom: 0.5rem !important;
+}
+
+.kitchen-display__status-tag {
+  font-size: 1rem;
+  padding: 0.15rem 0.6rem;
+  margin-bottom: 0.75rem;
 }
 
 .kitchen-display__line-items {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  line-height: 1.8;
 }

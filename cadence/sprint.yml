@@ -30,8 +30,8 @@ items:
     title: "Kitchen Page"
     type: story
     parent: C-14
-    status: todo
+    status: done
     points: 4
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: KitchenPage.tsx -- pure presentational Layout/Content wrapper (apiBaseUrl only, no auth/session import anywhere), replaces the bare KitchenDisplay render at /kitchen with no RoleRoute, no gate. KitchenDisplay rebuilt: Row/Col grid of large Cards (bigger type/padding for at-a-distance kitchen legibility), Tag status badge, large block Mark-ready Button; fetch-on-mount, WebSocket subscription lifecycle, upsertPendingOrder, handleMarkReady all untouched, all 8 existing tests pass against new markup unmodified. KitchenClockPad rebuilt: large Buttons for toggle+keypad digits (3.5rem min touch target for wet/gloved hands), Card panel, Alert role=status override for confirmation; PIN logic and independence from KitchenDisplay state unchanged, all 7 existing tests pass unmodified. 92/93 full-suite tests passing -- the 1 failure (MenuManager edit-save) reproduced identically against the pre-C-19 codebase via git stash, confirming it's a pre-existing full-suite resource-contention flake unrelated to this ticket (passes 9/9 in isolation). typecheck/lint clean. This completes epic C-14 -- all 5 stories (C-15 through C-19) now done."

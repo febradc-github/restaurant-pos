@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Alert, Button, Card, Typography } from 'antd'
 import { createKitchenClockApi } from '../api/kitchenClock'
 import './KitchenClockPad.css'
 
@@ -26,6 +27,13 @@ function errorMessage(err: unknown, fallback: string): string {
  * PIN clocks them in on one submission and out on the next -- so the
  * confirmation always echoes back which action the backend actually took
  * rather than assuming.
+ *
+ * Rebuilt on Ant Design (C-19): kitchen staff may be tapping this with wet
+ * or gloved hands, so the keypad uses large `Button`s in a grid (at least as
+ * generously sized as C-18's quantity-stepper buttons) rather than compact
+ * controls. The panel itself is a `Card` so it reads as a distinct floating
+ * surface above the order grid -- it stays fixed-position and never dims or
+ * covers the order list underneath.
  */
 export function KitchenClockPad({ apiBaseUrl }: KitchenClockPadProps) {
   const api = useMemo(() => createKitchenClockApi({ baseUrl: apiBaseUrl }), [apiBaseUrl])
@@ -66,44 +74,44 @@ export function KitchenClockPad({ apiBaseUrl }: KitchenClockPadProps) {
 
   return (
     <div className="kitchen-clock-pad">
-      <button type="button" onClick={() => setOpen((prev) => !prev)}>
+      <Button size="large" onClick={() => setOpen((prev) => !prev)}>
         {open ? 'Close clock in/out' : 'Clock in/out'}
-      </button>
+      </Button>
 
       {open && (
-        <div className="kitchen-clock-pad__panel">
-          <p className="kitchen-clock-pad__display" aria-label="PIN entry">
+        <Card className="kitchen-clock-pad__panel">
+          <Typography.Text className="kitchen-clock-pad__display" aria-label="PIN entry">
             {'•'.repeat(pin.length).padEnd(PIN_LENGTH, '·')}
-          </p>
+          </Typography.Text>
 
-          {error && (
-            <p className="kitchen-clock-pad__error" role="alert">
-              {error}
-            </p>
-          )}
+          {error && <Alert type="error" showIcon message={error} className="kitchen-clock-pad__error" />}
           {message && (
-            <p className="kitchen-clock-pad__message" role="status">
-              {message}
-            </p>
+            <Alert type="success" showIcon role="status" message={message} className="kitchen-clock-pad__message" />
           )}
 
           <div className="kitchen-clock-pad__keys">
             {DIGITS.map((digit) => (
-              <button key={digit} type="button" onClick={() => pressDigit(digit)}>
+              <Button key={digit} size="large" className="kitchen-clock-pad__key" onClick={() => pressDigit(digit)}>
                 {digit}
-              </button>
+              </Button>
             ))}
-            <button type="button" onClick={handleClear}>
+            <Button size="large" className="kitchen-clock-pad__key" onClick={handleClear}>
               Clear
-            </button>
-            <button type="button" onClick={() => pressDigit('0')}>
+            </Button>
+            <Button size="large" className="kitchen-clock-pad__key" onClick={() => pressDigit('0')}>
               0
-            </button>
-            <button type="button" onClick={handleSubmit} disabled={pin.length !== PIN_LENGTH || submitting}>
+            </Button>
+            <Button
+              type="primary"
+              size="large"
+              className="kitchen-clock-pad__key"
+              onClick={handleSubmit}
+              disabled={pin.length !== PIN_LENGTH || submitting}
+            >
               Submit
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
       )}
     </div>
   )

@@ -4,7 +4,7 @@ tags: [code/frontend]
 aliases: ["src/api/orders.ts"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[src-types-order-ts]]", "[[src-api-menu-ts]]", "[[src-api-tables-ts]]", "[[src-components-ordertaking-tsx]]"]
+related: ["[[src-types-order-ts]]", "[[src-api-menu-ts]]", "[[src-api-tables-ts]]", "[[src-components-ordertaking-tsx]]", "[[src-components-kitchendisplay-tsx]]", "[[US-6]]", "[[US-18]]", "[[US-19]]", "[[EP-14]]"]
 sources: []
 ---
 
@@ -23,3 +23,4 @@ No authentication headers (server/kitchen device pattern). Status filter is opti
 
 ## Used by
 - [[src-components-ordertaking-tsx|src/components/OrderTaking.tsx]] -- create() call on form submission
+- [[src-components-kitchendisplay-tsx|src/components/KitchenDisplay.tsx]] -- list(status='pending') on mount for reconnect-catch-up

@@ -4,7 +4,7 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { App as AntdApp, Button, ConfigProvider, Typography } from 'antd'
 import { OwnerPage } from './components/OwnerPage'
 import { TakeOrdersPage } from './components/TakeOrdersPage'
-import { KitchenDisplay } from './components/KitchenDisplay'
+import { KitchenPage } from './components/KitchenPage'
 import { Login } from './components/Login'
 import { CashierPage } from './components/CashierPage'
 import { createAuthApi } from './api/auth'
@@ -141,8 +141,10 @@ function App() {
 
             {/* Kitchen still has no login per the C-6 design (PIN-based
                 clock-in is a separate concern, C-12) -- deliberately
-                ungated. See adr-008-server-login-kitchen-pin-attendance. */}
-            <Route path="/kitchen" element={<KitchenDisplay />} />
+                ungated. See adr-008-server-login-kitchen-pin-attendance.
+                KitchenPage (C-19) is a pure presentational wrapper with no
+                RoleRoute, no session check of any kind -- do not add one. */}
+            <Route path="/kitchen" element={<KitchenPage />} />
 
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>

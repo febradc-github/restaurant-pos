@@ -4,7 +4,7 @@ tags: [code/frontend]
 aliases: ["src/realtime/echo.ts"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[laravel-reverb-broadcastas-dot-prefix-gotcha]]", "[[reverb-hardcoded-host-deployment-bug]]", "[[US-9]]"]
+related: ["[[src-components-kitchendisplay-tsx]]", "[[laravel-reverb-broadcastas-dot-prefix-gotcha]]", "[[reverb-hardcoded-host-deployment-bug]]", "[[US-6]]", "[[US-9]]", "[[US-19]]", "[[EP-14]]"]
 sources: []
 ---
 
@@ -30,3 +30,6 @@ First WebSocket client in this project, thin Laravel Echo/Reverb wrapper (C-6). 
 ## Test coverage
 
 Tests in src/realtime/echo.test.ts verify env-var override behavior (VITE env vars correctly passed to Echo config).
+
+## Used by
+- [[src-components-kitchendisplay-tsx|src/components/KitchenDisplay.tsx]] -- subscribeToKitchenChannel() for live order updates

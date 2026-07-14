@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Alert, Button, Card, Col, Row, Tag, Typography } from 'antd'
 import { createOrdersApi } from '../api/orders'
 import { subscribeToKitchenChannel } from '../realtime/echo'
 import { KitchenClockPad } from './KitchenClockPad'
@@ -34,6 +35,13 @@ function upsertPendingOrder(orders: Order[], order: Order): Order[] {
  * fixed-position panel -- it owns its own PIN entry/confirmation state and
  * never touches the order list's fetch, WebSocket subscription, or
  * mark-ready logic above.
+ *
+ * Rebuilt on Ant Design (C-19): this screen is a wall/counter display read
+ * from a few feet away in a busy kitchen, the opposite design pressure from
+ * a tablet-in-hand screen -- so it favors large type and high-contrast
+ * components over density. One large Card per pending order in a responsive
+ * grid, a big `Typography.Title` for the table label (not small text), a
+ * status Tag, and a full-width `size="large"` Mark ready button.
  */
 export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
   const api = useMemo(() => createOrdersApi({ baseUrl: apiBaseUrl }), [apiBaseUrl])
@@ -81,36 +89,39 @@ export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
 
   return (
     <div className="kitchen-display">
-      <h2>Kitchen Display</h2>
+      <Typography.Title level={2}>Kitchen Display</Typography.Title>
 
-      {error && (
-        <p className="kitchen-display__error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <Alert type="error" showIcon message={error} className="kitchen-display__error" />}
 
       {orders === null ? (
-        <p>Loading…</p>
+        <Typography.Text className="kitchen-display__status-text">Loading…</Typography.Text>
       ) : orders.length === 0 ? (
-        <p>No pending orders.</p>
+        <Typography.Text className="kitchen-display__status-text">No pending orders.</Typography.Text>
       ) : (
-        <ul className="kitchen-display__list">
+        <Row gutter={[24, 24]}>
           {orders.map((order) => (
-            <li key={order.id} className="kitchen-display__order" data-testid={`order-${order.id}`}>
-              <h3>{order.table.label}</h3>
-              <ul className="kitchen-display__line-items">
-                {order.items.map((lineItem) => (
-                  <li key={lineItem.id}>
-                    {lineItem.quantity}x {lineItem.menu_item.name}
-                  </li>
-                ))}
-              </ul>
-              <button type="button" onClick={() => handleMarkReady(order)}>
-                Mark ready
-              </button>
-            </li>
+            <Col key={order.id} xs={24} sm={12} lg={8}>
+              <Card className="kitchen-display__card" data-testid={`order-${order.id}`}>
+                <Typography.Title level={3} className="kitchen-display__table-label">
+                  {order.table.label}
+                </Typography.Title>
+                <Tag color="warning" className="kitchen-display__status-tag">
+                  Pending
+                </Tag>
+                <ul className="kitchen-display__line-items">
+                  {order.items.map((lineItem) => (
+                    <li key={lineItem.id}>
+                      {lineItem.quantity}x {lineItem.menu_item.name}
+                    </li>
+                  ))}
+                </ul>
+                <Button type="primary" size="large" block onClick={() => handleMarkReady(order)}>
+                  Mark ready
+                </Button>
+              </Card>
+            </Col>
           ))}
-        </ul>
+        </Row>
       )}
 
       <KitchenClockPad apiBaseUrl={apiBaseUrl} />

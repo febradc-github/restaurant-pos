@@ -20,7 +20,7 @@ items:
   - id: C-14
     title: "Role-Based Page Architecture & Ant Design Redesign"
     type: epic
-    status: idea
+    status: done
     points: 21
     assignee: claude
     created: 2026-07-14
