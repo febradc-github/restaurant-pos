@@ -22,6 +22,7 @@ class InventoryItemFactory extends Factory
         return [
             'name' => fake()->unique()->words(2, true),
             'stock' => fake()->numberBetween(0, 100),
+            'threshold' => 0,
         ];
     }
 }

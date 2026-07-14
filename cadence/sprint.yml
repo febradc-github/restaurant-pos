@@ -20,11 +20,11 @@ items:
     title: "Inventory Threshold & Restock API"
     type: story
     parent: C-23
-    status: todo
+    status: done
     points: 6
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: threshold unsignedInteger column on inventory_items (default 0). New RestockController: index() returns combined live report per ingredient {id, name, stock, threshold, suggested_threshold, shortfall}, computed fresh per request (no caching/snapshot); suggested_threshold = ceil(trailing-30-day Paid-order consumption / 30), 0 for no history, non-Paid orders excluded (reuses Order::scopePaid from C-24). update() is a dedicated PATCH /api/inventory-items/{id}/threshold Owner-override endpoint, deliberately separate from the existing C-5 InventoryItemController (whose validation only accepts name/stock) so the override can't be smuggled through the general endpoint. 216/216 full backend suite passing (601 assertions, 13 new RestockTest cases), Pint clean. Response shapes for C-26 confirmed in notes."
 
   - id: C-26
     title: "Analytics Dashboard UI"

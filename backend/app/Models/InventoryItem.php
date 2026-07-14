@@ -15,7 +15,7 @@ use InvalidArgumentException;
  * stock reaches zero, every menu item that requires it is automatically
  * flagged unavailable (see MenuItem::syncAvailability()).
  */
-#[Fillable(['name', 'stock'])]
+#[Fillable(['name', 'stock', 'threshold'])]
 class InventoryItem extends Model
 {
     /** @use HasFactory<InventoryItemFactory> */
@@ -30,6 +30,7 @@ class InventoryItem extends Model
     {
         return [
             'stock' => 'integer',
+            'threshold' => 'integer',
         ];
     }
 

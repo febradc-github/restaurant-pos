@@ -3,8 +3,8 @@ type: architecture
 tags: [backend, code/backend]
 aliases: []
 created: 2026-07-14
-updated: 2026-07-14
-related: ["[[EP-23]]", "[[app-models-inventoryitem-php]]"]
+updated: 2026-07-15
+related: ["[[app-http-controllers-api-restockcontroller-php]]", "[[app-models-inventoryitem-php]]", "[[EP-23]]", "[[US-24]]", "[[US-25]]"]
 sources: []
 ---
 
@@ -17,6 +17,16 @@ Owner analytics dashboard computes inventory reorder suggestions live on every d
 ## Pattern
 
 Each dashboard view triggers a fresh aggregation query over `OrderItem` and `MenuItem` for the last 30 days of Paid orders, computing per-ingredient totals. The result is not persisted—next load recomputes. No scheduled background job mirrors the C-13 auto-close pattern.
+
+## Implementation
+
+**C-24** (Analytics): Sales-over-time and best-seller metrics use chainable `Order` scopes (scopePaid, scopePaidBetween) for live aggregation on every chart load.
+
+**C-25** (Restock API): Inventory suggested threshold endpoint (GET /api/inventory-items/restock) computes per-ingredient suggestion on every request:
+- Consumption summed via `menu_item_inventory_item.quantity_required` across all OrderItem on Paid orders with paid_at in trailing 30 days
+- Suggested threshold = ceil(totalConsumedInTrailing30Days / 30), deliberately rounded up to err toward "enough to not run out"
+- Owned by RestockController, paired with PATCH /api/inventory-items/{id}/threshold for manual override
+- No caching, no stored snapshot, no scheduled job
 
 ## Rationale
 
@@ -31,5 +41,5 @@ Each dashboard view triggers a fresh aggregation query over `OrderItem` and `Men
 ## Constraints
 
 - Reorder thresholds reflect only Paid orders (OrderStatus::Paid). Pending/Cancelled orders are excluded.
-- Threshold = average daily usage over last 30 days; no seasonal adjustment, no safety stock buffer (owner can adjust manually)
+- Threshold = average daily usage over last 30 days; no seasonal adjustment, no safety stock buffer (owner can adjust manually via PATCH endpoint)
 - Query is not cached; every dashboard load recomputes. If needed, implement HTTP caching headers or query-level caching later.

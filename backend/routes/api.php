@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\MenuItemInventoryItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OwnerController;
+use App\Http\Controllers\Api\RestockController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\Api\TimeEntryController;
@@ -120,4 +121,14 @@ Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
     Route::get('/analytics/sales', [AnalyticsController::class, 'sales']);
     Route::get('/analytics/menu-items', [AnalyticsController::class, 'menuItems']);
+});
+
+// Inventory threshold & restock reporting (C-25). Owner-only, same
+// role-gate pattern as the analytics endpoints above. The restock report is
+// computed fresh on every request -- no stored snapshot or scheduled job --
+// and only Paid orders' consumption feeds the suggested threshold, same
+// Paid-only convention as C-24.
+Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
+    Route::get('/inventory-items/restock', [RestockController::class, 'index']);
+    Route::patch('/inventory-items/{inventoryItem}/threshold', [RestockController::class, 'update']);
 });
