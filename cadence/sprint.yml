@@ -30,8 +30,8 @@ items:
     title: "Forgotten Clock-Out Auto-Close & Attendance Queries"
     type: story
     parent: C-10
-    status: todo
+    status: done
     points: 3
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: config/attendance.php (time_entry_auto_close_cutoff, env-driven, default 00:00), new Artisan command time-entries:auto-close (CloseForgottenTimeEntries) closing every open time_entries row whose applicable per-entry cutoff has passed (cutoff-time-agnostic: computed as next occurrence of configured time-of-day at/after clock_in), registered on the schedule in routes/console.php (Laravel 11/13 routes/console.php convention, no Kernel.php in this app). TimeEntry::scopeClockedInBetween added alongside existing forUser/forRole. New GET /api/time-entries (TimeEntryController, role:owner-gated) filtering by user_id/role/from/to, returning auto_closed per row -- query surface for the future analytics dashboard. 151/151 backend tests passing (412 assertions), Pint clean. Confirmed auto_closed distinguishes job-closed vs normal-closed rows; boundary-tested with travelTo including a non-default 02:00 cutoff."

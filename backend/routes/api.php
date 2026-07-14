@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\TableController;
+use App\Http\Controllers\Api\TimeEntryController;
 use Illuminate\Support\Facades\Route;
 
 // Owner and Cashier authenticate here; Server and Kitchen have no login.
@@ -90,3 +91,9 @@ Route::middleware(['auth:sanctum', 'role:cashier'])->group(function () {
 // no-auth pattern as /status and /orders above -- identified purely by a
 // PIN submitted with each request, not by a session.
 Route::post('/kitchen/clock', [KitchenClockController::class, 'clock']);
+
+// Attendance query surface (C-13). Owner-only, same role-gate pattern as
+// /owner/dashboard above. A pure data/query endpoint over time_entries for
+// the not-yet-built Owner analytics dashboard epic -- no aggregation or
+// reporting UI here.
+Route::middleware(['auth:sanctum', 'role:owner'])->get('/time-entries', [TimeEntryController::class, 'index']);

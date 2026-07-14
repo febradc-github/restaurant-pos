@@ -69,4 +69,18 @@ class TimeEntry extends Model
     {
         return $query->where('role', $role instanceof UserRole ? $role->value : $role);
     }
+
+    /**
+     * Scope to entries clocked in within a date range. Either bound may be
+     * omitted for an open-ended range.
+     *
+     * @param  Builder<TimeEntry>  $query
+     * @return Builder<TimeEntry>
+     */
+    public function scopeClockedInBetween(Builder $query, ?string $from, ?string $to): Builder
+    {
+        return $query
+            ->when($from, fn (Builder $query) => $query->where('clock_in', '>=', $from))
+            ->when($to, fn (Builder $query) => $query->where('clock_in', '<=', $to));
+    }
 }

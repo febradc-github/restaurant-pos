@@ -79,4 +79,38 @@ class TimeEntryTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame($matching->id, $results->first()->id);
     }
+
+    public function test_entries_are_queryable_by_clock_in_date_range(): void
+    {
+        $inRange = TimeEntry::factory()->create(['clock_in' => '2026-07-10 09:00:00']);
+        TimeEntry::factory()->create(['clock_in' => '2026-07-05 09:00:00']);
+        TimeEntry::factory()->create(['clock_in' => '2026-07-20 09:00:00']);
+
+        $results = TimeEntry::clockedInBetween('2026-07-08', '2026-07-15')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame($inRange->id, $results->first()->id);
+    }
+
+    public function test_clocked_in_between_with_only_a_from_bound_matches_everything_after_it(): void
+    {
+        TimeEntry::factory()->create(['clock_in' => '2026-07-05 09:00:00']);
+        $afterFrom = TimeEntry::factory()->create(['clock_in' => '2026-07-20 09:00:00']);
+
+        $results = TimeEntry::clockedInBetween('2026-07-08', null)->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame($afterFrom->id, $results->first()->id);
+    }
+
+    public function test_clocked_in_between_with_only_a_to_bound_matches_everything_before_it(): void
+    {
+        $beforeTo = TimeEntry::factory()->create(['clock_in' => '2026-07-05 09:00:00']);
+        TimeEntry::factory()->create(['clock_in' => '2026-07-20 09:00:00']);
+
+        $results = TimeEntry::clockedInBetween(null, '2026-07-15')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame($beforeTo->id, $results->first()->id);
+    }
 }

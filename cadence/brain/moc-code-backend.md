@@ -10,8 +10,12 @@ sources: []
 
 # Backend code index
 
-## Routing
+## Routing & Scheduling
 - [[routes-api-php]]
+- [[routes-console-php]]
+
+## Configuration
+- [[config-attendance-php]]
 
 ## Models
 - [[app-models-table-php]]
@@ -29,6 +33,7 @@ sources: []
 - [[app-http-controllers-api-categorycontroller-php]]
 - [[app-http-controllers-api-menuitemcontroller-php]]
 - [[backend-app-http-controllers-api-kitchenclockcontroller-php]]
+- [[app-http-controllers-api-timeentrycontroller-php]]
 
 ## Models: Enums
 - [[app-enums-tableshape-php]]
@@ -36,6 +41,9 @@ sources: []
 
 ## Middleware
 - [[app-http-middleware-ensureuserhasrole-php]]
+
+## Console Commands
+- [[backend-console-commands-closeforgottentimeentries-php]]
 
 ## Migrations
 - [[database-migrations-2026-07-14-000001-create-personal-access-tokens-table-php]]
@@ -61,3 +69,5 @@ sources: []
 - [[tests-feature-auth-logouttest-php]]
 - [[tests-feature-timeentries-timeentrytest-php]]
 - [[backend-tests-feature-kitchen-clocktest-php]]
+- [[backend-tests-feature-timeentries-autoclosatetimeentriestest-php]]
+- [[backend-tests-feature-timeentries-timeentryindextest-php]]
