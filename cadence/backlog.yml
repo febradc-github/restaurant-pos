@@ -35,4 +35,13 @@ items:
     created: 2026-07-14
     updated: 2026-07-14
 
+  - id: C-23
+    title: "Owner Analytics Dashboard"
+    type: epic
+    status: idea
+    points: 18
+    assignee: claude
+    created: 2026-07-14
+    updated: 2026-07-14
+
 

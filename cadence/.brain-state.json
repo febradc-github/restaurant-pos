@@ -18,7 +18,7 @@
     "brain/inventory-unlink-and-delete-behavior": 1783969584617.57,
     "brain/kitchen-employees-placeholder-credentials-schema-constraint": 1784032068068.6995,
     "brain/laravel-11-scheduled-tasks-in-console-routes": 1784012269805.9763,
-    "brain/laravel-decimal-json-serialization-gotcha": 1783968202599.8674,
+    "brain/laravel-decimal-json-serialization-gotcha": 1784033871543.999,
     "brain/laravel-reverb-broadcastas-dot-prefix-gotcha": 1783971062443.1604,
     "brain/menumanager-flaky-test-vitest-resource-contention": 1784029260009.3218,
     "brain/moc-code-backend": 1784012297882.413,
@@ -42,8 +42,10 @@
     "decisions/adr-008-server-login-kitchen-pin-attendance": 1784010034709.801,
     "decisions/adr-009-frontend-redesign-before-digital-transformation": 1784014592910.8665,
     "decisions/adr-010-employee-deactivation-not-deletion": 1784030223376.6423,
+    "architecture/AR-chainable-query-scopes-for-analytics": 1784033883874.671,
     "architecture/AR-frontend-design-system": 1784014631225.3057,
-    "architecture/AR-POS-core": 1784014650175.8186,
+    "architecture/AR-live-computed-suggestions-vs-snapshots": 1784033414323.1145,
+    "architecture/AR-POS-core": 1784033448886.1006,
     "architecture/AR-print-agent-polyglot": 1783975153848.2986,
     "architecture/AR-time-entries-unified-pattern": 1784012265142.545,
     "code/app-enums-orderstatus-php": 1783973426712.7449,
@@ -67,7 +69,7 @@
     "code/app-models-category-php": 1783968159500.173,
     "code/app-models-inventoryitem-php": 1783969584668.7358,
     "code/app-models-menuitem-php": 1783969584718.1604,
-    "code/app-models-order-php": 1783973424414.0515,
+    "code/app-models-order-php": 1784033831511.5051,
     "code/app-models-orderitem-php": 1783971081797.6367,
     "code/app-models-table-php": 1783967214680.876,
     "code/app-models-timeentry-php": 1784012219816.7134,
@@ -118,7 +120,7 @@
     "code/frontend-src-types-kitchenclock-ts": 1784029296700.2583,
     "code/index-html": 1784015512126.0376,
     "code/package-json": 1784015441644.8247,
-    "code/routes-api-php": 1784030963680.515,
+    "code/routes-api-php": 1784033848071.3604,
     "code/routes-channels-php": 1783971110542.6567,
     "code/routes-console-php": 1784012244425.8484,
     "code/src-api-auth-ts": 1783973404098.3555,
@@ -188,7 +190,11 @@
     "code/tests-feature-orders-ordertest-php": 1783971124211.477,
     "code/tests-feature-tables-tablelayouttest-php": 1783967231303.199,
     "code/tests-feature-timeentries-timeentrytest-php": 1784012223885.6804,
-    "code/vite-config-ts": 1783967257898.6067
+    "code/vite-config-ts": 1783967257898.6067,
+    "code/app-http-controllers-api-analyticscontroller-php": 1784033810020.0095,
+    "code/tests-feature-analytics-analyticssalestest-php": 1784033898592.6633,
+    "code/tests-feature-analytics-analyticsmenuitemstest-php": 1784033819469.401,
+    "brain/analytics-api-response-format-decimal-string-convention": 1784033860695.2288
   },
-  "updatedAt": "2026-07-14T12:28:18.431Z"
+  "updatedAt": "2026-07-14T12:50:58.075Z"
 }

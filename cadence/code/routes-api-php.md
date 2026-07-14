@@ -4,13 +4,13 @@ tags: [code/backend]
 aliases: ["routes/api.php"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[app-http-controllers-api-tablecontroller-php]]", "[[app-http-controllers-api-categorycontroller-php]]", "[[app-http-controllers-api-menuitemcontroller-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[backend-app-http-controllers-api-kitchenclockcontroller-php]]", "[[backend-app-http-controllers-api-employeecontroller-php]]", "[[app-http-controllers-api-timeentrycontroller-php]]", "[[US-3]]", "[[US-4]]", "[[US-5]]", "[[US-6]]", "[[US-12]]", "[[US-13]]", "[[US-21]]", "[[EP-20]]"]
+related: ["[[app-http-controllers-api-tablecontroller-php]]", "[[app-http-controllers-api-categorycontroller-php]]", "[[app-http-controllers-api-menuitemcontroller-php]]", "[[app-http-controllers-api-inventoryitemcontroller-php]]", "[[app-http-controllers-api-menuiteminventoryitemcontroller-php]]", "[[app-http-controllers-api-ordercontroller-php]]", "[[app-http-controllers-api-analyticscontroller-php]]", "[[backend-app-http-controllers-api-kitchenclockcontroller-php]]", "[[backend-app-http-controllers-api-employeecontroller-php]]", "[[app-http-controllers-api-timeentrycontroller-php]]", "[[US-3]]", "[[US-4]]", "[[US-5]]", "[[US-6]]", "[[US-12]]", "[[US-13]]", "[[US-21]]", "[[US-24]]", "[[EP-20]]", "[[EP-23]]"]
 sources: []
 ---
 
 # routes/api.php
 
-API route definitions. Defines public GET endpoints and Owner-gated mutations in role:owner group for POST/PATCH/DELETE, using auth:sanctum + role middleware (C-2/C-3 pattern). All controllers follow same grouping. C-6 adds no-auth order endpoints (server/kitchen device pattern). C-12 adds kitchen clock endpoint. C-13 adds owner-gated time-entries listing. C-21 adds owner-gated employee CRUD.
+API route definitions. Defines public GET endpoints and Owner-gated mutations in role:owner group for POST/PATCH/DELETE, using auth:sanctum + role middleware (C-2/C-3 pattern). All controllers follow same grouping. C-6 adds no-auth order endpoints (server/kitchen device pattern). C-12 adds kitchen clock endpoint. C-13 adds owner-gated time-entries listing. C-21 adds owner-gated employee CRUD. C-24 adds owner-gated analytics endpoints.
 
 ## Exports
 - GET /api/tables → TableController@index (open)
@@ -41,6 +41,8 @@ API route definitions. Defines public GET endpoints and Owner-gated mutations in
 - PATCH /api/employees/{user} → EmployeeController@update (role:owner, C-21)
 - PATCH /api/employees/{user}/deactivate → EmployeeController@deactivate (role:owner, C-21)
 - PATCH /api/employees/{user}/reactivate → EmployeeController@reactivate (role:owner, C-21)
+- GET /api/analytics/sales → AnalyticsController@sales (role:owner, C-24, supports ?from=, ?to= filters)
+- GET /api/analytics/menu-items → AnalyticsController@menuItems (role:owner, C-24, supports ?from=, ?to= filters)
 
 ## Imports
 - app/Http/Controllers/Api/TableController
@@ -49,6 +51,7 @@ API route definitions. Defines public GET endpoints and Owner-gated mutations in
 - app/Http/Controllers/Api/InventoryItemController
 - app/Http/Controllers/Api/MenuItemInventoryItemController
 - app/Http/Controllers/Api/OrderController
+- app/Http/Controllers/Api/AnalyticsController (C-24)
 - app/Http/Controllers/Api/KitchenClockController
 - app/Http/Controllers/Api/EmployeeController (C-21)
 - app/Http/Controllers/Api/TimeEntryController

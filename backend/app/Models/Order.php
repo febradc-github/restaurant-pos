@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,5 +56,30 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Scope to orders that have been paid.
+     *
+     * @param  Builder<Order>  $query
+     * @return Builder<Order>
+     */
+    public function scopePaid(Builder $query): Builder
+    {
+        return $query->where('status', OrderStatus::Paid);
+    }
+
+    /**
+     * Scope to orders paid within a date range. Either bound may be omitted
+     * for an open-ended range.
+     *
+     * @param  Builder<Order>  $query
+     * @return Builder<Order>
+     */
+    public function scopePaidBetween(Builder $query, ?string $from, ?string $to): Builder
+    {
+        return $query
+            ->when($from, fn (Builder $query) => $query->where('paid_at', '>=', $from))
+            ->when($to, fn (Builder $query) => $query->where('paid_at', '<=', $to));
     }
 }

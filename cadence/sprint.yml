@@ -1,27 +1,37 @@
 sprint:
-  name: "Sprint 7"
-  number: 7
-  goal: "Ship Owner Employee Management -- real employee registration, role assignment, and deactivation, closing out the C-20 epic"
+  name: "Sprint 8"
+  number: 8
+  goal: "Ship the Owner Analytics Dashboard -- sales, best/worst-sellers, attendance, and inventory restock -- closing out C-23 and the original digital-transformation goal"
   started: 2026-07-14
   ends: 2026-07-28
   status: active
 items:
-  - id: C-21
-    title: "Employee Management API"
+  - id: C-24
+    title: "Sales & Best-Seller Analytics API"
     type: story
-    parent: C-20
+    parent: C-23
     status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: users.active column (default true, not hidden so Owner UI can read it); EmployeeController (index/store/update/deactivate/reactivate) under auth:sanctum+role:owner; store/update validate role-conditionally (email+password for login roles, unique 6-digit pin for Kitchen); deactivate rejects self-deactivation and deactivating the last active Owner (422, errors.user); AuthController::login and KitchenClockController::clock both extended to reject inactive users via the exact same rejection branch/response as wrong-password / invalid-PIN (byte-for-byte identical, verified by test). Kitchen employees get an internal never-exposed placeholder email+password (schema predates PIN-only auth, NOT NULL columns) -- email is always null and password never returned in any response for non-login roles. Response shape for C-22: {id, name, email, role, active, has_pin} uniformly across index/store/update/deactivate/reactivate. 191/191 backend tests passing (538 assertions), Pint clean. Flagged for follow-up: password validation uses a generic min:8 rule, no pre-existing password-strength convention in this codebase to match -- worth confirming stronger rules aren't wanted before C-22 ships a UI around it."
+    notes: "work pass 1: Order gained scopePaid/scopePaidBetween chainable local scopes (mirroring TimeEntry's pattern) instead of raw SQL. New AnalyticsController: GET /api/analytics/sales (revenue grouped by day, Paid orders only, dated by paid_at) and GET /api/analytics/menu-items (quantity_sold + revenue per item, sorted revenue desc by default, both fields present for re-sorting), both owner-gated. Revenue computed as quantity*menu_item.price summed as floats then number_format(...,2) to a string, mirroring PrintAgentClient::payloadFor()'s existing precedent for order totals rather than introducing bcmath. 12/12 new analytics tests, 203/203 full backend suite passing (572 assertions), Pint clean. Response shapes for C-26: sales=[{date, revenue}] ascending by date; menu-items=[{menu_item_id, name, quantity_sold, revenue}] descending by revenue by default."
 
-  - id: C-22
-    title: "Employee Management UI"
+  - id: C-25
+    title: "Inventory Threshold & Restock API"
     type: story
-    parent: C-20
-    status: done
+    parent: C-23
+    status: todo
     points: 6
     assignee: claude
     carryovers: 0
-    notes: "work pass 1: Employees nav entry + /owner/employees route added to OwnerPage's data-driven NAV_ENTRIES (no restructuring of Table Layout/Menu Management). EmployeeManager: Card+Table listing name/role/active status; inline Add-Employee Form with role-conditional credential reveal (Form.useWatch swaps PIN vs email+password field by selected role); edit via Modal+Form (chosen over editable-cell since the credential field's identity must react live to an in-progress role selection) for role change + credential reset; deactivate (Popconfirm-gated) / reactivate per row. Backend 422 errors.user (self-deactivation, last-active-Owner) parsed and surfaced via Alert. Closed the C-21 review gap client-side: edit modal makes the new credential field required whenever the selected role crosses the login/Kitchen boundary from the employee's current role, blocking submission until filled. New api/employees.ts + types/employee.ts mirroring api/menu.ts's factory pattern, exact C-21 field/method contract. Scope decision: edit modal does not expose email (only role + role-conditional credential) -- avoids a stale-resend bug, not required by acceptance criteria. 115/116 full-suite tests passing -- the 1 failure (MenuManager edit-save) reproduced identically against the pre-C-22 tree via git stash, confirming the now-familiar pre-existing full-suite resource-contention flake, unrelated to this ticket. New suites all green in isolation (employees.test.ts 8/8, EmployeeManager.test.tsx 13/13, OwnerPage.test.tsx 7/7 incl. 2 new nav tests). typecheck/lint clean. This closes epic C-20."
+    notes: ""
+
+  - id: C-26
+    title: "Analytics Dashboard UI"
+    type: story
+    parent: C-23
+    status: todo
+    points: 7
+    assignee: claude
+    carryovers: 0
+    notes: ""

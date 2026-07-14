@@ -4,7 +4,7 @@ tags: [pos, backend, infrastructure]
 aliases: ["POS core system", "system shape"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[EP-1]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]", "[[AR-frontend-design-system]]", "[[EP-10]]", "[[adr-008-server-login-kitchen-pin-attendance]]"]
+related: ["[[EP-1]]", "[[EP-23]]", "[[pos-launch-session-2026-07-14]]", "[[AR-print-agent-polyglot]]", "[[AR-frontend-design-system]]", "[[AR-chainable-query-scopes-for-analytics]]", "[[AR-live-computed-suggestions-vs-snapshots]]", "[[EP-10]]", "[[adr-008-server-login-kitchen-pin-attendance]]"]
 sources: []
 ---
 
@@ -21,6 +21,7 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 - Table layout configuration
 - Role-based access control
 - Time entries tracking for attendance/payroll (new in C-10)
+- Analytics queries for owner dashboard (C-23): sales-over-time, best-seller ranking, inventory reorder suggestions. See [[AR-chainable-query-scopes-for-analytics]] and [[AR-live-computed-suggestions-vs-snapshots]] for pattern details.
 
 **PostgreSQL datastore:**
 - Primary database for all persistent state
@@ -58,6 +59,8 @@ Single self-hosted on-premise deployment (one local machine at the restaurant, e
 ## Key Architectural Decisions
 
 - **Attendance tracking (C-10):** Time-in/time-out is now tracked across all authenticated staff via a `time_entries` table. Server added real Sanctum login to support this. Kitchen order display remains gate-free, but Kitchen staff authenticate separately via PIN for clock-in/out only (no session issued). See [[adr-008-server-login-kitchen-pin-attendance]] for the reasoning on this partial reversal of the original "no login" design.
+
+- **Analytics queries (C-23):** Owner dashboard queries reuse the chainable local-scope pattern established by TimeEntry (forUser/forRole/clockedInBetween) rather than raw SQL or generic parameterized endpoints. See [[AR-chainable-query-scopes-for-analytics]]. Inventory reorder suggestions are computed live on dashboard load without scheduled jobs. See [[AR-live-computed-suggestions-vs-snapshots]].
 
 ## Network & Durability
 

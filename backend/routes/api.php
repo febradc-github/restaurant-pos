@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashierController;
 use App\Http\Controllers\Api\CategoryController;
@@ -109,4 +110,14 @@ Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
     Route::patch('/employees/{user}', [EmployeeController::class, 'update']);
     Route::patch('/employees/{user}/deactivate', [EmployeeController::class, 'deactivate']);
     Route::patch('/employees/{user}/reactivate', [EmployeeController::class, 'reactivate']);
+});
+
+// Sales & best-seller analytics (C-24). Owner-only, same role-gate pattern
+// as /time-entries above. Both endpoints only ever consider Paid orders,
+// dated by paid_at -- Pending, Ready, and Cancelled orders never
+// contribute. Inventory-side analytics (C-25) and the frontend that
+// consumes all of this (C-26) are separate tickets.
+Route::middleware(['auth:sanctum', 'role:owner'])->group(function () {
+    Route::get('/analytics/sales', [AnalyticsController::class, 'sales']);
+    Route::get('/analytics/menu-items', [AnalyticsController::class, 'menuItems']);
 });
