@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { Alert, Button, Card, InputNumber, Select, Space, Typography } from 'antd'
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import { createTablesApi } from '../api/tables'
 import { createMenuApi } from '../api/menu'
 import { createOrdersApi } from '../api/orders'
@@ -21,6 +23,13 @@ function errorMessage(err: unknown, fallback: string): string {
  * design), so it never sends an auth token. Fetches tables and available
  * menu items on mount, lets the Server pick a table and quantities per menu
  * item, then submits the order and resets the form on success.
+ *
+ * Rebuilt on Ant Design (C-18): a waiter uses this tableside on a tablet, so
+ * speed and large touch targets matter more than density. Table selection
+ * -- the first thing the waiter does -- is a searchable Select up top (there
+ * could be many tables). Each menu item gets a +/- Button pair flanking an
+ * InputNumber for fast, accurate tap-to-adjust quantity, with generous
+ * spacing between rows instead of a cramped list.
  */
 export function OrderTaking({ apiBaseUrl }: OrderTakingProps) {
   const tablesApi = useMemo(() => createTablesApi({ baseUrl: apiBaseUrl }), [apiBaseUrl])
@@ -54,6 +63,7 @@ export function OrderTaking({ apiBaseUrl }: OrderTakingProps) {
   }, [tablesApi, menuApi])
 
   const availableItems = (menuItems ?? []).filter((item) => item.available)
+  const tableOptions = (tables ?? []).map((table) => ({ value: String(table.id), label: table.label }))
 
   function setQuantity(itemId: number, quantity: number) {
     setQuantities((prev) => {
@@ -99,56 +109,90 @@ export function OrderTaking({ apiBaseUrl }: OrderTakingProps) {
 
   return (
     <div className="order-taking">
-      <h2>Take Order</h2>
+      <Typography.Title level={2}>Take Order</Typography.Title>
 
-      {error && (
-        <p className="order-taking__error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <Alert type="error" showIcon message={error} className="order-taking__error" />}
       {confirmation && (
-        <p className="order-taking__confirmation" role="status">
-          {confirmation}
-        </p>
+        <Alert
+          type="success"
+          showIcon
+          role="status"
+          message={confirmation}
+          className="order-taking__confirmation"
+        />
       )}
 
       {tables === null || menuItems === null ? (
-        <p>Loading…</p>
+        <Typography.Text>Loading…</Typography.Text>
       ) : (
         <form className="order-taking__form" onSubmit={handleSubmit}>
-          <label>
-            Table
-            <select value={selectedTableId} onChange={(event) => setSelectedTableId(event.target.value)}>
-              <option value="" disabled>
-                Select a table
-              </option>
-              {tables.map((table) => (
-                <option key={table.id} value={table.id}>
-                  {table.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+            aria-label="Table"
+            data-testid="table-select"
+            className="order-taking__table-select"
+            size="large"
+            showSearch
+            placeholder="Select a table"
+            value={selectedTableId || undefined}
+            onChange={(value) => setSelectedTableId(value)}
+            optionFilterProp="label"
+            options={tableOptions}
+          />
 
-          <ul className="order-taking__items">
-            {availableItems.map((item) => (
-              <li key={item.id} className="order-taking__item" data-testid={`menu-item-${item.id}`}>
-                <span className="order-taking__item-name">{item.name}</span>
-                <span className="order-taking__item-price">{item.price}</span>
-                <input
-                  type="number"
-                  min={0}
-                  aria-label={`${item.name} quantity`}
-                  value={quantities[item.id] ?? 0}
-                  onChange={(event) => setQuantity(item.id, Number(event.target.value))}
-                />
-              </li>
-            ))}
-          </ul>
+          <Card title="Menu" className="order-taking__menu-card">
+            <div className="order-taking__items">
+              {availableItems.map((item) => {
+                const quantity = quantities[item.id] ?? 0
+                return (
+                  <div key={item.id} data-testid={`menu-item-${item.id}`} className="order-taking__item">
+                    <div className="order-taking__item-info">
+                      <Typography.Text strong className="order-taking__item-name">
+                        {item.name}
+                      </Typography.Text>
+                      <Typography.Text type="secondary" className="order-taking__item-price">
+                        {item.price}
+                      </Typography.Text>
+                    </div>
+                    <Space.Compact className="order-taking__quantity-control">
+                      <Button
+                        aria-label={`Decrease ${item.name} quantity`}
+                        icon={<MinusOutlined />}
+                        size="large"
+                        disabled={quantity <= 0}
+                        onClick={() => setQuantity(item.id, quantity - 1)}
+                      />
+                      <InputNumber
+                        aria-label={`${item.name} quantity`}
+                        className="order-taking__quantity-input"
+                        size="large"
+                        min={0}
+                        value={quantity}
+                        onChange={(value) => setQuantity(item.id, Number(value) || 0)}
+                      />
+                      <Button
+                        aria-label={`Increase ${item.name} quantity`}
+                        icon={<PlusOutlined />}
+                        size="large"
+                        onClick={() => setQuantity(item.id, quantity + 1)}
+                      />
+                    </Space.Compact>
+                  </div>
+                )
+              })}
+            </div>
+          </Card>
 
-          <button type="submit" disabled={submitting}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            block
+            loading={submitting}
+            disabled={submitting}
+            className="order-taking__submit"
+          >
             Place order
-          </button>
+          </Button>
         </form>
       )}
     </div>

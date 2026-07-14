@@ -20,11 +20,11 @@ items:
     title: "Take-Orders Page"
     type: story
     parent: C-14
-    status: todo
+    status: done
     points: 4
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: TakeOrdersPage.tsx (thin Layout/Content wrapper around rebuilt OrderTaking, mirrors CashierPage). OrderTaking rebuilt: searchable large Select for table choice as first control, Card with +/-/InputNumber Space.Compact quantity stepper per menu item (large touch targets, - disabled at 0), full-width primary Button with loading state for Place order, Alert type=error for validation/fetch failures, Alert type=success role=status (explicit role override -- antd Alert hardcodes role=alert by default but spreads restProps after, so an explicit role prop wins) for the confirmation. All original behavior (fetch-on-mount no auth header, available-only filtering, quantity delete-on-zero, validation, ordersApi.create payload, reset-on-success) preserved byte-for-byte. Avoided antd List (deprecated in v6.5.1, emits runtime warning) in favor of a plain div grid. 91/91 frontend tests passing (+6 net), typecheck/lint clean; App.test.tsx route-gating re-confirmed for /take-orders. Notes for C-19: antd Select's non-aria DOM props (e.g. data-testid) land on the root wrapper not the portal dropdown, useful for scoping queries; broad regex getByLabelText matches are a trap when a stepper's +/- buttons share substrings with the input's own label (anchor with ^...$)."
 
   - id: C-19
     title: "Kitchen Page"

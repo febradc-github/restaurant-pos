@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { App as AntdApp, Button, ConfigProvider, Typography } from 'antd'
 import { OwnerPage } from './components/OwnerPage'
-import { OrderTaking } from './components/OrderTaking'
+import { TakeOrdersPage } from './components/TakeOrdersPage'
 import { KitchenDisplay } from './components/KitchenDisplay'
 import { Login } from './components/Login'
 import { CashierPage } from './components/CashierPage'
@@ -134,7 +134,7 @@ function App() {
               path="/take-orders"
               element={
                 <RoleRoute session={session} role="server" onLogout={handleLogout}>
-                  {() => <OrderTaking />}
+                  {() => <TakeOrdersPage />}
                 </RoleRoute>
               }
             />

@@ -1,52 +1,65 @@
 .order-taking {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.order-taking__error {
-  color: #b91c1c;
-}
-
-.order-taking__confirmation {
-  color: #15803d;
+  gap: 1rem;
 }
 
 .order-taking__form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-.order-taking__form > label {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.75rem;
-  gap: 0.15rem;
+.order-taking__table-select {
+  width: 100%;
+  max-width: 24rem;
 }
 
 .order-taking__items {
-  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 0;
-  margin: 0;
 }
 
 .order-taking__item {
+  /* Comfortable touch spacing between rows -- a waiter taps these
+     tableside, so rows must never feel cramped. */
+  padding: 1rem 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0;
+  justify-content: space-between;
+  gap: 1rem;
   border-bottom: 1px solid #eee;
 }
 
-.order-taking__item-name {
+.order-taking__item:last-child {
+  border-bottom: none;
+}
+
+.order-taking__item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
   min-width: 8rem;
 }
 
 .order-taking__item-price::before {
   content: '$';
+}
+
+.order-taking__quantity-control {
+  flex-shrink: 0;
+}
+
+.order-taking__quantity-input {
+  width: 4rem;
+  text-align: center;
+}
+
+.order-taking__quantity-input input {
+  text-align: center;
+}
+
+.order-taking__submit {
+  align-self: stretch;
 }

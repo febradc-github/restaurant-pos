@@ -4,7 +4,7 @@ tags: [code/frontend]
 aliases: ["src/api/orders.ts"]
 created: 2026-07-14
 updated: 2026-07-14
-related: ["[[src-types-order-ts]]", "[[src-api-menu-ts]]", "[[src-api-tables-ts]]"]
+related: ["[[src-types-order-ts]]", "[[src-api-menu-ts]]", "[[src-api-tables-ts]]", "[[src-components-ordertaking-tsx]]"]
 sources: []
 ---
 
@@ -20,3 +20,6 @@ API client for order endpoints, mirrors tables.ts and menu.ts pattern (C-6).
 ## Design
 
 No authentication headers (server/kitchen device pattern). Status filter is optional, returns all orders if not specified.
+
+## Used by
+- [[src-components-ordertaking-tsx|src/components/OrderTaking.tsx]] -- create() call on form submission
