@@ -3,8 +3,8 @@ type: process
 tags: [backend/database, pos]
 aliases: ["Analytics API decimal convention", "analytics-response-decimal-string"]
 created: 2026-07-14
-updated: 2026-07-14
-related: ["[[laravel-decimal-json-serialization-gotcha]]", "[[app-http-controllers-api-analyticscontroller-php]]", "[[US-24]]", "[[US-26]]"]
+updated: 2026-07-15
+related: ["[[laravel-decimal-json-serialization-gotcha]]", "[[app-http-controllers-api-analyticscontroller-php]]", "[[src-types-analytics-ts]]", "[[src-api-analytics-ts]]", "[[US-24]]", "[[US-26]]"]
 sources: []
 ---
 

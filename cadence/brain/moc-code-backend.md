@@ -3,7 +3,7 @@ type: moc
 tags: [code/backend]
 aliases: []
 created: 2026-07-14
-updated: 2026-07-14
+updated: 2026-07-15
 related: []
 sources: []
 ---
@@ -41,6 +41,7 @@ sources: []
 - [[app-http-controllers-api-menuiteminventoryitemcontroller-php]]
 - [[app-http-controllers-api-ordercontroller-php]]
 - [[app-http-controllers-api-analyticscontroller-php]]
+- [[app-http-controllers-api-restockcontroller-php]]
 - [[backend-app-http-controllers-api-kitchenclockcontroller-php]]
 - [[backend-app-http-controllers-api-employeecontroller-php]]
 - [[app-http-controllers-api-timeentrycontroller-php]]
@@ -78,6 +79,7 @@ sources: []
 - [[database-migrations-2026_07_14_000011_create_time_entries_table-php]]
 - [[backend-database-migrations-2026-07-14-000012-add-pin-to-users-table-php]]
 - [[backend-database-migrations-2026-07-14-000013-add-active-to-users-table-php]]
+- [[database-migrations-2026_07_14_000014_add_threshold_to_inventory_items_table-php]]
 
 ## Factories
 - [[database-factories-userfactory-php]]
@@ -98,6 +100,7 @@ sources: []
 - [[tests-feature-inventory-inventoryitemtest-php]]
 - [[tests-feature-inventory-inventorydecrementtest-php]]
 - [[tests-feature-inventory-menuiteminventorylinktest-php]]
+- [[backend-tests-feature-inventory-restocktest-php]]
 - [[tests-feature-orders-ordertest-php]]
 - [[tests-feature-analytics-analyticssalestest-php]]
 - [[tests-feature-analytics-analyticsmenuitemstest-php]]

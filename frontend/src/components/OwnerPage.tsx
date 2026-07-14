@@ -2,11 +2,12 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import type { MenuProps } from 'antd'
-import { AppstoreOutlined, TableOutlined, TeamOutlined } from '@ant-design/icons'
+import { AppstoreOutlined, BarChartOutlined, TableOutlined, TeamOutlined } from '@ant-design/icons'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { TableLayoutEditor } from './TableLayoutEditor'
 import { MenuManager } from './MenuManager'
 import { EmployeeManager } from './EmployeeManager'
+import { AnalyticsDashboard } from './AnalyticsDashboard'
 import './OwnerPage.css'
 
 export interface OwnerPageProps {
@@ -25,15 +26,15 @@ interface OwnerNavEntry {
 }
 
 /**
- * The Owner's primary navigation, structured as data so a third/fourth
- * section (Employee Management, Analytics -- C-16 out of scope, later
- * epics) is a one-line addition here rather than a restructure of the
- * Sider/Menu/Routes wiring below.
+ * The Owner's primary navigation, structured as data so a fourth section
+ * (Analytics, C-26) is a one-line addition here rather than a restructure
+ * of the Sider/Menu/Routes wiring below.
  */
 const NAV_ENTRIES: OwnerNavEntry[] = [
   { key: 'tables', icon: <TableOutlined />, label: 'Table Layout', path: 'tables' },
   { key: 'menu', icon: <AppstoreOutlined />, label: 'Menu Management', path: 'menu' },
   { key: 'employees', icon: <TeamOutlined />, label: 'Employees', path: 'employees' },
+  { key: 'analytics', icon: <BarChartOutlined />, label: 'Analytics', path: 'analytics' },
 ]
 
 /**
@@ -95,6 +96,7 @@ export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
             <Route path="tables" element={<TableLayoutEditor apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
             <Route path="menu" element={<MenuManager apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
             <Route path="employees" element={<EmployeeManager apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
+            <Route path="analytics" element={<AnalyticsDashboard apiBaseUrl={apiBaseUrl} authToken={authToken} />} />
             <Route path="*" element={<Navigate to={ownerPath('tables')} replace />} />
           </Routes>
         </Layout.Content>

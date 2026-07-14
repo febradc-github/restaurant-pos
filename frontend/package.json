@@ -14,6 +14,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.3.2",
     "antd": "^6.5.1",
+    "dayjs": "^1.11.21",
     "laravel-echo": "^2.4.0",
     "pusher-js": "^8.5.0",
     "react": "^19.2.7",

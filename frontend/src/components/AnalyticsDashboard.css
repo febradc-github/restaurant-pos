@@ -1,0 +1,18 @@
+.analytics-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.analytics-dashboard__filters {
+  margin-bottom: 0.5rem;
+}
+
+.analytics-dashboard__section .analytics-dashboard__sales-table {
+  margin-top: 1rem;
+}
+
+.analytics-dashboard__row-actions {
+  display: flex;
+  gap: 0.5rem;
+}

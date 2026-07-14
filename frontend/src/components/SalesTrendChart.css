@@ -1,0 +1,20 @@
+.sales-trend-chart {
+  width: 100%;
+}
+
+.sales-trend-chart--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.sales-trend-chart__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sales-trend-chart__tooltip text {
+  user-select: none;
+}

@@ -22,6 +22,10 @@ function stubFetch() {
       if (url.includes('/api/categories')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/api/menu-items')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/api/employees')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/api/analytics/sales')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/api/analytics/menu-items')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/api/time-entries')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/api/inventory-items/restock')) return Promise.resolve(jsonResponse([]))
       throw new Error(`Unexpected fetch in test: ${url}`)
     }),
   )
@@ -47,12 +51,32 @@ describe('OwnerPage', () => {
     vi.unstubAllGlobals()
   })
 
-  it('shows a nav entry for Table Layout, Menu Management, and Employees', async () => {
+  it('shows a nav entry for Table Layout, Menu Management, Employees, and Analytics', async () => {
     renderOwnerPage('/owner')
 
     expect(await screen.findByRole('menuitem', { name: /table layout/i })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /menu management/i })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /employees/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /analytics/i })).toBeInTheDocument()
+  })
+
+  it('renders the Analytics section directly at /owner/analytics', async () => {
+    renderOwnerPage('/owner/analytics')
+
+    expect(await screen.findByRole('heading', { name: /analytics dashboard/i })).toBeInTheDocument()
+    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+  })
+
+  it('switches to the Analytics section when its nav item is clicked', async () => {
+    const user = userEvent.setup()
+    renderOwnerPage('/owner')
+
+    await screen.findByRole('heading', { name: /floor plan/i })
+
+    await user.click(screen.getByRole('menuitem', { name: /analytics/i }))
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: /analytics dashboard/i })).toBeInTheDocument())
+    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
   })
 
   it('renders the Employees section directly at /owner/employees', async () => {

@@ -30,8 +30,8 @@ items:
     title: "Analytics Dashboard UI"
     type: story
     parent: C-23
-    status: todo
+    status: done
     points: 7
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Added Analytics as a 4th data-driven NAV_ENTRIES item in OwnerPage (no restructuring) with a new /owner/analytics route rendering AnalyticsDashboard. Sales trend is a hand-built SVG line chart (SalesTrendChart.tsx, geometry extracted to salesTrendChartMath.ts) -- 2px colorPrimary line, hairline gridlines, end-marker dot, pointermove crosshair+tooltip (date secondary/revenue bold, never series-colored text) -- no new charting dependency. Best/worst sellers and inventory restock are antd Tables (revenue-desc default sort; restock threshold overridden inline via editable-cell pattern mirroring MenuManager, PATCH response merged not replaced so suggested_threshold/shortfall survive). Attendance aggregates raw /api/time-entries rows client-side (attendanceAggregation.ts) into per-user total hours, showing user_id (no name in that endpoint), in-progress count for open entries, and auto_closed count as a warning Tag. Shared RangePicker (Today/7/30/90-day presets) scopes sales+sellers+attendance together; restock is unscoped, fetches once on mount. New: api/{analytics,restock,timeEntries}.ts + types + tests, components/{SalesTrendChart,AnalyticsDashboard,salesTrendChartMath,attendanceAggregation}. Added dayjs as an explicit dependency (was already transitive via antd's DatePicker). 150/150 full frontend suite passing serially (142/150 under parallel load -- 8 failures are the repo's pre-existing documented flaky-under-parallel-load tests, not regressions), tsc -b clean, oxlint clean. OwnerPage.test.tsx/App.test.tsx re-verified passing with the new nav entry. This is the final story of epic C-23 -- pending review, closes out the epic and the original digital-transformation goal."

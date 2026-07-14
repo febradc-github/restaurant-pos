@@ -3,8 +3,8 @@ type: domain
 tags: [code/frontend, frontend/performance]
 aliases: ["antd bundle size performance"]
 created: 2026-07-14
-updated: 2026-07-14
-related: ["[[US-15]]", "[[US-16]]", "[[US-17]]", "[[US-18]]", "[[US-19]]"]
+updated: 2026-07-15
+related: ["[[hand-built-svg-chart-pattern]]", "[[US-15]]", "[[US-16]]", "[[US-17]]", "[[US-18]]", "[[US-19]]", "[[US-26]]"]
 sources: []
 ---
 
@@ -17,3 +17,5 @@ With antd bundled as a single whole import, the frontend's production main JS ch
 - Vite will automatically code-split each route into its own chunk
 
 This will defer the full antd import until that route is first navigated to, reducing the initial load.
+
+**Related:** C-26's SalesTrendChart exemplifies an alternative strategy for specific components: hand-build lightweight features (single-series charts) rather than adding dependencies. See [[hand-built-svg-chart-pattern]].

@@ -3,7 +3,7 @@ type: moc
 tags: [code/frontend]
 aliases: []
 created: 2026-07-14
-updated: 2026-07-14
+updated: 2026-07-15
 related: []
 sources: []
 ---
@@ -25,6 +25,9 @@ sources: []
 - [[src-types-auth-ts]]
 - [[src-types-checkout-ts]]
 - [[src-types-order-ts]]
+- [[src-types-analytics-ts]]
+- [[src-types-restock-ts]]
+- [[src-types-timeentry-ts]]
 - [[frontend-src-types-kitchenclock-ts]]
 
 ## API clients
@@ -34,12 +37,19 @@ sources: []
 - [[src-api-employees-ts]]
 - [[src-api-employees-test-ts]]
 - [[src-api-orders-ts]]
+- [[src-api-analytics-ts]]
+- [[src-api-restock-ts]]
+- [[src-api-timeentries-ts]]
 - [[frontend-src-api-kitchenclock-ts]]
 
 ## Pages & Components
 - [[src-components-ownerpage-tsx]]
 - [[src-components-ownerpage-css]]
 - [[src-components-ownerpage-test-tsx]]
+- [[src-components-analyticsdashboard-tsx]]
+- [[src-components-salestrendchart-tsx]]
+- [[src-components-salestrendchartmath-ts]]
+- [[src-components-attendanceaggregation-ts]]
 - [[src-components-cashierpage-tsx]]
 - [[src-components-cashierpage-css]]
 - [[src-components-cashierpage-test-tsx]]
@@ -91,3 +101,5 @@ sources: []
 - [[c-16-19-page-pattern-guidance]]
 - [[c3-c4-retroactive-auth-usability]]
 - [[frontend-employee-credential-crossing-validation-gap]]
+- [[hand-built-svg-chart-pattern]]
+- [[restock-patch-response-gotcha]]
