@@ -20,11 +20,11 @@ items:
     title: "Login Page UI Audit & Fixes"
     type: story
     parent: C-28
-    status: todo
+    status: done
     points: 2
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Audited Login.tsx/Login.css against ui-ux-pro-max guidelines. One concrete finding fixed: inputs/submit button were antd default 'middle' size (~32px), below the 44px touch target minimum and inconsistent with the app's established size=\"large\" convention (OrderTaking, KitchenClockPad, KitchenDisplay) -- added size=\"large\" to Input/Input.Password/Button, with a regression test verified to fail pre-fix. All other audit areas checked and found already compliant (visible labels, password toggle, Alert role semantics, focus states, Ant Design tokens, spacing scale) -- documented with evidence in notes rather than invented busywork. 154/154 frontend tests passing, tsc -b clean, oxlint clean."
 
   - id: C-31
     title: "Owner Console UI Audit & Fixes"

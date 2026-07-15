@@ -65,4 +65,16 @@ describe('Login', () => {
     expect(await screen.findByRole('alert')).toBeInTheDocument()
     expect(onLogin).not.toHaveBeenCalled()
   })
+
+  it('renders large-sized inputs and submit button for comfortable touch targets', () => {
+    render(<Login apiBaseUrl={BASE_URL} onLogin={vi.fn()} />)
+
+    expect(screen.getByLabelText(/email/i).closest('.ant-input-affix-wrapper')).toHaveClass(
+      'ant-input-affix-wrapper-lg',
+    )
+    expect(screen.getByLabelText(/password/i).closest('.ant-input-affix-wrapper')).toHaveClass(
+      'ant-input-affix-wrapper-lg',
+    )
+    expect(screen.getByRole('button', { name: /log in/i })).toHaveClass('ant-btn-lg')
+  })
 })

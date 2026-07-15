@@ -23,9 +23,10 @@
     "brain/laravel-11-scheduled-tasks-in-console-routes": 1784012269805.9763,
     "brain/laravel-decimal-json-serialization-gotcha": 1784033871543.999,
     "brain/laravel-reverb-broadcastas-dot-prefix-gotcha": 1783971062443.1604,
+    "brain/login-page-c30-audit-findings": 1784089934286.13,
     "brain/menumanager-flaky-test-vitest-resource-contention": 1784029260009.3218,
     "brain/moc-code-backend": 1784048518011.396,
-    "brain/moc-code-frontend": 1784049170991.1267,
+    "brain/moc-code-frontend": 1784089948525.6262,
     "brain/password-validation-default-open-question": 1784030985847.8613,
     "brain/pos-launch-session-2026-07-14": 1783959790991.8323,
     "brain/restock-patch-response-gotcha": 1784049147642.3535,
@@ -170,8 +171,9 @@
     "code/src-components-kitchenpage-css": 1784029188459.4336,
     "code/src-components-kitchenpage-test-tsx": 1784029187301.2883,
     "code/src-components-kitchenpage-tsx": 1784029184488.1997,
-    "code/src-components-login-css": 1784015509510.157,
-    "code/src-components-login-tsx": 1784015432416.0051,
+    "code/src-components-login-css": 1784089922987.3423,
+    "code/src-components-login-test-tsx": 1784089915961.49,
+    "code/src-components-login-tsx": 1784089911613.3125,
     "code/src-components-menumanager-css": 1784017698571.9456,
     "code/src-components-menumanager-test-tsx": 1784017701343.566,
     "code/src-components-menumanager-tsx": 1784017696411.7815,
@@ -221,5 +223,5 @@
     "code/tests-feature-timeentries-timeentrytest-php": 1784012223885.6804,
     "code/vite-config-ts": 1783967257898.6067
   },
-  "updatedAt": "2026-07-15T04:24:34.960Z"
+  "updatedAt": "2026-07-15T04:32:33.204Z"
 }

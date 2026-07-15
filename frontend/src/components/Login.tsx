@@ -55,7 +55,7 @@ export function Login({ apiBaseUrl, onLogin }: LoginProps) {
 
         <Form<LoginFormValues> layout="vertical" requiredMark={false} onFinish={handleFinish}>
           <Form.Item label="Email" name="identifier" rules={[{ required: true, message: 'Email is required' }]}>
-            <Input autoComplete="username" prefix={<UserOutlined />} disabled={submitting} />
+            <Input size="large" autoComplete="username" prefix={<UserOutlined />} disabled={submitting} />
           </Form.Item>
 
           <Form.Item
@@ -63,11 +63,23 @@ export function Login({ apiBaseUrl, onLogin }: LoginProps) {
             name="password"
             rules={[{ required: true, message: 'Password is required' }]}
           >
-            <Input.Password autoComplete="current-password" prefix={<LockOutlined />} disabled={submitting} />
+            <Input.Password
+              size="large"
+              autoComplete="current-password"
+              prefix={<LockOutlined />}
+              disabled={submitting}
+            />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={submitting} disabled={submitting}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              block
+              loading={submitting}
+              disabled={submitting}
+            >
               Log in
             </Button>
           </Form.Item>
