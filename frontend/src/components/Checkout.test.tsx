@@ -30,10 +30,14 @@ const table1: Table = {
 }
 const burger: MenuItem = { id: 1, name: 'Cheeseburger', price: '9.99', category_id: 1, available: true }
 
+const table2: Table = { ...table1, id: 2, label: 'Bar 3' }
+const fries: MenuItem = { id: 2, name: 'Fries', price: '3.50', category_id: 1, available: true }
+
 const pendingOrder: Order = {
   id: 1,
   table_id: 1,
   status: 'pending',
+  created_at: '2026-07-16T12:00:00Z',
   table: table1,
   items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, menu_item: burger }],
 }
@@ -47,6 +51,7 @@ describe('Checkout', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
   it('does not fetch orders or render any checkout action without a Cashier token', () => {
@@ -191,5 +196,176 @@ describe('Checkout', () => {
     resolveCheckout!(jsonResponse({ ...pendingOrder, status: 'paid', print_status: 'printed' }))
     await waitFor(() => expect(within(orderRow).getByRole('status')).toHaveTextContent(/paid/i))
     expect(within(orderRow).queryByRole('button', { name: /confirm payment/i })).not.toBeInTheDocument()
+  })
+
+  it('shows the order number and elapsed time since the order was placed', async () => {
+    vi.setSystemTime(new Date('2026-07-16T12:12:00Z'))
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-1')
+    expect(within(orderRow).getByText('#1')).toBeInTheDocument()
+    expect(within(orderRow).getByText('12 min')).toBeInTheDocument()
+  })
+
+  it('distinguishes two open orders for the same table by order number', async () => {
+    const secondOrderSameTable: Order = { ...pendingOrder, id: 9 }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder, secondOrderSameTable]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    expect(await screen.findByTestId('checkout-order-1')).toBeInTheDocument()
+    expect(screen.getByTestId('checkout-order-9')).toBeInTheDocument()
+    expect(within(screen.getByTestId('checkout-order-1')).getByText('#1')).toBeInTheDocument()
+    expect(within(screen.getByTestId('checkout-order-9')).getByText('#9')).toBeInTheDocument()
+  })
+
+  it('shows a right-aligned price per line item and a total footer that the confirm button label repeats', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-1')
+    expect(within(orderRow).getByText('₱19.98')).toBeInTheDocument()
+    expect(within(orderRow).getByText(/Total: ₱19\.98/)).toBeInTheDocument()
+    expect(within(orderRow).getByRole('button', { name: /confirm payment ₱19\.98/i })).toBeInTheDocument()
+  })
+
+  it('truncates a long order to the preview count and expands it via "+N more items"', async () => {
+    const user = userEvent.setup()
+    const bigOrder: Order = {
+      ...pendingOrder,
+      id: 3,
+      items: Array.from({ length: 12 }, (_, index) => ({
+        id: index + 1,
+        order_id: 3,
+        menu_item_id: 1,
+        quantity: 1,
+        menu_item: { ...burger, name: `Item ${index + 1}` },
+      })),
+    }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([bigOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-3')
+    expect(within(orderRow).getByText(/^1x Item 1$/)).toBeInTheDocument()
+    expect(within(orderRow).queryByText(/^1x Item 12$/)).not.toBeInTheDocument()
+
+    await user.click(within(orderRow).getByRole('button', { name: /\+7 more items/i }))
+
+    expect(within(orderRow).getByText(/^1x Item 12$/)).toBeInTheDocument()
+    expect(within(orderRow).getByRole('button', { name: /show less/i })).toBeInTheDocument()
+  })
+
+  it('does not truncate an order at or under the preview count', async () => {
+    const smallOrder: Order = {
+      ...pendingOrder,
+      id: 4,
+      items: Array.from({ length: 5 }, (_, index) => ({
+        id: index + 1,
+        order_id: 4,
+        menu_item_id: 1,
+        quantity: 1,
+        menu_item: { ...burger, name: `Item ${index + 1}` },
+      })),
+    }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([smallOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-4')
+    expect(within(orderRow).getByText(/^1x Item 5$/)).toBeInTheDocument()
+    expect(within(orderRow).queryByText(/more items/i)).not.toBeInTheDocument()
+  })
+
+  it('shows a shift-summary header with open order count, pending total, and paid-today total', async () => {
+    const paidToday: Order = {
+      ...pendingOrder,
+      id: 5,
+      status: 'paid',
+      created_at: '2026-07-16T09:00:00Z',
+      items: [{ id: 10, order_id: 5, menu_item_id: 1, quantity: 1, menu_item: burger }],
+    }
+    vi.setSystemTime(new Date('2026-07-16T15:00:00Z'))
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder, paidToday]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    await screen.findByTestId('checkout-order-1')
+    const stats = screen.getByTestId('checkout-stats')
+    expect(within(stats).getByText('Open orders')).toBeInTheDocument()
+    expect(within(stats).getByText('1')).toBeInTheDocument()
+    expect(within(stats).getByText('Pending total')).toBeInTheDocument()
+    expect(within(stats).getByText('₱19.98')).toBeInTheDocument()
+    expect(within(stats).getByText('Paid today')).toBeInTheDocument()
+    expect(within(stats).getByText('₱9.99')).toBeInTheDocument()
+  })
+
+  it('filters visible orders by table label via the search input', async () => {
+    const user = userEvent.setup()
+    const orderOnTable2: Order = { ...pendingOrder, id: 2, table: table2 }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder, orderOnTable2]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    await screen.findByTestId('checkout-order-1')
+    expect(screen.getByTestId('checkout-order-2')).toBeInTheDocument()
+
+    await user.type(screen.getByRole('textbox', { name: /search orders/i }), 'Bar 3')
+
+    expect(screen.queryByTestId('checkout-order-1')).not.toBeInTheDocument()
+    expect(screen.getByTestId('checkout-order-2')).toBeInTheDocument()
+  })
+
+  it('filters visible orders by line item name via the search input', async () => {
+    const user = userEvent.setup()
+    const friesOrder: Order = {
+      ...pendingOrder,
+      id: 2,
+      table: table2,
+      items: [{ id: 20, order_id: 2, menu_item_id: 2, quantity: 1, menu_item: fries }],
+    }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder, friesOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    await screen.findByTestId('checkout-order-1')
+    expect(screen.getByTestId('checkout-order-2')).toBeInTheDocument()
+
+    await user.type(screen.getByRole('textbox', { name: /search orders/i }), 'fries')
+
+    expect(screen.queryByTestId('checkout-order-1')).not.toBeInTheDocument()
+    expect(screen.getByTestId('checkout-order-2')).toBeInTheDocument()
+  })
+
+  it('reorders orders via the sort control, defaulting to oldest first', async () => {
+    const user = userEvent.setup()
+    const older: Order = { ...pendingOrder, id: 1, created_at: '2026-07-16T10:00:00Z' }
+    const newer: Order = { ...pendingOrder, id: 2, table: table2, created_at: '2026-07-16T11:00:00Z' }
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([newer, older]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    await screen.findByTestId('checkout-order-1')
+    const orderedIds = () => screen.getAllByTestId(/checkout-order-/).map((card) => card.dataset.testid)
+    expect(orderedIds()).toEqual(['checkout-order-1', 'checkout-order-2'])
+
+    await user.click(screen.getByRole('combobox', { name: /sort orders/i }))
+    await user.click(await screen.findByText('Newest first'))
+
+    expect(orderedIds()).toEqual(['checkout-order-2', 'checkout-order-1'])
+  })
+
+  it('keeps Cancel order visually demoted to a quiet text-style button', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-1')
+    const cancelButton = within(orderRow).getByRole('button', { name: /cancel order/i })
+    expect(cancelButton).toHaveClass('ant-btn-text')
+    expect(cancelButton).not.toHaveClass('ant-btn-primary')
   })
 })

@@ -92,6 +92,7 @@ describe('OrderTaking', () => {
       id: 5,
       table_id: 1,
       status: 'pending',
+      created_at: '2026-07-16T12:00:00Z',
       table,
       items: [{ id: 1, order_id: 5, menu_item_id: 1, quantity: 2, menu_item: burger }],
     }

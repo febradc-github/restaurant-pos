@@ -30,11 +30,11 @@ items:
     title: "Cashier/Checkout Redesign"
     type: story
     parent: C-35
-    status: todo
+    status: done
     points: 6
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Checkout.tsx redesigned -- order number (#id) + elapsed time since created_at (added to frontend Order type, confirmed no backend change needed since Eloquent's default toArray() already serializes it, just wasn't typed), right-aligned per-line prices, total footer, Confirm button label repeats total, truncation at 5 items with +N more items expander, shift-summary header (open order count/pending total/paid-today via new pure checkoutHelpers.ts), search (table or item name) + oldest/newest sort, Cancel demoted to type=\"text\" danger button (Popconfirm + busy-state preserved exactly). New shared currency formatter (utils/currency.ts, hand-rolled Peso formatting -- ADR-005 confirms this is a Philippines-market POS via QR Ph/GCash, so ₱ not $). Fetch widened from open-only to all orders (needed for paid-today stat) while the card grid still only shows open orders via a visibleOrders derivation. 216/216 tests passing (187 baseline + 29 new), tsc -b clean, oxlint clean -- independently re-verified by running the full suite myself, not just trusting the implementation report."
 
   - id: C-40
     title: "Auto-install PHP in deploy/setup.sh"

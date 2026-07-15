@@ -29,6 +29,7 @@ const pendingOrder: Order = {
   id: 1,
   table_id: 1,
   status: 'pending',
+  created_at: '2026-07-16T12:00:00Z',
   table: {
     id: 1,
     label: 'Table 1',
@@ -56,6 +57,7 @@ const secondOrder: Order = {
   id: 2,
   table_id: 2,
   status: 'pending',
+  created_at: '2026-07-16T12:05:00Z',
   table: {
     id: 2,
     label: 'Table 2',

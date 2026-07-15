@@ -4,17 +4,76 @@
   gap: 1rem;
 }
 
+/* Shift-summary header (C-38): wraps to multiple rows rather than
+   overflowing horizontally at tablet width, matching TableLayoutEditor's
+   stat-row pattern. */
+.checkout__stats {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.checkout__stats .ant-card {
+  flex: 1 1 10rem;
+}
+
+.checkout__toolbar {
+  row-gap: 0.5rem;
+}
+
+.checkout__search {
+  width: 16rem;
+  max-width: 100%;
+}
+
+.checkout__sort {
+  min-width: 10rem;
+}
+
+.checkout__card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.checkout__table-label {
+  margin: 0 !important;
+}
+
+.checkout__meta {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .checkout__line-items {
   list-style: none;
   padding: 0;
   margin: 0.5rem 0;
 }
 
+.checkout__line-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.checkout__line-item-price {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.checkout__more-items {
+  padding-left: 0;
+  height: auto;
+}
+
 .checkout__total {
   display: block;
   font-size: 1.125rem;
   font-variant-numeric: tabular-nums;
-  margin-bottom: 0.75rem;
+  margin: 0.5rem 0 0.75rem;
 }
 
 .checkout__paid-block {

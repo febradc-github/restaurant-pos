@@ -25,6 +25,13 @@ export interface Order {
   id: number
   table_id: number
   status: OrderStatus
+  /**
+   * When the order was placed, as an ISO 8601 string (Eloquent's default
+   * timestamp serialization -- `OrderController` doesn't hide it, so it's
+   * already present on every order response; just wasn't typed here until
+   * C-38 needed it for elapsed-time and shift-summary display).
+   */
+  created_at: string
   table: Table
   items: OrderLineItem[]
 }
