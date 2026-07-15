@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { HTMLAttributes } from 'react'
-import { Alert, Button, Card, Form, Input, Select, Space, Switch, Table } from 'antd'
+import { Alert, Button, Card, Form, Input, Select, Space, Switch, Table, Typography } from 'antd'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { createMenuApi } from '../api/menu'
 import type { Category, MenuItem } from '../types/menu'
@@ -336,7 +336,7 @@ export function MenuManager({ apiBaseUrl, authToken = null }: MenuManagerProps) 
 
   return (
     <div className="menu-manager">
-      <h2>Menu</h2>
+      <Typography.Title level={2}>Menu</Typography.Title>
 
       {error && <Alert className="menu-manager__error" type="error" message={error} showIcon closable onClose={() => setError(null)} />}
 

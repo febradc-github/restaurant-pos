@@ -1,8 +1,15 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Layout, Menu, Typography } from 'antd'
+import { Button, Layout, Menu, Typography } from 'antd'
 import type { MenuProps } from 'antd'
-import { AppstoreOutlined, BarChartOutlined, TableOutlined, TeamOutlined } from '@ant-design/icons'
+import {
+  AppstoreOutlined,
+  BarChartOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  TableOutlined,
+  TeamOutlined,
+} from '@ant-design/icons'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { TableLayoutEditor } from './TableLayoutEditor'
 import { MenuManager } from './MenuManager'
@@ -74,7 +81,7 @@ export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
 
   return (
     <Layout className="owner-page">
-      <Layout.Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+      <Layout.Sider collapsible trigger={null} collapsed={collapsed} onCollapse={setCollapsed}>
         <div className="owner-page__brand">{collapsed ? 'POS' : 'Owner Console'}</div>
         <Menu
           theme="dark"
@@ -86,6 +93,13 @@ export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
       </Layout.Sider>
       <Layout>
         <Layout.Header className="owner-page__header">
+          <Button
+            type="text"
+            className="owner-page__collapse-toggle"
+            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed((prev) => !prev)}
+          />
           <Typography.Title level={4} className="owner-page__title">
             {selectedEntry?.label ?? 'Owner'}
           </Typography.Title>

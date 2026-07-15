@@ -169,6 +169,24 @@ describe('TableLayoutEditor', () => {
     expect(body).toEqual({ x: 60, y: 60 })
   })
 
+  it('renders the Floor Plan heading and an 800x600 canvas as normal DOM structure (post-C-29 shell fix)', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([]))
+
+    render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+
+    // A regression guard for the epic's origin bug: the app shell used to
+    // force this page to shrink-to-fit, splitting "Floor Plan" one character
+    // per line. Asserting the heading's accessible name is the single intact
+    // string (not fragmented across sibling elements) plus the canvas's
+    // explicit pixel dimensions is the DOM-structure-level check available
+    // to a jsdom test -- true visual layout isn't rendered here.
+    const heading = await screen.findByRole('heading', { level: 2, name: 'Floor Plan' })
+    expect(heading.textContent).toBe('Floor Plan')
+
+    const canvas = screen.getByTestId('floor-plan-canvas')
+    expect(canvas).toHaveStyle({ width: '800px', height: '600px' })
+  })
+
   it('surfaces an error message when the initial fetch fails', async () => {
     vi.mocked(fetch).mockResolvedValueOnce(new Response('boom', { status: 500 }))
 

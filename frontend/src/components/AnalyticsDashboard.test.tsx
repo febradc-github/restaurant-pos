@@ -81,6 +81,15 @@ describe('AnalyticsDashboard', () => {
     vi.unstubAllGlobals()
   })
 
+  it('renders the page heading with the antd Typography token, not a bare h2', async () => {
+    mockAllEndpoints()
+
+    render(<AnalyticsDashboard apiBaseUrl={BASE_URL} authToken="owner-token" />)
+
+    const heading = await screen.findByRole('heading', { level: 2, name: 'Analytics Dashboard' })
+    expect(heading).toHaveClass('ant-typography')
+  })
+
   it('renders a sales chart populated from the analytics sales endpoint', async () => {
     mockAllEndpoints()
 

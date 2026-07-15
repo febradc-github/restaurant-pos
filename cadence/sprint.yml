@@ -30,11 +30,11 @@ items:
     title: "Owner Console UI Audit & Fixes"
     type: story
     parent: C-28
-    status: todo
+    status: done
     points: 5
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Audited OwnerPage shell + all 4 sections against ui-ux-pro-max. Fixed: Sider collapse trigger had no accessible name/keyboard focus (was a bare div, now an explicit Button with aria-label); Menu Management/Employees/Analytics headings used raw <h2> inheriting leftover landing-page CSS instead of Typography.Title (now consistent with Table Layout/Login/Checkout/OrderTaking). Re-verified the epic's origin bug: Table Layout's Floor Plan heading/800x600 canvas render correctly post-C-29, with a new regression test. Checked and confirmed compliant: Alert roles, icon aria-labels, no emoji icons, no focus-ring overrides, status color+text pairing. Deferred with reasons: canvas delete/resize controls below 44px touch target (would require redesigning the floor-plan interaction model, not an audit fix); resize handle has no keyboard equivalent (new feature, not audit scope); Owner Console's compact/small controls vs. the app's size=\"large\" convention (deliberate admin-density pattern, not a deviation -- that convention is for frontline touch interactions). 159/159 frontend tests passing (2 runs, no flake), tsc -b clean, oxlint clean."
 
   - id: C-32
     title: "Cashier & Take-Orders UI Audit & Fixes"

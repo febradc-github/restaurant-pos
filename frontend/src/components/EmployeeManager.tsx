@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { HTMLAttributes } from 'react'
-import { Alert, Button, Card, Form, Input, Modal, Popconfirm, Select, Table, Tag } from 'antd'
+import { Alert, Button, Card, Form, Input, Modal, Popconfirm, Select, Table, Tag, Typography } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import { createEmployeesApi } from '../api/employees'
 import type { Employee, EmployeeRole, EmployeeUpdate } from '../types/employee'
@@ -232,7 +232,7 @@ export function EmployeeManager({ apiBaseUrl, authToken = null }: EmployeeManage
 
   return (
     <div className="employee-manager">
-      <h2>Employee Management</h2>
+      <Typography.Title level={2}>Employee Management</Typography.Title>
 
       {error && (
         <Alert

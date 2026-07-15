@@ -132,4 +132,16 @@ describe('OwnerPage', () => {
     expect(screen.getByRole('menuitem', { name: /menu management/i })).toHaveClass('ant-menu-item-selected')
     expect(screen.getByRole('menuitem', { name: /table layout/i })).not.toHaveClass('ant-menu-item-selected')
   })
+
+  it('collapses and expands the nav sider via an accessible, labeled button', async () => {
+    const user = userEvent.setup()
+    renderOwnerPage('/owner')
+
+    await screen.findByRole('heading', { name: /floor plan/i })
+
+    const collapseButton = screen.getByRole('button', { name: /collapse navigation/i })
+    await user.click(collapseButton)
+
+    expect(await screen.findByRole('button', { name: /expand navigation/i })).toBeInTheDocument()
+  })
 })

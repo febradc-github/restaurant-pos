@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { HTMLAttributes } from 'react'
-import { Alert, Button, Card, DatePicker, InputNumber, Space, Table, Tag } from 'antd'
+import { Alert, Button, Card, DatePicker, InputNumber, Space, Table, Tag, Typography } from 'antd'
 import { CheckCircleOutlined, EditOutlined, WarningOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
@@ -266,7 +266,7 @@ export function AnalyticsDashboard({ apiBaseUrl, authToken = null }: AnalyticsDa
 
   return (
     <div className="analytics-dashboard">
-      <h2>Analytics Dashboard</h2>
+      <Typography.Title level={2}>Analytics Dashboard</Typography.Title>
 
       {error && <Alert className="analytics-dashboard__error" type="error" message={error} showIcon closable onClose={() => setError(null)} />}
 

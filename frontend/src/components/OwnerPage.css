@@ -16,6 +16,7 @@
 .owner-page__header {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   background: #fff;
 }
 

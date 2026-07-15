@@ -66,6 +66,15 @@ describe('EmployeeManager', () => {
     vi.unstubAllGlobals()
   })
 
+  it('renders the page heading with the antd Typography token, not a bare h2', async () => {
+    mockInitialLoad([])
+
+    render(<EmployeeManager apiBaseUrl={BASE_URL} authToken="owner-token" />)
+
+    const heading = await screen.findByRole('heading', { level: 2, name: 'Employee Management' })
+    expect(heading).toHaveClass('ant-typography')
+  })
+
   it('fetches and displays every employee with name, role, and active status', async () => {
     mockInitialLoad([owner, cook])
 

@@ -51,6 +51,15 @@ describe('MenuManager', () => {
     vi.unstubAllGlobals()
   })
 
+  it('renders the page heading with the antd Typography token, not a bare h2', async () => {
+    mockInitialLoad([], [])
+
+    render(<MenuManager apiBaseUrl={BASE_URL} authToken={null} />)
+
+    const heading = await screen.findByRole('heading', { level: 2, name: 'Menu' })
+    expect(heading).toHaveClass('ant-typography')
+  })
+
   it('fetches and displays categories and menu items on mount', async () => {
     mockInitialLoad([appetizers, drinks], [springRolls])
 
