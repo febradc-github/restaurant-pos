@@ -53,4 +53,21 @@ items:
     created: 2026-07-15
     updated: 2026-07-15
 
+  - id: C-35
+    title: "Dark Theme Redesign & UX Overhaul (Owner Console, Cashier, Server)"
+    type: epic
+    status: idea
+    points: 28
+    assignee: claude
+    created: 2026-07-15
+    updated: 2026-07-15
 
+  - id: C-39
+    title: "Server/Take-Orders Redesign"
+    type: story
+    parent: C-35
+    status: ready
+    points: 8
+    assignee: claude
+    created: 2026-07-15
+    updated: 2026-07-16
