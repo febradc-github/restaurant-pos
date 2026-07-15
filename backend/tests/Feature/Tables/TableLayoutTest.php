@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Tables;
 
+use App\Enums\OrderStatus;
+use App\Models\Order;
 use App\Models\Table;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -183,5 +185,89 @@ class TableLayoutTest extends TestCase
         $response = $this->getJson('/api/tables');
 
         $response->assertOk()->assertJsonFragment(['label' => 'Patio 3']);
+    }
+
+    public function test_owner_can_create_a_table_with_a_zone(): void
+    {
+        $owner = User::factory()->owner()->create();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->tokenFor($owner))
+            ->postJson('/api/tables', $this->validTablePayload(['zone' => 'Patio']));
+
+        $response->assertCreated()->assertJsonPath('zone', 'Patio');
+
+        $this->assertDatabaseHas('tables', ['label' => 'Table 1', 'zone' => 'Patio']);
+    }
+
+    public function test_a_table_can_be_created_without_a_zone(): void
+    {
+        $owner = User::factory()->owner()->create();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->tokenFor($owner))
+            ->postJson('/api/tables', $this->validTablePayload());
+
+        $response->assertCreated()->assertJsonPath('zone', null);
+    }
+
+    public function test_owner_can_update_a_tables_zone(): void
+    {
+        $owner = User::factory()->owner()->create();
+        $table = Table::factory()->create(['zone' => 'Main Floor']);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->tokenFor($owner))
+            ->patchJson("/api/tables/{$table->id}", ['zone' => 'Bar']);
+
+        $response->assertOk()->assertJsonPath('zone', 'Bar');
+        $this->assertDatabaseHas('tables', ['id' => $table->id, 'zone' => 'Bar']);
+    }
+
+    public function test_creating_a_table_with_a_non_string_zone_is_rejected(): void
+    {
+        $owner = User::factory()->owner()->create();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->tokenFor($owner))
+            ->postJson('/api/tables', $this->validTablePayload(['zone' => ['not', 'a', 'string']]));
+
+        $response->assertUnprocessable()->assertJsonValidationErrors(['zone']);
+    }
+
+    public function test_index_marks_a_table_occupied_when_it_has_a_pending_order(): void
+    {
+        $table = Table::factory()->create();
+        Order::factory()->create(['table_id' => $table->id, 'status' => OrderStatus::Pending]);
+
+        $response = $this->getJson('/api/tables');
+
+        $response->assertOk()->assertJsonFragment(['id' => $table->id, 'is_occupied' => true]);
+    }
+
+    public function test_index_marks_a_table_occupied_when_it_has_a_ready_order(): void
+    {
+        $table = Table::factory()->create();
+        Order::factory()->create(['table_id' => $table->id, 'status' => OrderStatus::Ready]);
+
+        $response = $this->getJson('/api/tables');
+
+        $response->assertOk()->assertJsonFragment(['id' => $table->id, 'is_occupied' => true]);
+    }
+
+    public function test_index_marks_a_table_available_when_its_only_orders_are_paid_or_cancelled(): void
+    {
+        $table = Table::factory()->create();
+        Order::factory()->create(['table_id' => $table->id, 'status' => OrderStatus::Paid]);
+        Order::factory()->create(['table_id' => $table->id, 'status' => OrderStatus::Cancelled]);
+
+        $response = $this->getJson('/api/tables');
+
+        $response->assertOk()->assertJsonFragment(['id' => $table->id, 'is_occupied' => false]);
+    }
+
+    public function test_index_marks_a_table_with_no_orders_available(): void
+    {
+        $table = Table::factory()->create();
+
+        $response = $this->getJson('/api/tables');
+
+        $response->assertOk()->assertJsonFragment(['id' => $table->id, 'is_occupied' => false]);
     }
 }

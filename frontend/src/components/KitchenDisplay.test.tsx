@@ -29,7 +29,18 @@ const pendingOrder: Order = {
   id: 1,
   table_id: 1,
   status: 'pending',
-  table: { id: 1, label: 'Table 1', shape: 'round', capacity: 4, x: 0, y: 0, width: 80, height: 80 },
+  table: {
+    id: 1,
+    label: 'Table 1',
+    shape: 'round',
+    capacity: 4,
+    zone: 'Main Floor',
+    is_occupied: true,
+    x: 0,
+    y: 0,
+    width: 80,
+    height: 80,
+  },
   items: [
     {
       id: 1,
@@ -45,7 +56,18 @@ const secondOrder: Order = {
   id: 2,
   table_id: 2,
   status: 'pending',
-  table: { id: 2, label: 'Table 2', shape: 'square', capacity: 2, x: 100, y: 0, width: 60, height: 60 },
+  table: {
+    id: 2,
+    label: 'Table 2',
+    shape: 'square',
+    capacity: 2,
+    zone: 'Main Floor',
+    is_occupied: true,
+    x: 100,
+    y: 0,
+    width: 60,
+    height: 60,
+  },
   items: [
     {
       id: 2,

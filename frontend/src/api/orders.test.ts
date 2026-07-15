@@ -17,6 +17,8 @@ const sampleTable: Table = {
   label: 'Table 1',
   shape: 'round',
   capacity: 4,
+  zone: 'Main Floor',
+  is_occupied: false,
   x: 10,
   y: 20,
   width: 80,

@@ -24,6 +24,7 @@ class TableFactory extends Factory
             'label' => 'Table '.fake()->unique()->numberBetween(1, 999),
             'shape' => fake()->randomElement(TableShape::cases()),
             'capacity' => fake()->numberBetween(2, 8),
+            'zone' => fake()->randomElement(['Main Floor', 'Patio', 'Bar', 'Private Room']),
             'x' => fake()->randomFloat(2, 0, 1000),
             'y' => fake()->randomFloat(2, 0, 1000),
             'width' => fake()->randomFloat(2, 40, 200),

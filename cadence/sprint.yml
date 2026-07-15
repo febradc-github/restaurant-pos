@@ -20,11 +20,11 @@ items:
     title: "Owner Console Table Layout Rebuild (Zone Card Grid)"
     type: story
     parent: C-35
-    status: todo
+    status: done
     points: 9
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Backend: additive migration adds nullable tables.zone; Table model +orders() HasMany + zone in Fillable; TableController@index uses withExists to compute is_occupied server-side (open Pending/Ready order), zone added to validation rules. Frontend: TableLayoutEditor.tsx fully rebuilt from canvas to card grid -- stat row (Tables/Seats/Occupied), Add-table form with Zone, tables grouped by zone (Unassigned catch-all) via new tested tableZoneGrouping.ts helper, color-coded cards (green/red, sourced via theme.useToken() per established pattern) for available/occupied, right-hand detail panel (Shape/Seats/Zone/Server -- Server always '--', no Order-to-user relation exists to derive it) with Edit modal/Duplicate/Remove (Popconfirm, mirrors EmployeeManager's Deactivate pattern). OwnerPage.tsx Sider gained breakpoint=\"lg\"/onBreakpoint/collapsedWidth for tablet responsiveness (auto-collapses off-canvas below ~992px, header toggle reveals as full-width overlay). Menu/Employees/Analytics audited for hardcoded light-theme colors -- none found, no changes needed. SCOPE AMENDMENT during implementation: user decided mid-ticket they want a full reservation booking system (customer details, times, list UI, auto-expiry, order conversion), which is bigger than this spec's original 3-color (available/occupied/reserved) scope -- shipped 2 colors only (available/occupied), deferred reserved/reservations entirely to new story C-40 (spec amended accordingly, see SP-37.md). Backend: 231/231 tests passing (21 Table tests, was 13), Pint clean. Frontend: 187/187 passing in isolation (172 baseline + 15 new); full-suite run shows the pre-existing documented MenuManager flake (unrelated, confirmed via isolation rerun), tsc -b clean, oxlint clean, vite build succeeds. End-to-end smoke-tested live against migrate+seed dev DB via curl (zone/is_occupied round-trip, occupied flips on order placement) since no browser/screenshot tool was available in this environment for visual confirmation."
 
   - id: C-38
     title: "Cashier/Checkout Redesign"
@@ -34,4 +34,14 @@ items:
     points: 6
     assignee: claude
     carryovers: 0
+    notes: ""
+
+  - id: C-40
+    title: "Auto-install PHP in deploy/setup.sh"
+    type: task
+    status: todo
+    points: 2
+    assignee: claude
+    carryovers: 0
+    added_mid_sprint: true
     notes: ""

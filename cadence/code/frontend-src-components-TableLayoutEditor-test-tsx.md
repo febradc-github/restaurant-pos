@@ -1,25 +1,34 @@
 ---
 type: file
-tags: [code/frontend]
+tags: [code/frontend, code/testing]
 aliases: ["frontend/src/components/TableLayoutEditor.test.tsx"]
 created: 2026-07-15
-updated: 2026-07-15
-related: ["[[US-31]]"]
+updated: 2026-07-16
+related: ["[[frontend-src-components-TableLayoutEditor-tsx]]", "[[frontend-src-components-tableZoneGrouping-ts]]", "[[src-api-tables-ts]]", "[[US-37]]", "[[US-31]]"]
 sources: []
 ---
 
 # frontend/src/components/TableLayoutEditor.test.tsx
 
-Test suite for TableLayoutEditor component (floor plan editor for table layout configuration).
+Test suite for TableLayoutEditor component. Fully rewritten in C-37 (14 tests); prior C-31 regression test removed.
 
-## Changes (C-31)
+## Test Coverage (C-37)
 
-Added regression test to re-verify the epic's origin bug fix from C-29. The test ensures that the "Floor Plan" heading maintains its accessible name and that the canvas renders at explicit 800x600 dimensions. This prevents regression of C-29's app-shell accessibility improvements.
+- **Fetch and display**: lists tables correctly, handles loading and error states
+- **Stat row**: displays correct table count, total seats, and occupied count
+- **Zone grouping**: tables grouped by zone with "Unassigned" sorted last
+- **Color-coding**: verifies green (`colorSuccessBg`) for available, red (`colorErrorBg`) for occupied
+- **Read-only gating**: no add form or edit controls when `authToken` is absent
+- **Add with zone**: creates a table with optional zone value
+- **Detail panel**: shows/hides correctly, displays Shape/Seats/Zone/Server fields, handles edit/duplicate/remove actions
+- **Fetch error handling**: displays and dismisses error alerts
 
-## Test Coverage
-- Accessible heading name verification (validates C-29 fix is preserved)
-- Canvas rendering dimensions (800x600 explicit size)
+## Coverage notes
+
+- Tests assert against CSS class names, `style.background` values (theme token diffing), and testid/heading presence
+- No browser/screenshot verification available (see [[c37-browser-screenshot-testing-gap]])
+- Zone grouping logic extracted to `tableZoneGrouping.ts` with its own test suite
 
 ## Related Work
-- C-29 app-shell fix provided the origin context for this regression verification
-- No source changes needed in TableLayoutEditor.tsx itself; test-only addition
+- US-31: prior regression test for accessible heading (removed in C-37 rewrite)
+- US-37: full redesign from canvas drag/resize to card-grid UI

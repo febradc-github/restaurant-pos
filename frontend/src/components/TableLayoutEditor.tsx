@@ -1,13 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
-import { Alert, Button, Card, Form, Input, InputNumber, Select, Typography } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
+import {
+  Alert,
+  Button,
+  Card,
+  Descriptions,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Popconfirm,
+  Select,
+  Statistic,
+  Typography,
+  theme as antdTheme,
+} from 'antd'
 import { createTablesApi } from '../api/tables'
-import type { NewTable, Table, TableShape } from '../types/table'
+import type { NewTable, Table, TableShape, TableUpdate } from '../types/table'
+import { groupTablesByZone, UNASSIGNED_ZONE } from './tableZoneGrouping'
 import './TableLayoutEditor.css'
-
-const CANVAS_WIDTH = 800
-const CANVAS_HEIGHT = 600
-const MIN_TABLE_SIZE = 20
 
 const SHAPE_DEFAULTS: Record<TableShape, { width: number; height: number }> = {
   round: { width: 80, height: 80 },
@@ -21,57 +32,57 @@ const SHAPE_OPTIONS: { value: TableShape; label: string }[] = [
   { value: 'rectangular', label: 'Rectangular' },
 ]
 
-function clamp(value: number, min: number, max: number): number {
-  if (max < min) return min
-  return Math.min(Math.max(value, min), max)
-}
-
-interface DragState {
-  id: number
-  pointerId: number
-  startX: number
-  startY: number
-  originX: number
-  originY: number
-  width: number
-  height: number
-  currentX: number
-  currentY: number
-}
-
-interface ResizeState {
-  id: number
-  pointerId: number
-  startX: number
-  startY: number
-  originWidth: number
-  originHeight: number
-  tableX: number
-  tableY: number
-  currentWidth: number
-  currentHeight: number
+const SHAPE_LABEL: Record<TableShape, string> = {
+  round: 'Round',
+  square: 'Square',
+  rectangular: 'Rectangular',
 }
 
 interface AddTableValues {
   label?: string
   shape: TableShape
   capacity: number
+  zone?: string
+}
+
+interface EditTableValues {
+  label: string
+  shape: TableShape
+  capacity: number
+  zone?: string
+}
+
+function errorMessage(err: unknown, fallback: string): string {
+  return err instanceof Error ? err.message : fallback
 }
 
 export interface TableLayoutEditorProps {
   /** Backend origin. Defaults to VITE_API_BASE_URL / localhost. */
   apiBaseUrl?: string
   /**
-   * Owner bearer token. When absent, the canvas renders read-only: no add
-   * form, no delete/resize controls, and dragging is disabled. Real
-   * enforcement happens server-side -- this only gates the UI.
+   * Owner bearer token. When absent, the grid renders read-only: no add
+   * form, no Edit/Duplicate/Remove controls. Real enforcement happens
+   * server-side -- this only gates the UI.
    */
   authToken?: string | null
 }
 
 /**
- * Drag-and-drop floor-plan editor: fetches the table layout on mount and
- * lets an Owner add, move, resize, and delete tables on a fixed-size canvas.
+ * Owner-facing table management screen (C-37): a zone-grouped grid of
+ * color-coded table cards, replacing the earlier canvas-based drag/resize
+ * floor-plan editor (see AR-frontend-design-system's redesign-exception
+ * reversal, adr-012). A stat row summarizes table/seat/occupancy counts, an
+ * inline form adds tables, and selecting a card opens a detail panel with
+ * Edit/Duplicate/Remove actions.
+ *
+ * Occupancy (green/red card coloring) is read straight off each table's
+ * server-computed `is_occupied` flag (TableController@index, C-37) rather
+ * than fetched/derived here from /api/orders -- one shared definition of
+ * "occupied" for every consumer of the tables endpoint, not a second one
+ * reimplemented client-side. Only two states exist: available and occupied.
+ * A third "reserved" state was cut from this ticket's scope (see SP-37's
+ * amendment) since no reservation data model exists anywhere in this
+ * system yet -- building one is tracked separately as C-40.
  */
 export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutEditorProps) {
   const isOwner = Boolean(authToken)
@@ -79,14 +90,16 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
     () => createTablesApi({ baseUrl: apiBaseUrl, token: authToken }),
     [apiBaseUrl, authToken],
   )
+  const { token } = antdTheme.useToken()
 
   const [tables, setTables] = useState<Table[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
 
-  const [addTableForm] = Form.useForm<AddTableValues>()
+  const [addForm] = Form.useForm<AddTableValues>()
 
-  const dragState = useRef<DragState | null>(null)
-  const resizeState = useRef<ResizeState | null>(null)
+  const [editingTable, setEditingTable] = useState<Table | null>(null)
+  const [editForm] = Form.useForm<EditTableValues>()
 
   useEffect(() => {
     let cancelled = false
@@ -97,7 +110,7 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
         if (!cancelled) setTables(fetched)
       })
       .catch((err: unknown) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load layout')
+        if (!cancelled) setError(errorMessage(err, 'Failed to load tables'))
       })
     return () => {
       cancelled = true
@@ -108,12 +121,16 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
     const index = tables?.length ?? 0
     const shape = values.shape ?? 'square'
     const { width, height } = SHAPE_DEFAULTS[shape]
+    // x/y/width/height are vestigial now that the canvas is gone (C-37) --
+    // the backend still stores them, so placeholder values keep the create
+    // request valid without exposing position/size controls in this form.
     const payload: NewTable = {
       label: values.label?.trim() || `Table ${index + 1}`,
       shape,
       capacity: values.capacity ?? 4,
-      x: 20 + (index % 5) * 100,
-      y: 20 + Math.floor(index / 5) * 100,
+      zone: values.zone?.trim() || null,
+      x: 0,
+      y: 0,
       width,
       height,
     }
@@ -121,128 +138,119 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
     try {
       const created = await api.create(payload)
       setTables((prev) => [...(prev ?? []), created])
-      addTableForm.resetFields()
+      addForm.resetFields()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add table')
+      setError(errorMessage(err, 'Failed to add table'))
     }
   }
 
-  async function handleDelete(id: number) {
+  function openEditModal(table: Table) {
+    setError(null)
+    setEditingTable(table)
+    editForm.resetFields()
+    editForm.setFieldsValue({
+      label: table.label,
+      shape: table.shape,
+      capacity: table.capacity,
+      zone: table.zone ?? undefined,
+    })
+  }
+
+  function closeEditModal() {
+    setEditingTable(null)
+  }
+
+  async function handleEditSubmit(values: EditTableValues) {
+    if (!editingTable) return
+    const updates: TableUpdate = {
+      label: values.label.trim(),
+      shape: values.shape,
+      capacity: values.capacity,
+      zone: values.zone?.trim() || null,
+    }
     try {
-      await api.remove(id)
-      setTables((prev) => (prev ?? []).filter((table) => table.id !== id))
+      const updated = await api.update(editingTable.id, updates)
+      setTables((prev) => (prev ?? []).map((table) => (table.id === updated.id ? updated : table)))
+      closeEditModal()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete table')
+      setError(errorMessage(err, 'Failed to update table'))
     }
   }
 
-  function handleDragPointerMove(event: PointerEvent) {
-    const drag = dragState.current
-    if (!drag) return
-    const nextX = clamp(drag.originX + (event.clientX - drag.startX), 0, CANVAS_WIDTH - drag.width)
-    const nextY = clamp(drag.originY + (event.clientY - drag.startY), 0, CANVAS_HEIGHT - drag.height)
-    drag.currentX = nextX
-    drag.currentY = nextY
-    setTables((prev) =>
-      (prev ?? []).map((table) => (table.id === drag.id ? { ...table, x: nextX, y: nextY } : table)),
-    )
-  }
-
-  async function handleDragPointerUp() {
-    const drag = dragState.current
-    dragState.current = null
-    window.removeEventListener('pointermove', handleDragPointerMove)
-    window.removeEventListener('pointerup', handleDragPointerUp)
-    if (!drag) return
-    try {
-      await api.update(drag.id, { x: drag.currentX, y: drag.currentY })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to move table')
-    }
-  }
-
-  function handleTablePointerDown(table: Table, event: ReactPointerEvent<HTMLDivElement>) {
-    if (!isOwner) return
-    dragState.current = {
-      id: table.id,
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      originX: table.x,
-      originY: table.y,
+  async function handleDuplicate(table: Table) {
+    const payload: NewTable = {
+      label: `${table.label} (Copy)`,
+      shape: table.shape,
+      capacity: table.capacity,
+      zone: table.zone,
+      x: table.x,
+      y: table.y,
       width: table.width,
       height: table.height,
-      currentX: table.x,
-      currentY: table.y,
     }
-    window.addEventListener('pointermove', handleDragPointerMove)
-    window.addEventListener('pointerup', handleDragPointerUp)
-  }
-
-  function handleResizePointerMove(event: PointerEvent) {
-    const resize = resizeState.current
-    if (!resize) return
-    const nextWidth = clamp(
-      resize.originWidth + (event.clientX - resize.startX),
-      MIN_TABLE_SIZE,
-      CANVAS_WIDTH - resize.tableX,
-    )
-    const nextHeight = clamp(
-      resize.originHeight + (event.clientY - resize.startY),
-      MIN_TABLE_SIZE,
-      CANVAS_HEIGHT - resize.tableY,
-    )
-    resize.currentWidth = nextWidth
-    resize.currentHeight = nextHeight
-    setTables((prev) =>
-      (prev ?? []).map((table) =>
-        table.id === resize.id ? { ...table, width: nextWidth, height: nextHeight } : table,
-      ),
-    )
-  }
-
-  async function handleResizePointerUp() {
-    const resize = resizeState.current
-    resizeState.current = null
-    window.removeEventListener('pointermove', handleResizePointerMove)
-    window.removeEventListener('pointerup', handleResizePointerUp)
-    if (!resize) return
     try {
-      await api.update(resize.id, { width: resize.currentWidth, height: resize.currentHeight })
+      const created = await api.create(payload)
+      setTables((prev) => [...(prev ?? []), created])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resize table')
+      setError(errorMessage(err, 'Failed to duplicate table'))
     }
   }
 
-  function handleResizeHandlePointerDown(table: Table, event: ReactPointerEvent<HTMLDivElement>) {
-    if (!isOwner) return
-    event.stopPropagation()
-    resizeState.current = {
-      id: table.id,
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      originWidth: table.width,
-      originHeight: table.height,
-      tableX: table.x,
-      tableY: table.y,
-      currentWidth: table.width,
-      currentHeight: table.height,
+  async function handleRemove(table: Table) {
+    try {
+      await api.remove(table.id)
+      setTables((prev) => (prev ?? []).filter((t) => t.id !== table.id))
+      setSelectedId((prev) => (prev === table.id ? null : prev))
+    } catch (err) {
+      setError(errorMessage(err, 'Failed to remove table'))
     }
-    window.addEventListener('pointermove', handleResizePointerMove)
-    window.addEventListener('pointerup', handleResizePointerUp)
+  }
+
+  const selectedTable = tables?.find((table) => table.id === selectedId) ?? null
+  const zoneGroups = useMemo(() => groupTablesByZone(tables ?? []), [tables])
+
+  const totalTables = tables?.length ?? 0
+  const totalSeats = tables?.reduce((sum, table) => sum + table.capacity, 0) ?? 0
+  const occupiedCount = tables?.filter((table) => table.is_occupied).length ?? 0
+
+  /** Green for available, red for occupied -- see the component doc comment for why there's no third state. */
+  function cardStyle(table: Table): CSSProperties {
+    return table.is_occupied
+      ? { background: token.colorErrorBg, borderColor: token.colorErrorBorder }
+      : { background: token.colorSuccessBg, borderColor: token.colorSuccessBorder }
   }
 
   return (
     <div className="table-layout-editor">
-      <Typography.Title level={2}>Floor Plan</Typography.Title>
+      <Typography.Title level={2}>Tables</Typography.Title>
 
-      {error && <Alert className="table-layout-editor__error" type="error" message={error} showIcon />}
+      {error && (
+        <Alert
+          className="table-layout-editor__error"
+          type="error"
+          message={error}
+          showIcon
+          closable
+          onClose={() => setError(null)}
+        />
+      )}
+
+      <div className="table-layout-editor__stats" data-testid="table-stats">
+        <Card size="small">
+          <Statistic title="Tables" value={totalTables} />
+        </Card>
+        <Card size="small">
+          <Statistic title="Seats" value={totalSeats} />
+        </Card>
+        <Card size="small">
+          <Statistic title="Occupied" value={occupiedCount} />
+        </Card>
+      </div>
 
       {isOwner && (
         <Card className="table-layout-editor__toolbar-card" size="small">
           <Form<AddTableValues>
-            form={addTableForm}
+            form={addForm}
             name="add-table"
             layout="inline"
             className="table-layout-editor__toolbar"
@@ -258,6 +266,9 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
             <Form.Item label="Capacity" name="capacity">
               <InputNumber min={1} />
             </Form.Item>
+            <Form.Item label="Zone" name="zone">
+              <Input placeholder="e.g. Patio" />
+            </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">
                 Add table
@@ -267,55 +278,116 @@ export function TableLayoutEditor({ apiBaseUrl, authToken = null }: TableLayoutE
         </Card>
       )}
 
-      {tables === null ? (
-        <p>Loading layout…</p>
-      ) : (
-        <div
-          className="table-layout-editor__canvas"
-          data-testid="floor-plan-canvas"
-          style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
-        >
-          {tables.map((table) => (
-            <div
-              key={table.id}
-              data-testid={`table-${table.id}`}
-              data-shape={table.shape}
-              className={[
-                'table-layout-editor__table',
-                `table-layout-editor__table--${table.shape}`,
-                isOwner ? 'table-layout-editor__table--editable' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              style={{ left: table.x, top: table.y, width: table.width, height: table.height }}
-              onPointerDown={isOwner ? (event) => handleTablePointerDown(table, event) : undefined}
-            >
-              <span>{table.label}</span>
-              <span>Seats {table.capacity}</span>
-
-              {isOwner && (
-                <>
-                  <button
-                    type="button"
-                    className="table-layout-editor__delete"
-                    aria-label={`Delete ${table.label}`}
-                    onPointerDown={(event) => event.stopPropagation()}
-                    onClick={() => handleDelete(table.id)}
-                  >
-                    ×
-                  </button>
-                  <div
-                    className="table-layout-editor__resize-handle"
-                    data-testid={`resize-${table.id}`}
-                    aria-label={`Resize ${table.label}`}
-                    onPointerDown={(event) => handleResizeHandlePointerDown(table, event)}
-                  />
-                </>
-              )}
-            </div>
-          ))}
+      <div className="table-layout-editor__body">
+        <div className="table-layout-editor__grid" data-testid="table-grid">
+          {tables === null ? (
+            <p>Loading tables…</p>
+          ) : (
+            zoneGroups.map(({ zone, tables: zoneTables }) => (
+              <div key={zone} className="table-layout-editor__zone">
+                <Typography.Title level={4}>{zone}</Typography.Title>
+                <div className="table-layout-editor__cards">
+                  {zoneTables.map((table) => (
+                    <button
+                      key={table.id}
+                      type="button"
+                      data-testid={`table-card-${table.id}`}
+                      className={[
+                        'table-layout-editor__card',
+                        table.is_occupied
+                          ? 'table-layout-editor__card--occupied'
+                          : 'table-layout-editor__card--available',
+                        selectedId === table.id ? 'table-layout-editor__card--selected' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      style={cardStyle(table)}
+                      aria-pressed={selectedId === table.id}
+                      onClick={() => setSelectedId(table.id)}
+                    >
+                      <span className="table-layout-editor__card-label">{table.label}</span>
+                      <span className="table-layout-editor__card-seats">Seats {table.capacity}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
         </div>
-      )}
+
+        {selectedTable && (
+          <Card
+            className="table-layout-editor__detail"
+            data-testid="table-detail-panel"
+            title={selectedTable.label}
+          >
+            <Descriptions
+              column={1}
+              size="small"
+              items={[
+                { key: 'shape', label: 'Shape', children: SHAPE_LABEL[selectedTable.shape] },
+                { key: 'seats', label: 'Seats', children: selectedTable.capacity },
+                { key: 'zone', label: 'Zone', children: selectedTable.zone ?? UNASSIGNED_ZONE },
+                // No Order->user/server relation exists anywhere in this
+                // codebase yet (checked Order model, C-37) -- rather than
+                // invent a new backend field out of this ticket's scope,
+                // this line stays a static placeholder until one exists.
+                { key: 'server', label: 'Server', children: '--' },
+              ]}
+            />
+
+            {isOwner && (
+              <div className="table-layout-editor__detail-actions">
+                <Button onClick={() => openEditModal(selectedTable)}>Edit</Button>
+                <Button onClick={() => handleDuplicate(selectedTable)}>Duplicate</Button>
+                <Popconfirm
+                  title="Remove this table?"
+                  okText="Yes, remove"
+                  cancelText="Cancel"
+                  onConfirm={() => handleRemove(selectedTable)}
+                >
+                  <Button danger>Remove</Button>
+                </Popconfirm>
+              </div>
+            )}
+          </Card>
+        )}
+      </div>
+
+      <Modal
+        title={editingTable ? `Edit ${editingTable.label}` : 'Edit table'}
+        open={editingTable !== null}
+        onCancel={closeEditModal}
+        destroyOnHidden
+        footer={null}
+      >
+        <Form<EditTableValues> form={editForm} name="edit-table" layout="vertical" onFinish={handleEditSubmit}>
+          <Form.Item label="Label" name="label" rules={[{ required: true, message: 'Label is required.' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Shape" name="shape" rules={[{ required: true, message: 'Shape is required.' }]}>
+            <Select options={SHAPE_OPTIONS} />
+          </Form.Item>
+          <Form.Item
+            label="Capacity"
+            name="capacity"
+            rules={[{ required: true, message: 'Capacity is required.' }]}
+          >
+            <InputNumber min={1} />
+          </Form.Item>
+          <Form.Item label="Zone" name="zone">
+            <Input placeholder="e.g. Patio" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+            <Button onClick={closeEditModal} className="table-layout-editor__cancel-edit">
+              Cancel
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   )
 }

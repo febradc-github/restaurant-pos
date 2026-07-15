@@ -64,64 +64,64 @@ describe('OwnerPage', () => {
     renderOwnerPage('/owner/analytics')
 
     expect(await screen.findByRole('heading', { name: /analytics dashboard/i })).toBeInTheDocument()
-    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('table-grid')).not.toBeInTheDocument()
   })
 
   it('switches to the Analytics section when its nav item is clicked', async () => {
     const user = userEvent.setup()
     renderOwnerPage('/owner')
 
-    await screen.findByRole('heading', { name: /floor plan/i })
+    await screen.findByRole('heading', { name: /^tables$/i })
 
     await user.click(screen.getByRole('menuitem', { name: /analytics/i }))
 
     await waitFor(() => expect(screen.getByRole('heading', { name: /analytics dashboard/i })).toBeInTheDocument())
-    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('table-grid')).not.toBeInTheDocument()
   })
 
   it('renders the Employees section directly at /owner/employees', async () => {
     renderOwnerPage('/owner/employees')
 
     expect(await screen.findByRole('heading', { name: /employees/i })).toBeInTheDocument()
-    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('table-grid')).not.toBeInTheDocument()
   })
 
   it('switches to the Employees section when its nav item is clicked', async () => {
     const user = userEvent.setup()
     renderOwnerPage('/owner')
 
-    await screen.findByRole('heading', { name: /floor plan/i })
+    await screen.findByRole('heading', { name: /^tables$/i })
 
     await user.click(screen.getByRole('menuitem', { name: /employees/i }))
 
     await waitFor(() => expect(screen.getByRole('heading', { name: /employees/i })).toBeInTheDocument())
-    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('table-grid')).not.toBeInTheDocument()
   })
 
   it('defaults /owner to the Table Layout section', async () => {
     renderOwnerPage('/owner')
 
-    expect(await screen.findByRole('heading', { name: /floor plan/i })).toBeInTheDocument()
-    expect(screen.getByTestId('floor-plan-canvas')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /^tables$/i })).toBeInTheDocument()
+    expect(screen.getByTestId('table-grid')).toBeInTheDocument()
   })
 
   it('renders the Menu Management section directly at /owner/menu', async () => {
     renderOwnerPage('/owner/menu')
 
     expect(await screen.findByRole('heading', { name: /^menu$/i })).toBeInTheDocument()
-    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('table-grid')).not.toBeInTheDocument()
   })
 
   it('switches sections when a nav item is clicked, without a full page reload', async () => {
     const user = userEvent.setup()
     renderOwnerPage('/owner')
 
-    await screen.findByRole('heading', { name: /floor plan/i })
+    await screen.findByRole('heading', { name: /^tables$/i })
 
     await user.click(screen.getByRole('menuitem', { name: /menu management/i }))
 
     await waitFor(() => expect(screen.getByRole('heading', { name: /^menu$/i })).toBeInTheDocument())
-    expect(screen.queryByTestId('floor-plan-canvas')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('table-grid')).not.toBeInTheDocument()
   })
 
   it('marks the active section as selected in the nav', async () => {
@@ -137,7 +137,7 @@ describe('OwnerPage', () => {
     const user = userEvent.setup()
     renderOwnerPage('/owner')
 
-    await screen.findByRole('heading', { name: /floor plan/i })
+    await screen.findByRole('heading', { name: /^tables$/i })
 
     const collapseButton = screen.getByRole('button', { name: /collapse navigation/i })
     await user.click(collapseButton)
@@ -161,7 +161,7 @@ describe('OwnerPage', () => {
     it('widens the expanded sider beyond antd\'s 200px default so labels fit at this app\'s font size', async () => {
       const { container } = renderOwnerPage('/owner')
 
-      await screen.findByRole('heading', { name: /floor plan/i })
+      await screen.findByRole('heading', { name: /^tables$/i })
 
       const sider = container.querySelector('.ant-layout-sider') as HTMLElement
       expect(sider).not.toBeNull()
@@ -172,12 +172,71 @@ describe('OwnerPage', () => {
       const user = userEvent.setup()
       const { container } = renderOwnerPage('/owner')
 
-      await screen.findByRole('heading', { name: /floor plan/i })
+      await screen.findByRole('heading', { name: /^tables$/i })
 
       await user.click(screen.getByRole('button', { name: /collapse navigation/i }))
 
       const sider = container.querySelector('.ant-layout-sider') as HTMLElement
       expect(sider.style.width).toBe('80px')
+    })
+  })
+
+  // C-37: below antd's "lg" Layout.Sider breakpoint (991.98px), the sider
+  // should collapse to a drawer/toggle pattern -- off-canvas (0 width)
+  // rather than the desktop icon rail -- until the header toggle reveals it
+  // as a full-width overlay. jsdom has no real viewport to resize, so these
+  // stub matchMedia to report a match for every query, simulating a tablet-
+  // width viewport the same way Layout.Sider's own responsive observer
+  // would see one (see antd's Sider source: it queries
+  // `screen and (max-width: 991.98px)` for breakpoint="lg" and calls
+  // onBreakpoint/onCollapse synchronously on mount with the match result).
+  describe('sidebar responsiveness (tablet breakpoint, C-37)', () => {
+    function stubNarrowViewport() {
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }))
+    }
+
+    it('auto-collapses the sider off-canvas below the tablet breakpoint', async () => {
+      stubNarrowViewport()
+      const { container } = renderOwnerPage('/owner')
+
+      await screen.findByRole('heading', { name: /^tables$/i })
+
+      const sider = container.querySelector('.ant-layout-sider') as HTMLElement
+      expect(sider.style.width).toBe('0px')
+      expect(screen.getByRole('button', { name: /expand navigation/i })).toBeInTheDocument()
+    })
+
+    it('lets the header toggle reveal the sider as a full-width drawer when narrow', async () => {
+      stubNarrowViewport()
+      const user = userEvent.setup()
+      const { container } = renderOwnerPage('/owner')
+
+      await screen.findByRole('heading', { name: /^tables$/i })
+
+      await user.click(screen.getByRole('button', { name: /expand navigation/i }))
+
+      const sider = container.querySelector('.ant-layout-sider') as HTMLElement
+      expect(sider.style.width).toBe('230px')
+      expect(await screen.findByRole('button', { name: /collapse navigation/i })).toBeInTheDocument()
+    })
+
+    it('does not affect desktop-width sider behavior (unbroken matchMedia stays false)', async () => {
+      const { container } = renderOwnerPage('/owner')
+
+      await screen.findByRole('heading', { name: /^tables$/i })
+
+      const sider = container.querySelector('.ant-layout-sider') as HTMLElement
+      expect(sider.style.width).toBe('230px')
+      expect(screen.getByRole('button', { name: /collapse navigation/i })).toBeInTheDocument()
     })
   })
 })

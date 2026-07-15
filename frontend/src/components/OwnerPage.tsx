@@ -68,6 +68,17 @@ const NAV_ITEMS: MenuProps['items'] = NAV_ENTRIES.map(({ key, icon, label }) => 
  */
 export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
   const [collapsed, setCollapsed] = useState(false)
+  // C-37: tablet-width responsiveness. `broken` tracks whether the Sider's
+  // own `breakpoint` observer currently considers the viewport narrower than
+  // "lg" (991.98px) -- see antd's Layout.Sider source. Below that width the
+  // sider auto-collapses (onBreakpoint below) *and* its collapsedWidth drops
+  // to 0, so it disappears off-canvas entirely rather than sitting as an
+  // 80px icon rail -- the existing header toggle button then acts as a
+  // drawer trigger, expanding it back to full width as an overlay-ish
+  // reveal. Above the breakpoint, collapsedWidth stays at antd's default
+  // 80px, preserving the icon-rail collapse behavior from C-31/C-34
+  // unchanged.
+  const [broken, setBroken] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -86,9 +97,20 @@ export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
           so the longest nav label ("Menu Management") no longer fit and
           antd's built-in menu-item ellipsis truncated it. 230px comfortably
           fits that label plus its icon at this app's font size without
-          over-widening the sider; collapsedWidth is left at antd's default
-          (80px) so the collapsed icon-only behavior is unchanged. */}
-      <Layout.Sider collapsible trigger={null} collapsed={collapsed} onCollapse={setCollapsed} width={230}>
+          over-widening the sider. Desktop collapsedWidth (80px, the
+          icon-only rail) is unchanged from C-34 -- see the `broken` state
+          above for how collapsedWidth adapts below the tablet breakpoint
+          (C-37). */}
+      <Layout.Sider
+        collapsible
+        trigger={null}
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        breakpoint="lg"
+        onBreakpoint={setBroken}
+        collapsedWidth={broken ? 0 : 80}
+        width={230}
+      >
         <div className="owner-page__brand">{collapsed ? 'POS' : 'Owner Console'}</div>
         <Menu
           theme="dark"

@@ -3,7 +3,7 @@ type: moc
 tags: [code/backend]
 aliases: []
 created: 2026-07-14
-updated: 2026-07-15
+updated: 2026-07-16
 related: []
 sources: []
 ---
@@ -22,6 +22,7 @@ sources: []
 ## Models
 - [[app-models-user-php]]
 - [[app-models-table-php]]
+- [[backend-app-models-table-php]]
 - [[app-models-category-php]]
 - [[app-models-menuitem-php]]
 - [[app-models-order-php]]
@@ -35,6 +36,7 @@ sources: []
 - [[app-http-controllers-api-ownercontroller-php]]
 - [[app-http-controllers-api-cashiercontroller-php]]
 - [[app-http-controllers-api-tablecontroller-php]]
+- [[backend-app-http-controllers-api-tablecontroller-php]]
 - [[app-http-controllers-api-categorycontroller-php]]
 - [[app-http-controllers-api-menuitemcontroller-php]]
 - [[app-http-controllers-api-inventoryitemcontroller-php]]
@@ -80,6 +82,7 @@ sources: []
 - [[backend-database-migrations-2026-07-14-000012-add-pin-to-users-table-php]]
 - [[backend-database-migrations-2026-07-14-000013-add-active-to-users-table-php]]
 - [[database-migrations-2026_07_14_000014_add_threshold_to_inventory_items_table-php]]
+- [[backend-database-migrations-2026-07-16-000001-add-zone-to-tables-table-php]]
 
 ## Factories
 - [[database-factories-userfactory-php]]

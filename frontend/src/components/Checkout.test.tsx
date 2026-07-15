@@ -16,7 +16,18 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   })
 }
 
-const table1: Table = { id: 1, label: 'Patio 1', shape: 'round', capacity: 4, x: 0, y: 0, width: 80, height: 80 }
+const table1: Table = {
+  id: 1,
+  label: 'Patio 1',
+  shape: 'round',
+  capacity: 4,
+  zone: 'Patio',
+  is_occupied: true,
+  x: 0,
+  y: 0,
+  width: 80,
+  height: 80,
+}
 const burger: MenuItem = { id: 1, name: 'Cheeseburger', price: '9.99', category_id: 1, available: true }
 
 const pendingOrder: Order = {

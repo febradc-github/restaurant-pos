@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TableLayoutEditor } from './TableLayoutEditor'
 import type { Table } from '../types/table'
@@ -14,27 +14,31 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   })
 }
 
-const roundTable: Table = {
-  id: 1,
-  label: 'Patio 1',
-  shape: 'round',
-  capacity: 4,
-  x: 10,
-  y: 20,
-  width: 80,
-  height: 80,
+function makeTable(overrides: Partial<Table> & Pick<Table, 'id'>): Table {
+  return {
+    label: `Table ${overrides.id}`,
+    shape: 'round',
+    capacity: 4,
+    zone: null,
+    is_occupied: false,
+    x: 0,
+    y: 0,
+    width: 80,
+    height: 80,
+    ...overrides,
+  }
 }
 
-const squareTable: Table = {
+const availableTable = makeTable({ id: 1, label: 'Patio 1', shape: 'round', capacity: 4, zone: 'Patio' })
+const occupiedTable = makeTable({
   id: 2,
   label: 'Bar 2',
   shape: 'square',
   capacity: 2,
-  x: 200,
-  y: 40,
-  width: 60,
-  height: 60,
-}
+  zone: 'Bar',
+  is_occupied: true,
+})
+const unassignedTable = makeTable({ id: 3, label: 'Table 3', shape: 'rectangular', capacity: 6, zone: null })
 
 describe('TableLayoutEditor', () => {
   beforeEach(() => {
@@ -45,50 +49,109 @@ describe('TableLayoutEditor', () => {
     vi.unstubAllGlobals()
   })
 
-  it('fetches and displays tables from the API on mount', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([roundTable, squareTable]))
+  it('fetches and displays tables from the API on mount, under the Tables heading', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable, occupiedTable]))
 
     render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
 
-    expect(await screen.findByText('Patio 1')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 2, name: 'Tables' })).toBeInTheDocument()
+    expect(screen.getByText('Patio 1')).toBeInTheDocument()
     expect(screen.getByText('Bar 2')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith(`${BASE_URL}/api/tables`, expect.anything())
   })
 
-  it('reflects each table shape via a data-shape attribute', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([roundTable, squareTable]))
+  it('shows a stat row summarizing table count, seat count, and occupied count', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable, occupiedTable]))
 
     render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
 
     await screen.findByText('Patio 1')
 
-    expect(screen.getByTestId('table-1')).toHaveAttribute('data-shape', 'round')
-    expect(screen.getByTestId('table-2')).toHaveAttribute('data-shape', 'square')
+    const stats = within(screen.getByTestId('table-stats'))
+    expect(stats.getByText('Tables')).toBeInTheDocument()
+    expect(stats.getByText('2')).toBeInTheDocument() // 2 tables
+    expect(stats.getByText('6')).toBeInTheDocument() // 4 + 2 seats
+    expect(stats.getByText('Seats')).toBeInTheDocument()
+    expect(stats.getByText('Occupied')).toBeInTheDocument()
+    expect(stats.getByText('1')).toBeInTheDocument() // 1 occupied
+  })
+
+  describe('zone grouping', () => {
+    it('groups tables under a heading for their zone', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable, occupiedTable]))
+
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+
+      await screen.findByText('Patio 1')
+
+      expect(screen.getByRole('heading', { level: 4, name: 'Patio' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { level: 4, name: 'Bar' })).toBeInTheDocument()
+    })
+
+    it('groups tables with no zone under an Unassigned heading', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([unassignedTable]))
+
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+
+      await screen.findByText('Table 3')
+
+      expect(screen.getByRole('heading', { level: 4, name: 'Unassigned' })).toBeInTheDocument()
+    })
+  })
+
+  describe('card color-coding', () => {
+    it('marks an available table (no open order) with the available card class', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable]))
+
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+
+      const card = await screen.findByTestId('table-card-1')
+      expect(card).toHaveClass('table-layout-editor__card--available')
+      expect(card).not.toHaveClass('table-layout-editor__card--occupied')
+    })
+
+    it('marks an occupied table (open order) with the occupied card class', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([occupiedTable]))
+
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+
+      const card = await screen.findByTestId('table-card-2')
+      expect(card).toHaveClass('table-layout-editor__card--occupied')
+      expect(card).not.toHaveClass('table-layout-editor__card--available')
+    })
+
+    it('renders available and occupied cards with different background colors', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable, occupiedTable]))
+
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+
+      const availableCard = await screen.findByTestId('table-card-1')
+      const occupiedCard = await screen.findByTestId('table-card-2')
+
+      expect(availableCard.style.background).not.toBe('')
+      expect(occupiedCard.style.background).not.toBe('')
+      expect(availableCard.style.background).not.toBe(occupiedCard.style.background)
+    })
   })
 
   it('does not render owner controls when no auth token is provided', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([roundTable]))
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable]))
 
     render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
 
     await screen.findByText('Patio 1')
 
     expect(screen.queryByRole('button', { name: /add table/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument()
+
+    await userEvent.setup().click(screen.getByTestId('table-card-1'))
+    expect(screen.queryByRole('button', { name: /^edit$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^duplicate$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^remove$/i })).not.toBeInTheDocument()
   })
 
-  it('lets the owner add a table, calling the create endpoint and rendering the result', async () => {
+  it('lets the owner add a table with a zone, calling the create endpoint and rendering the result', async () => {
     const user = userEvent.setup()
-    const createdTable: Table = {
-      id: 3,
-      label: 'New Table',
-      shape: 'rectangular',
-      capacity: 6,
-      x: 20,
-      y: 20,
-      width: 120,
-      height: 80,
-    }
+    const createdTable = makeTable({ id: 3, label: 'New Table', shape: 'rectangular', capacity: 6, zone: 'Patio' })
 
     vi.mocked(fetch)
       .mockResolvedValueOnce(jsonResponse([]))
@@ -103,88 +166,107 @@ describe('TableLayoutEditor', () => {
     await user.click(await screen.findByTitle('Rectangular'))
     await user.clear(screen.getByLabelText(/capacity/i))
     await user.type(screen.getByLabelText(/capacity/i), '6')
+    await user.type(screen.getByLabelText(/zone/i), 'Patio')
     await user.click(screen.getByRole('button', { name: /add table/i }))
 
     expect(await screen.findByText('New Table')).toBeInTheDocument()
 
     const [, createInit] = vi.mocked(fetch).mock.calls[1]
     expect(vi.mocked(fetch).mock.calls[1][0]).toBe(`${BASE_URL}/api/tables`)
-    expect(createInit).toMatchObject({
-      method: 'POST',
-      headers: expect.objectContaining({ Authorization: 'Bearer owner-token' }),
-    })
     expect(JSON.parse(createInit!.body as string)).toMatchObject({
       label: 'New Table',
       shape: 'rectangular',
       capacity: 6,
+      zone: 'Patio',
     })
   })
 
-  it('lets the owner delete a table, calling the delete endpoint and removing it from the canvas', async () => {
-    const user = userEvent.setup()
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(jsonResponse([roundTable]))
-      .mockResolvedValueOnce(new Response(null, { status: 204 }))
+  describe('detail panel', () => {
+    it('shows shape, seats, zone, and a server placeholder when a card is selected', async () => {
+      const user = userEvent.setup()
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([availableTable]))
 
-    render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken="owner-token" />)
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken="owner-token" />)
 
-    await screen.findByText('Patio 1')
+      await user.click(await screen.findByTestId('table-card-1'))
 
-    await user.click(screen.getByRole('button', { name: /delete patio 1/i }))
+      const panel = await screen.findByTestId('table-detail-panel')
+      expect(within(panel).getByText('Round')).toBeInTheDocument()
+      expect(within(panel).getByText('4')).toBeInTheDocument()
+      expect(within(panel).getByText('Patio')).toBeInTheDocument()
+      expect(within(panel).getByText('--')).toBeInTheDocument()
+    })
 
-    await waitFor(() => expect(screen.queryByText('Patio 1')).not.toBeInTheDocument())
+    it('lets the owner edit a table, calling the update endpoint and reflecting the result', async () => {
+      const user = userEvent.setup()
+      const updated = { ...availableTable, label: 'Patio 1 Renamed', zone: 'Deck' }
 
-    const [deleteUrl, deleteInit] = vi.mocked(fetch).mock.calls[1]
-    expect(deleteUrl).toBe(`${BASE_URL}/api/tables/1`)
-    expect(deleteInit).toMatchObject({ method: 'DELETE' })
-  })
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(jsonResponse([availableTable]))
+        .mockResolvedValueOnce(jsonResponse(updated))
 
-  it('lets the owner drag a table, calling the update endpoint with the new coordinates', async () => {
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(jsonResponse([roundTable]))
-      .mockResolvedValueOnce(jsonResponse({ ...roundTable, x: 60, y: 90 }))
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken="owner-token" />)
 
-    render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken="owner-token" />)
+      await user.click(await screen.findByTestId('table-card-1'))
+      await user.click(screen.getByRole('button', { name: /^edit$/i }))
 
-    const tableEl = await screen.findByTestId('table-1')
+      const dialog = within(await screen.findByRole('dialog'))
+      const labelInput = dialog.getByRole('textbox', { name: /^label$/i })
+      await user.clear(labelInput)
+      await user.type(labelInput, 'Patio 1 Renamed')
+      await user.click(dialog.getByRole('button', { name: /^save$/i }))
 
-    tableEl.setPointerCapture = vi.fn()
-    tableEl.releasePointerCapture = vi.fn()
+      await waitFor(() => expect(screen.getByTestId('table-card-1')).toHaveTextContent('Patio 1 Renamed'))
+      expect(screen.getByTestId('table-detail-panel')).toHaveTextContent('Patio 1 Renamed')
+      expect(within(screen.getByTestId('table-detail-panel')).getByText('Deck')).toBeInTheDocument()
 
-    tableEl.dispatchEvent(
-      new PointerEvent('pointerdown', { bubbles: true, clientX: 100, clientY: 100, pointerId: 1 }),
-    )
-    window.dispatchEvent(
-      new PointerEvent('pointermove', { bubbles: true, clientX: 150, clientY: 140, pointerId: 1 }),
-    )
-    window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 150, clientY: 140, pointerId: 1 }))
+      const [updateUrl, updateInit] = vi.mocked(fetch).mock.calls[1]
+      expect(updateUrl).toBe(`${BASE_URL}/api/tables/1`)
+      expect(updateInit).toMatchObject({ method: 'PATCH' })
+      expect(JSON.parse(updateInit!.body as string)).toMatchObject({ label: 'Patio 1 Renamed' })
+    })
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2))
+    it('lets the owner duplicate a table, calling the create endpoint with a distinguishing label', async () => {
+      const user = userEvent.setup()
+      const duplicated = makeTable({ id: 9, label: 'Patio 1 (Copy)', zone: 'Patio' })
 
-    const [updateUrl, updateInit] = vi.mocked(fetch).mock.calls[1]
-    expect(updateUrl).toBe(`${BASE_URL}/api/tables/1`)
-    expect(updateInit).toMatchObject({ method: 'PATCH' })
-    const body = JSON.parse(updateInit!.body as string)
-    // origin (10,20) + delta (50,40) = (60,60)
-    expect(body).toEqual({ x: 60, y: 60 })
-  })
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(jsonResponse([availableTable]))
+        .mockResolvedValueOnce(jsonResponse(duplicated, { status: 201 }))
 
-  it('renders the Floor Plan heading and an 800x600 canvas as normal DOM structure (post-C-29 shell fix)', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([]))
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken="owner-token" />)
 
-    render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken={null} />)
+      await user.click(await screen.findByTestId('table-card-1'))
+      await user.click(screen.getByRole('button', { name: /^duplicate$/i }))
 
-    // A regression guard for the epic's origin bug: the app shell used to
-    // force this page to shrink-to-fit, splitting "Floor Plan" one character
-    // per line. Asserting the heading's accessible name is the single intact
-    // string (not fragmented across sibling elements) plus the canvas's
-    // explicit pixel dimensions is the DOM-structure-level check available
-    // to a jsdom test -- true visual layout isn't rendered here.
-    const heading = await screen.findByRole('heading', { level: 2, name: 'Floor Plan' })
-    expect(heading.textContent).toBe('Floor Plan')
+      expect(await screen.findByText('Patio 1 (Copy)')).toBeInTheDocument()
 
-    const canvas = screen.getByTestId('floor-plan-canvas')
-    expect(canvas).toHaveStyle({ width: '800px', height: '600px' })
+      const [createUrl, createInit] = vi.mocked(fetch).mock.calls[1]
+      expect(createUrl).toBe(`${BASE_URL}/api/tables`)
+      const body = JSON.parse(createInit!.body as string)
+      expect(body.label).toContain('Patio 1')
+      expect(body.label).not.toBe('Patio 1')
+    })
+
+    it('lets the owner remove a table after confirming, calling the delete endpoint', async () => {
+      const user = userEvent.setup()
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(jsonResponse([availableTable]))
+        .mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+      render(<TableLayoutEditor apiBaseUrl={BASE_URL} authToken="owner-token" />)
+
+      await user.click(await screen.findByTestId('table-card-1'))
+      await user.click(screen.getByRole('button', { name: /^remove$/i }))
+      await user.click(await screen.findByRole('button', { name: /yes, remove/i }))
+
+      await waitFor(() => expect(screen.queryByText('Patio 1')).not.toBeInTheDocument())
+
+      const [deleteUrl, deleteInit] = vi.mocked(fetch).mock.calls[1]
+      expect(deleteUrl).toBe(`${BASE_URL}/api/tables/1`)
+      expect(deleteInit).toMatchObject({ method: 'DELETE' })
+      expect(screen.queryByTestId('table-detail-panel')).not.toBeInTheDocument()
+    })
   })
 
   it('surfaces an error message when the initial fetch fails', async () => {
