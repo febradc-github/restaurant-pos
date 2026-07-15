@@ -1,0 +1,47 @@
+sprint:
+  name: "Sprint 10"
+  number: 10
+  goal: "Ship the app-wide dark theme foundation, then rebuild Owner Console's Table Layout and redesign Cashier/Checkout to match the new reference designs (C-35)"
+  started: 2026-07-16
+  ends: 2026-07-30
+  status: completed
+items:
+  - id: C-36
+    title: "App-Wide Dark Theme Foundation"
+    type: story
+    parent: C-35
+    status: done
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: theme.ts switched to antd's darkAlgorithm with explicit dark tokens (colorBgLayout #000000, colorBgContainer #141414); colorPrimary nudged from #C2410C to #E55E10 (same terracotta hue) after a contrast script showed the original seed fell below WCAG's 3:1 UI-component floor against dark backgrounds -- #E55E10 hits ~4.1-4.7:1. index.css's OS-driven @media(prefers-color-scheme:dark) block removed entirely (app is now dark-only, not OS-conditional); its values became the base :root values. C-34's SessionBar inline background kept (still load-bearing -- shields against index.css's now-different --bg token). Two hardcoded-light-color regressions found and fixed: OwnerPage.css's Layout.Header white background (was sitting behind dark-theme text), TableLayoutEditor.css's table/delete-button text color (was inheriting the app's now-light ambient color, went light-on-light against their intentionally-still-light fixed backgrounds -- deferred properly to C-37's rebuild). New theme.test.ts asserts dark backgrounds, retained terracotta hue, and WCAG contrast ratios. 172 tests total, 170 passing; 2 MenuManager.test.tsx failures are pre-existing full-suite timing flakiness (confirmed: reproduces identically against pre-C-36 code via git stash, passes 10/10 in isolation both before and after this change) -- not a regression. tsc -b clean, oxlint clean. Noted for follow-up: App.test.tsx's `?raw` CSS-source imports resolve empty under this vitest config's `css:false`, silently defanging the C-29-era source-text assertions -- pre-existing, out of C-36's scope."
+
+  - id: C-37
+    title: "Owner Console Table Layout Rebuild (Zone Card Grid)"
+    type: story
+    parent: C-35
+    status: done
+    points: 9
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: Backend: additive migration adds nullable tables.zone; Table model +orders() HasMany + zone in Fillable; TableController@index uses withExists to compute is_occupied server-side (open Pending/Ready order), zone added to validation rules. Frontend: TableLayoutEditor.tsx fully rebuilt from canvas to card grid -- stat row (Tables/Seats/Occupied), Add-table form with Zone, tables grouped by zone (Unassigned catch-all) via new tested tableZoneGrouping.ts helper, color-coded cards (green/red, sourced via theme.useToken() per established pattern) for available/occupied, right-hand detail panel (Shape/Seats/Zone/Server -- Server always '--', no Order-to-user relation exists to derive it) with Edit modal/Duplicate/Remove (Popconfirm, mirrors EmployeeManager's Deactivate pattern). OwnerPage.tsx Sider gained breakpoint=\"lg\"/onBreakpoint/collapsedWidth for tablet responsiveness (auto-collapses off-canvas below ~992px, header toggle reveals as full-width overlay). Menu/Employees/Analytics audited for hardcoded light-theme colors -- none found, no changes needed. SCOPE AMENDMENT during implementation: user decided mid-ticket they want a full reservation booking system (customer details, times, list UI, auto-expiry, order conversion), which is bigger than this spec's original 3-color (available/occupied/reserved) scope -- shipped 2 colors only (available/occupied), deferred reserved/reservations entirely to a future story (spec amended accordingly, see SP-37.md). Backend: 231/231 tests passing (21 Table tests, was 13), Pint clean. Frontend: 187/187 passing in isolation (172 baseline + 15 new); full-suite run shows the pre-existing documented MenuManager flake (unrelated, confirmed via isolation rerun), tsc -b clean, oxlint clean, vite build succeeds. End-to-end smoke-tested live against migrate+seed dev DB via curl (zone/is_occupied round-trip, occupied flips on order placement) since no browser/screenshot tool was available in this environment for visual confirmation."
+
+  - id: C-38
+    title: "Cashier/Checkout Redesign"
+    type: story
+    parent: C-35
+    status: done
+    points: 6
+    assignee: claude
+    carryovers: 0
+    notes: "work pass 1: Checkout.tsx redesigned -- order number (#id) + elapsed time since created_at (added to frontend Order type, confirmed no backend change needed since Eloquent's default toArray() already serializes it, just wasn't typed), right-aligned per-line prices, total footer, Confirm button label repeats total, truncation at 5 items with +N more items expander, shift-summary header (open order count/pending total/paid-today via new pure checkoutHelpers.ts), search (table or item name) + oldest/newest sort, Cancel demoted to type=\"text\" danger button (Popconfirm + busy-state preserved exactly). New shared currency formatter (utils/currency.ts, hand-rolled Peso formatting -- ADR-005 confirms this is a Philippines-market POS via QR Ph/GCash, so ₱ not $). Fetch widened from open-only to all orders (needed for paid-today stat) while the card grid still only shows open orders via a visibleOrders derivation. 216/216 tests passing (187 baseline + 29 new), tsc -b clean, oxlint clean -- independently re-verified by running the full suite myself, not just trusting the implementation report."
+
+  - id: C-40
+    title: "Auto-install PHP in deploy/setup.sh"
+    type: task
+    status: todo
+    points: 2
+    assignee: claude
+    carryovers: 0
+    added_mid_sprint: true
+    notes: ""
