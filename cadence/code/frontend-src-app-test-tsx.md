@@ -1,10 +1,10 @@
 ---
 type: file
-tags: [code/frontend]
+tags: [code/frontend, code/testing]
 aliases: ["frontend/src/App.test.tsx"]
 created: 2026-07-15
-updated: 2026-07-15
-related: ["[[US-29]]", "[[TK-34]]", "[[frontend-src-app-tsx]]", "[[frontend-src-app-css]]", "[[frontend-src-index-css]]", "[[vitest-jsdom-layout-regression-test-pattern]]"]
+updated: 2026-07-16
+related: ["[[US-29]]", "[[US-36]]", "[[TK-34]]", "[[frontend-src-app-tsx]]", "[[frontend-src-app-css]]", "[[frontend-src-index-css]]", "[[vitest-jsdom-layout-regression-test-pattern]]", "[[vitest-raw-css-imports-empty-string-gotcha]]"]
 sources: []
 ---
 
@@ -16,11 +16,17 @@ Test suite for `App.tsx` focusing on app-shell layout regression tests (C-29). I
 
 Added regression test "session bar contrast (C-34 regression)" asserting that SessionBar has an explicit background color set via inline style, preventing the index.css dark-mode `:root` background from bleeding through.
 
+## Changes (C-36)
+
+Extended with a C-36 regression test asserting index.css no longer contains the OS-driven `@media (prefers-color-scheme: dark)` media query. The test needed a workaround: `?raw` CSS imports currently resolve to an empty string under this project's vitest config (see [[vitest-raw-css-imports-empty-string-gotcha]]), so the test reads the file via `node:fs` directly instead. This required `/// <reference types="node" />` at the file top to bring in ambient Node types for TypeScript.
+
 ## Exports
 - Test cases only (no named exports)
 
 ## Imports
+- `node:fs`, `node:path` -- filesystem access for CSS file content assertions (C-36 workaround)
 - `react`, `@testing-library/react` -- component testing framework
 - `vitest` -- test runner
+- `react-router-dom` (MemoryRouter) -- in-memory router for testing
 - `[[frontend-src-app-tsx|frontend/src/App.tsx]]` -- component under test
-- `App.css?raw`, `index.css?raw` -- CSS content assertions
+- `App.css?raw`, `index.css?raw` -- CSS content assertions (note: these resolve to empty string; see gotcha note above)

@@ -1,3 +1,13 @@
+/// <reference types="node" />
+// The above brings in ambient Node types (process, node:fs/node:path module
+// shapes) for this file only -- tsconfig.app.json's `types` is deliberately
+// scoped to `vite/client` for browser app code, so a project-wide addition
+// isn't warranted just for this test's use of the filesystem (see the
+// indexCssOnDisk comment below). @types/node is already a project
+// devDependency (used by tsconfig.node.json for vite.config.ts), so this
+// adds no new dependency.
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -7,6 +17,14 @@ import appCssSource from './App.css?raw'
 import indexCssSource from './index.css?raw'
 import type { AuthSession } from './types/auth'
 import type { KitchenChannelHandlers } from './realtime/echo'
+
+// C-36: `?raw` CSS imports (used by appCssSource/indexCssSource above)
+// currently resolve to an empty string under this project's vitest config
+// (`test.css: false` appears to disable Vite's CSS pipeline for raw
+// queries too, not just style injection -- pre-existing, unrelated to this
+// ticket). That makes the `?raw`-sourced assertions below vacuous, so the
+// C-36 test reads the file straight off disk instead.
+const indexCssOnDisk = readFileSync(join(process.cwd(), 'src/index.css'), 'utf8')
 
 vi.mock('./realtime/echo', () => ({
   subscribeToKitchenChannel: vi.fn((_handlers: KitchenChannelHandlers) => vi.fn()),
@@ -182,6 +200,18 @@ describe('App', () => {
       const background = (sessionBar as HTMLElement).style.backgroundColor
       expect(background).not.toBe('')
       expect(background).not.toBe('transparent')
+    })
+  })
+
+  // C-36: theme.ts's ConfigProvider is now dark-only (antd `darkAlgorithm`),
+  // so index.css's leftover pre-C-29 `@media (prefers-color-scheme: dark)`
+  // block is redundant at best -- and actively conflicting at worst, since
+  // it flips :root's background based on OS preference independent of the
+  // app's actual (always-dark) theme, rather than a light OS reverting to a
+  // stray light `:root` background behind app content.
+  describe('index.css theme reconciliation (C-36)', () => {
+    it('no longer flips the page background based on OS color-scheme preference', () => {
+      expect(indexCssOnDisk).not.toMatch(/@media\s*\(prefers-color-scheme:\s*dark\)/)
     })
   })
 })

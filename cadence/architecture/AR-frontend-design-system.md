@@ -3,8 +3,8 @@ type: architecture
 tags: [frontend, pos]
 aliases: ["Frontend routing", "Ant Design integration"]
 created: 2026-07-14
-updated: 2026-07-15
-related: ["[[EP-14]]", "[[EP-28]]", "[[US-29]]", "[[AR-POS-core]]", "[[adr-008-server-login-kitchen-pin-attendance]]", "[[adr-009-frontend-redesign-before-digital-transformation]]", "[[adr-011-patch-ant-design-in-place-over-rebuild]]", "[[deploy-static-server-js]]"]
+updated: 2026-07-16
+related: ["[[EP-14]]", "[[EP-28]]", "[[EP-35]]", "[[US-29]]", "[[US-36]]", "[[AR-POS-core]]", "[[adr-008-server-login-kitchen-pin-attendance]]", "[[adr-009-frontend-redesign-before-digital-transformation]]", "[[adr-011-patch-ant-design-in-place-over-rebuild]]", "[[adr-012-redesign-exception-to-adr-011-patch-default]]", "[[DS-35]]", "[[DS-36]]", "[[deploy-static-server-js]]", "[[frontend-src-theme-ts]]", "[[frontend-src-theme-test-ts]]", "[[frontend-src-index-css]]"]
 sources: []
 ---
 
@@ -32,12 +32,16 @@ Auth gates follow the session model established in [[adr-008-server-login-kitche
 
 **Library:** Ant Design (antd)
 
-**Implementation pattern:** Shared `ConfigProvider` wrapper at app root with:
+**Implementation pattern (C-14 through C-35):** Shared `ConfigProvider` wrapper at app root with:
 - Custom brand color palette (chosen per-page/story via the ui-ux-pro-max design skill during implementation, not unified up front)
 - Typography configuration aligned to brand
-- Theme applied globally to all page components
+- Light theme applied globally to all page components
 
-**Coverage:** Every existing screen (Login, TableLayoutEditor, MenuManager, Checkout, OrderTaking, KitchenDisplay, KitchenClockPad) rebuilt with Ant Design components. Exception: TableLayoutEditor's drag/resize canvas interaction logic retained as-is (domain-specific logic, not a typical form/table UI); only surrounding chrome (headers, controls, panels) restyled.
+**Dark theme (C-36):** App-wide dark theme foundation applied via [[frontend-src-theme-ts|theme.ts]], which pins `algorithm: antdTheme.darkAlgorithm`, `colorBgLayout: #000000`, `colorBgContainer: #141414`, and `colorPrimary: #E55E10` (brightened from the light-theme `#C2410C` to achieve WCAG contrast minimums). See [[frontend-src-theme-test-ts|theme.test.ts]] for contrast ratio assertions. [[frontend-src-index-css|index.css]] removed the OS-driven `@media (prefers-color-scheme: dark)` block and became dark-only.
+
+**Coverage:** Every existing screen (Login, Owner Console, Cashier, Take-Orders, Kitchen) rebuilt with Ant Design components. 
+
+**Exception (reversed in-flight by C-35):** TableLayoutEditor's drag/resize canvas interaction logic was retained as-is in C-14 through C-34 (domain-specific logic, not a typical form/table UI); only surrounding chrome (headers, controls, panels) restyled. This exception is **being reversed by [[EP-35]]** (Dark Theme Redesign & UX Overhaul): the canvas-based editor is being removed entirely in favor of a zone-grouped color-coded card grid. See [[adr-012-redesign-exception-to-adr-011-patch-default]] for the decision record. The reversal is in-flight; once C-35's Table Layout story ships, this note will reflect the new architecture.
 
 ## SPA Fallback Compatibility
 
@@ -56,6 +60,6 @@ This shell layer was never cleaned up when the app was repurposed from the Vite 
 ## Key Architectural Decisions
 
 - **Routing replaces presentation mechanism, not auth logic:** The gating model from [[AR-POS-core]] and [[adr-008-server-login-kitchen-pin-attendance]] is explicitly preserved. Routes are a presentation layer reorganization; auth enforcement remains at the API level (Sanctum middleware on backend, token validation on frontend).
-- **Design system per-page:** Ant Design theme and palette choices are made during each page's implementation story (e.g., US-N for the Owner page design). This defers unanimous brand alignment to stories that have design input, rather than pre-committing to a palette that may need revision as pages land. The ConfigProvider umbrella ensures consistency despite per-story choices.
-- **Patch over rebuild for C-28:** See [[adr-011-patch-ant-design-in-place-over-rebuild]] for the decision to audit and fix the existing Ant Design implementation in place rather than rebuild pages from scratch. This honors C-14's production-proven foundation and limits risk.
+- **Design system per-page:** Ant Design theme and palette choices are made during each page's implementation story (e.g., US-N for the Owner page design). This defers unanimous brand alignment to stories that have design input, rather than pre-committing to a palette that may need revision as pages land. The ConfigProvider umbrella ensures consistency despite per-story choices. (C-35's app-wide dark theme will unify this under a single global palette once shipped.)
+- **Patch over rebuild for C-28:** See [[adr-011-patch-ant-design-in-place-over-rebuild]] for the decision to audit and fix the existing Ant Design implementation in place rather than rebuild pages from scratch. This honors C-14's production-proven foundation and limits risk. **Exception (C-35):** See [[adr-012-redesign-exception-to-adr-011-patch-default]] for the decision to redesign three pages (Owner Console's Table Layout, Cashier, Server/Take-Orders) where user-supplied reference designs and accumulated UX gaps warrant the exception ADR-011 explicitly named.
 - **Sequencing:** C-14 is intentionally sequenced ahead of future digital transformation epics (Owner Employee Management, Analytics Dashboard) to establish the design system foundation first. See [[adr-009-frontend-redesign-before-digital-transformation]] for the reasoning.

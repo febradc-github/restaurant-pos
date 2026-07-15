@@ -3,7 +3,7 @@ type: moc
 tags: [code/frontend]
 aliases: []
 created: 2026-07-14
-updated: 2026-07-15
+updated: 2026-07-16
 related: []
 sources: []
 ---
@@ -14,6 +14,8 @@ sources: []
 - [[src-main-tsx]]
 - [[src-app-tsx]]
 - [[src-theme-ts]]
+- [[frontend-src-theme-ts]]
+- [[frontend-src-theme-test-ts]]
 - [[index-html]]
 - [[vite-config-ts]]
 - [[package-json]]
@@ -68,6 +70,7 @@ sources: []
 - [[src-components-tablelayouteditor-tsx]]
 - [[src-components-tablelayouteditor-css]]
 - [[src-components-tablelayouteditor-test-tsx]]
+- [[frontend-src-components-tablelayouteditor-css]]
 - [[src-components-menumanager-tsx]]
 - [[src-components-menumanager-css]]
 - [[src-components-menumanager-test-tsx]]
@@ -89,6 +92,7 @@ sources: []
 ## Testing
 - [[src-test-setup-ts]]
 - [[src-app-test-tsx]]
+- [[frontend-src-app-test-tsx]]
 - [[menumanager-flaky-test-vitest-resource-contention]]
 
 ## Gotchas & Patterns
@@ -105,3 +109,4 @@ sources: []
 - [[hand-built-svg-chart-pattern]]
 - [[restock-patch-response-gotcha]]
 - [[epic-c28-per-item-pending-state-scoping-patterns]]
+- [[vitest-raw-css-imports-empty-string-gotcha]]

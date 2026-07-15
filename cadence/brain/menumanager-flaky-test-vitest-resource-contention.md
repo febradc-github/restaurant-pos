@@ -1,31 +1,23 @@
 ---
-type: process
-tags: [frontend/testing]
+type: domain
+tags: [code/frontend, code/testing, frontend/testing]
 aliases: []
-created: 2026-07-14
-updated: 2026-07-14
-related: ["[[src-components-menumanager-test-tsx]]"]
+created: 2026-07-16
+updated: 2026-07-16
+related: []
 sources: []
 ---
 
-# MenuManager Flaky Test: Vitest Resource Contention
+# MenuManager.test.tsx Has Pre-Existing Full-Suite Timing Flakiness
 
-## Symptom
+MenuManager.test.tsx contains a pre-existing intermittent timeout failure: the test "lets the owner edit and save a category name, menu item" times out at the default 5000ms when the full test suite runs in parallel, but passes reliably (10/10) when run in isolation.
 
-`MenuManager.test.tsx > lets the owner edit and save a category name` intermittently times out ONLY when the full Vitest suite runs together. Test passes 9/9 in isolation; fails sporadically under full-suite load.
+**Discovery:** Confirmed during C-36's implementation (via `git stash` and re-running against pre-C-36 code) that this flakiness predates C-36 entirely. Not introduced by this ticket.
 
-## Investigation
+**Probable cause:** Resource contention when all tests run in parallel. The test passes quickly in isolation but competes for resources (likely DOM, timers, or API mocking) when other tests run concurrently.
 
-Pre-existing and unrelated to C-17/C-18/C-19 (Ant Design redesign). Confirmed by `git stash`-ing all C-19 changes and re-running the full suite against the pre-C-19 codebase: the test still failed under load (in fact, 2 tests failed in one run). MenuManager code and antd Switch behavior are not the root cause.
+**Workaround:** Run the suite serially or run MenuManager.test.tsx in isolation. Neither is ideal for CI.
 
-## Root Cause
+**Out of scope:** C-36 did not investigate or fix this issue; it's orthogonal to the dark theme work.
 
-Likely resource contention across parallel Vitest workers in this environment. The test passes consistently in isolation because it runs alone; under parallel load, worker processes compete for CPU, I/O, or other system resources, causing timeouts in time-sensitive tests.
-
-## Mitigation
-
-This is an environment/test-runner issue, not a product or test logic bug. Future sessions should not waste time chasing this as a regression when it resurfaces. The fix, if ever pursued, would be tuning Vitest's worker pool/concurrency settings (e.g., `--pool-size`, `--workers` flags or vitest.config.ts adjustments), not touching MenuManager or antd code.
-
-## Recommendation
-
-Record this as a known flaky-test artifact of this environment. No action needed on product code; candidate for infrastructure/CI tuning if the full suite becomes critical path.
+**Action item:** Worth a quick-lane bug ticket to either increase MenuManager's test timeout, refactor the test to be more resistant to contention, or investigate the underlying resource bottleneck. For now, if a full-suite CI run goes red on this test in isolation, this gotcha explains why it's not a regression from the most recent ticket.

@@ -7,6 +7,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Layout.Sider defaults to its own dark background (antd's `theme="dark"`
+     Sider default, see the dark `<Menu>` below) independent of
+     ConfigProvider's algorithm, so this stays white under both the old
+     light app theme and the new dark one (C-36) -- not a hardcoded color
+     that needs to track the app palette. */
   color: #fff;
   font-weight: 600;
   overflow: hidden;
@@ -17,7 +22,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #fff;
+  /* C-36: no longer hardcoded to #fff -- under the app's now-dark theme
+     that pinned white background sat behind antd's dark-theme Title/Button
+     text (light-on-light). Layout.Header already carries a theme-aware
+     background of its own (antd's Layout component derives it from
+     colorBgContainer), so removing the override lets that track the app's
+     palette automatically. */
 }
 
 .owner-page__title {

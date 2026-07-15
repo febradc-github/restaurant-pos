@@ -26,6 +26,15 @@
   justify-content: center;
   border: 2px solid #555;
   background: #ffe8c2;
+  /* C-36: this canvas keeps its own fixed light palette regardless of the
+     app theme (the floor-plan rebuild is C-37's job, not this ticket's) --
+     but its label/seat-count text previously had no color of its own, so it
+     inherited the app's ambient text color. That was fine under the old
+     light theme (dark-on-light) but turns light-on-light now that the
+     ambient color is a light near-white (C-36's dark theme). Pinned
+     alongside the equally-fixed peach background above so it stays
+     readable under either theme. */
+  color: #1f1f1f;
   box-sizing: border-box;
   user-select: none;
   touch-action: none;
@@ -61,6 +70,11 @@
   border-radius: 50%;
   border: 1px solid #999;
   background: #fff;
+  /* C-36: same reasoning as .table-layout-editor__table above -- this is a
+     plain <button>, not an antd component, so its "x" glyph had no color of
+     its own and inherited the app's ambient text color. Pinned dark to
+     match this button's own fixed white background. */
+  color: #1f1f1f;
   cursor: pointer;
   font-size: 0.7rem;
 }

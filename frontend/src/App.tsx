@@ -25,14 +25,19 @@ interface SessionBarProps {
 }
 
 /**
- * Wraps its content in an explicit, theme-token-sourced background (C-34) --
- * index.css's leftover `@media (prefers-color-scheme: dark)` block repaints
- * the page background near-black on dark-mode OSes, and this bar has no
- * background of its own to shield it from that bleed-through, making the
- * antd light-theme (dark) text unreadable. Follows this codebase's
- * established pattern (see SalesTrendChart.tsx) of sourcing runtime-theme
- * colors from `theme.useToken()` in TSX rather than CSS custom properties,
- * since ConfigProvider doesn't enable antd's cssVar mode.
+ * Wraps its content in an explicit, theme-token-sourced background (C-34).
+ * Originally this shielded the session text from index.css's OS-driven
+ * dark-mode background bleeding through behind a backgroundless
+ * `.app__session`; C-36 made `theme.ts`'s ConfigProvider dark-only and
+ * removed that OS-driven CSS, but this is still load-bearing, not just
+ * inherited insurance: `.app__session` has no background rule of its own in
+ * App.css, so without this inline style it would show whatever `index.css`'s
+ * `:root { background }` paints (`#16171d`) rather than antd's own
+ * `colorBgContainer` (`#141414`) -- close, but a different token, and one
+ * that would silently drift out of sync with future theme.ts tuning. Follows
+ * this codebase's established pattern (see SalesTrendChart.tsx) of sourcing
+ * runtime-theme colors from `theme.useToken()` in TSX rather than CSS custom
+ * properties, since ConfigProvider doesn't enable antd's cssVar mode.
  */
 function SessionBar({ session, onLogout }: SessionBarProps) {
   const { token } = antdTheme.useToken()
