@@ -35,7 +35,7 @@ function makeOrder(overrides: Partial<Order> = {}): Order {
     status: 'pending',
     created_at: '2026-07-16T12:00:00Z',
     table,
-    items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, menu_item: burger }],
+    items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, notes: null, menu_item: burger }],
     ...overrides,
   }
 }
@@ -44,8 +44,8 @@ describe('orderTotalAmount', () => {
   it('sums quantity x price across every line item', () => {
     const order = makeOrder({
       items: [
-        { id: 1, order_id: 1, menu_item_id: 1, quantity: 2, menu_item: burger },
-        { id: 2, order_id: 1, menu_item_id: 2, quantity: 3, menu_item: fries },
+        { id: 1, order_id: 1, menu_item_id: 1, quantity: 2, notes: null, menu_item: burger },
+        { id: 2, order_id: 1, menu_item_id: 2, quantity: 3, notes: null, menu_item: fries },
       ],
     })
     expect(orderTotalAmount(order)).toBeCloseTo(2 * 9.99 + 3 * 3.5)

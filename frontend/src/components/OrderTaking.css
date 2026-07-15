@@ -4,55 +4,105 @@
   gap: 1rem;
 }
 
-.order-taking__form {
+/* Desktop: menu + summary side by side. Narrow (C-39): the flex-wrap lets
+   the summary aside/bar naturally fall onto its own row below the main
+   column instead of squeezing beside it. */
+.order-taking__layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.order-taking__main {
+  flex: 1 1 20rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.order-taking__table-select {
-  width: 100%;
-  max-width: 24rem;
+.order-taking__section-label {
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-.order-taking__items {
-  display: flex;
-  flex-direction: column;
-}
-
-.order-taking__item {
-  /* Comfortable touch spacing between rows -- a waiter taps these
-     tableside, so rows must never feel cramped. */
-  padding: 1rem 0;
+.order-taking__table-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid #eee;
+  gap: 0.75rem;
 }
 
-.order-taking__item:last-child {
-  border-bottom: none;
-}
-
-.order-taking__item-info {
+.order-taking__menu-section {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  min-width: 8rem;
+  gap: 1rem;
 }
 
-.order-taking__item-price::before {
-  content: '$';
+.order-taking__menu-toolbar {
+  row-gap: 0.5rem;
+}
+
+.order-taking__search {
+  width: 16rem;
+  max-width: 100%;
+}
+
+.order-taking__category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-taking__category-heading {
+  margin: 0 !important;
+}
+
+/* Compact item cards (C-39): name, price, and the +/- stepper stacked
+   together in a fixed-width tile rather than spread across a wide row --
+   the grid wraps as many tiles per row as fit instead of one item per
+   full-width line. */
+.order-taking__items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.75rem;
+}
+
+.order-taking__item-card {
+  border-width: 1px;
+}
+
+/* Accent border once an item's quantity is above zero (C-39) -- the actual
+   accent color is applied inline via theme.useToken(), this just widens the
+   border so the highlight reads clearly against the card's default border. */
+.order-taking__item-card--selected {
+  border-width: 2px;
+}
+
+.order-taking__item-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.order-taking__item-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.order-taking__item-name {
+  overflow-wrap: anywhere;
 }
 
 .order-taking__quantity-control {
-  flex-shrink: 0;
+  align-self: stretch;
 }
 
 .order-taking__quantity-input {
-  width: 4rem;
+  width: 3.5rem;
   text-align: center;
 }
 
@@ -60,6 +110,97 @@
   text-align: center;
 }
 
+/* Persistent right-hand order-summary panel (C-39). */
+.order-taking__summary {
+  flex: 0 0 20rem;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 1rem;
+}
+
+.order-taking__summary-title {
+  margin: 0 !important;
+}
+
+.order-taking__summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.order-taking__summary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.order-taking__summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.order-taking__summary-total {
+  display: block;
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-taking__notes {
+  resize: vertical;
+}
+
 .order-taking__submit {
   align-self: stretch;
+}
+
+/* Narrow/tablet viewports (C-39): the summary collapses into a fixed
+   compact bar at the bottom of the screen. The expanded panel, when open,
+   sits directly above it as a full-width block instead of the sticky
+   sidebar treatment used at desktop widths. */
+.order-taking__summary-mobile {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.order-taking__summary-mobile .order-taking__summary {
+  flex: 1 1 auto;
+  position: static;
+  border-radius: 8px 8px 0 0;
+}
+
+.order-taking__summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.order-taking__summary-bar-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
 }

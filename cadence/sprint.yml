@@ -19,8 +19,8 @@ items:
     title: "Server/Take-Orders Redesign"
     type: story
     parent: C-35
-    status: todo
+    status: done
     points: 8
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Backend: additive migration adds nullable order_items.notes; OrderItem model +notes to Fillable; OrderController@store validates items.*.notes (nullable, max:500) and persists it. Frontend: OrderTaking.tsx fully rebuilt -- categories fetched alongside tables/menu items, category-sectioned menu grid with search box + filter chips, compact item cards (name/price/stepper together, colorPrimary accent border once quantity>0), table selection as Radio.Group chips (buttonStyle=\"solid\") with a \"Served by {serverName}\" tag (serverName newly threaded from App.tsx's RoleRoute session, previously discarded, through TakeOrdersPage -- purely display, order-taking API calls remain unauthenticated as before), persistent right-hand order-summary panel (selected lines, running total via C-38's shared formatCurrency, kitchen-notes textarea, Send to kitchen). Kitchen notes modeled as a single order-level textarea copied onto every submitted line item's notes field (satisfies the per-order_items-field spec criterion without per-item note inputs). Responsive: useIsNarrowViewport() hook (matchMedia max-width:991.98px, mirrors C-37's Sider breakpoint testing pattern) collapses the panel into a compact bottom bar (count/total/Send) below tablet width, expandable back to the full panel. Guest count omitted entirely per spec (no backing field, not separately confirmed as in-scope). Backend: 234/234 tests passing (3 new), Pint clean -- independently re-verified. Frontend: 226/226 passing in isolation (216 baseline -4 replaced +14 new); full-suite run shows the pre-existing documented MenuManager flake (unrelated, confirmed via isolation rerun), tsc -b clean, oxlint clean -- independently re-verified, not just trusting the implementation report."

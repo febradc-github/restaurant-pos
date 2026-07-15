@@ -5,6 +5,12 @@ import './TakeOrdersPage.css'
 export interface TakeOrdersPageProps {
   /** Backend origin. Defaults to VITE_API_BASE_URL / localhost. */
   apiBaseUrl?: string
+  /**
+   * The logged-in Server's name (C-39), forwarded from App.tsx's session --
+   * purely a display label next to the selected table chip, not an auth
+   * token. OrderTaking's API calls remain unauthenticated regardless.
+   */
+  serverName?: string
 }
 
 /**
@@ -18,11 +24,11 @@ export interface TakeOrdersPageProps {
  * token because OrderTaking's API calls have never needed one (Server has
  * no login-gated order-taking endpoints).
  */
-export function TakeOrdersPage({ apiBaseUrl }: TakeOrdersPageProps) {
+export function TakeOrdersPage({ apiBaseUrl, serverName }: TakeOrdersPageProps) {
   return (
     <Layout className="take-orders-page">
       <Layout.Content className="take-orders-page__content">
-        <OrderTaking apiBaseUrl={apiBaseUrl} />
+        <OrderTaking apiBaseUrl={apiBaseUrl} serverName={serverName} />
       </Layout.Content>
     </Layout>
   )

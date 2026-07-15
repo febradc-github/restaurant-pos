@@ -39,7 +39,7 @@ const pendingOrder: Order = {
   status: 'pending',
   created_at: '2026-07-16T12:00:00Z',
   table: table1,
-  items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, menu_item: burger }],
+  items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, notes: null, menu_item: burger }],
 }
 
 const paidOrder: Order = { ...pendingOrder, id: 2, status: 'paid' }
@@ -242,6 +242,7 @@ describe('Checkout', () => {
         order_id: 3,
         menu_item_id: 1,
         quantity: 1,
+        notes: null,
         menu_item: { ...burger, name: `Item ${index + 1}` },
       })),
     }
@@ -268,6 +269,7 @@ describe('Checkout', () => {
         order_id: 4,
         menu_item_id: 1,
         quantity: 1,
+        notes: null,
         menu_item: { ...burger, name: `Item ${index + 1}` },
       })),
     }
@@ -286,7 +288,7 @@ describe('Checkout', () => {
       id: 5,
       status: 'paid',
       created_at: '2026-07-16T09:00:00Z',
-      items: [{ id: 10, order_id: 5, menu_item_id: 1, quantity: 1, menu_item: burger }],
+      items: [{ id: 10, order_id: 5, menu_item_id: 1, quantity: 1, notes: null, menu_item: burger }],
     }
     vi.setSystemTime(new Date('2026-07-16T15:00:00Z'))
     vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder, paidToday]))
@@ -325,7 +327,7 @@ describe('Checkout', () => {
       ...pendingOrder,
       id: 2,
       table: table2,
-      items: [{ id: 20, order_id: 2, menu_item_id: 2, quantity: 1, menu_item: fries }],
+      items: [{ id: 20, order_id: 2, menu_item_id: 2, quantity: 1, notes: null, menu_item: fries }],
     }
     vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder, friesOrder]))
 

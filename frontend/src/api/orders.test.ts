@@ -39,7 +39,7 @@ const sampleOrder: Order = {
   status: 'pending',
   created_at: '2026-07-16T12:00:00Z',
   table: sampleTable,
-  items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, menu_item: sampleMenuItem }],
+  items: [{ id: 1, order_id: 1, menu_item_id: 1, quantity: 2, notes: null, menu_item: sampleMenuItem }],
 }
 
 describe('createOrdersApi', () => {

@@ -14,6 +14,12 @@ export interface OrderLineItem {
   order_id: number
   menu_item_id: number
   quantity: number
+  /**
+   * Free-text kitchen note captured at order-taking time (C-39), e.g. "no
+   * onions". Null when the Server didn't enter one. Not yet surfaced on
+   * Kitchen Display -- that's a deliberately deferred follow-up.
+   */
+  notes: string | null
   menu_item: MenuItem
 }
 
@@ -40,6 +46,15 @@ export interface Order {
 export interface NewOrderItem {
   menu_item_id: number
   quantity: number
+  /**
+   * Free-text kitchen note for this line item (C-39). OrderTaking models
+   * kitchen notes as a single order-level textarea in its UI and copies that
+   * same text onto every submitted line item -- `order_items` is the only
+   * place the backend persists a note (per C-39's spec), and copying a
+   * shared note onto each item is simpler than a second per-item note UI
+   * while still round-tripping through the real per-item field.
+   */
+  notes?: string
 }
 
 /** Fields needed to place a new order. */

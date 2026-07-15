@@ -151,7 +151,7 @@ function App() {
               path="/take-orders"
               element={
                 <RoleRoute session={session} role="server" onLogout={handleLogout}>
-                  {() => <TakeOrdersPage />}
+                  {(active) => <TakeOrdersPage serverName={active.user.name} />}
                 </RoleRoute>
               }
             />

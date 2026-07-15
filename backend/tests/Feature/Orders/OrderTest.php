@@ -54,6 +54,57 @@ class OrderTest extends TestCase
         ]);
     }
 
+    public function test_server_can_attach_a_kitchen_note_to_a_line_item_and_it_is_persisted_and_returned(): void
+    {
+        $table = Table::factory()->create();
+        $burger = MenuItem::factory()->create(['name' => 'Cheeseburger']);
+
+        $response = $this->postJson('/api/orders', [
+            'table_id' => $table->id,
+            'items' => [
+                ['menu_item_id' => $burger->id, 'quantity' => 1, 'notes' => 'No onions, please'],
+            ],
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('items.0.notes', 'No onions, please');
+
+        $this->assertDatabaseHas('order_items', [
+            'menu_item_id' => $burger->id,
+            'notes' => 'No onions, please',
+        ]);
+    }
+
+    public function test_a_line_item_with_no_note_persists_a_null_notes_value(): void
+    {
+        $table = Table::factory()->create();
+        $menuItem = MenuItem::factory()->create();
+
+        $response = $this->postJson('/api/orders', [
+            'table_id' => $table->id,
+            'items' => [
+                ['menu_item_id' => $menuItem->id, 'quantity' => 1],
+            ],
+        ]);
+
+        $response->assertCreated()->assertJsonPath('items.0.notes', null);
+    }
+
+    public function test_a_kitchen_note_over_the_max_length_is_rejected(): void
+    {
+        $table = Table::factory()->create();
+        $menuItem = MenuItem::factory()->create();
+
+        $response = $this->postJson('/api/orders', [
+            'table_id' => $table->id,
+            'items' => [
+                ['menu_item_id' => $menuItem->id, 'quantity' => 1, 'notes' => str_repeat('a', 501)],
+            ],
+        ]);
+
+        $response->assertUnprocessable()->assertJsonValidationErrors(['items.0.notes']);
+    }
+
     public function test_placing_an_order_fires_the_order_placed_broadcast_event(): void
     {
         Event::fake([OrderPlaced::class]);

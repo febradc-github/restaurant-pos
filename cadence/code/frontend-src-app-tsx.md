@@ -4,13 +4,13 @@ tags: [code/frontend]
 aliases: ["frontend/src/App.tsx"]
 created: 2026-07-15
 updated: 2026-07-16
-related: ["[[US-29]]", "[[US-36]]", "[[TK-34]]", "[[AR-frontend-design-system]]", "[[frontend-src-app-css]]", "[[frontend-src-app-test-tsx]]", "[[owner-console-ui-audit-learnings]]"]
+related: ["[[US-29]]", "[[US-36]]", "[[TK-34]]", "[[US-39]]", "[[AR-frontend-design-system]]", "[[frontend-src-app-css]]", "[[frontend-src-app-test-tsx]]", "[[frontend-src-components-takeorderspage-tsx]]", "[[owner-console-ui-audit-learnings]]"]
 sources: []
 ---
 
 # frontend/src/App.tsx
 
-Main application component wrapping routed pages inside a session bar and flex-based main content area. Removed Vite-starter-template `#center` markup and replaced with semantic `<main className="app__main\">` as part of C-29 shell cleanup.
+Main application component wrapping routed pages inside a session bar and flex-based main content area. Removed Vite-starter-template `#center` markup and replaced with semantic `<main className="app__main">` as part of C-29 shell cleanup.
 
 ## Changes (C-34)
 
@@ -19,6 +19,10 @@ SessionBar component now calls antd's `theme.useToken()` and applies an explicit
 ## Changes (C-36)
 
 The C-34 inline background fix was re-verified and kept as still load-bearing: `.app__session` has no CSS background of its own, and even under the new dark theme (ConfigProvider with `darkAlgorithm`, see [[frontend-src-theme-ts]]), index.css's `--bg` token and antd's `colorBgContainer` token are two independently-set dark colors that could drift apart, so the explicit inline background still prevents relying on accidental alignment.
+
+## Changes (C-39)
+
+The `/take-orders` route now forwards `active.user.name` as a new `serverName` prop to [[frontend-src-components-takeorderspage-tsx|TakeOrdersPage]]. Previously the RoleRoute render-prop discarded the session entirely. This is purely a display prop — order-taking API calls remain deliberately unauthenticated and unchanged from before (per adr-008 about Server's screen-gated-but-API-open design). The change is minimal (one prop forwarding) and maintains the existing authentication boundary.
 
 ## Exports
 - `App()` -- root component; renders SessionBar and outlet for react-router pages

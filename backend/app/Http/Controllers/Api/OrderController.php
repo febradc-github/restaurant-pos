@@ -65,6 +65,7 @@ class OrderController extends Controller
             'items' => ['required', 'array', 'min:1'],
             'items.*.menu_item_id' => ['required', 'integer', 'exists:menu_items,id'],
             'items.*.quantity' => ['sometimes', 'integer', 'min:1'],
+            'items.*.notes' => ['nullable', 'string', 'max:500'],
         ]);
 
         $order = DB::transaction(function () use ($data) {
@@ -80,6 +81,7 @@ class OrderController extends Controller
                 $order->items()->create([
                     'menu_item_id' => $menuItem->id,
                     'quantity' => $quantity,
+                    'notes' => $item['notes'] ?? null,
                 ]);
 
                 foreach ($menuItem->inventoryItems as $inventoryItem) {
