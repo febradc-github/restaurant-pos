@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import App from './App'
+import appCssSource from './App.css?raw'
+import indexCssSource from './index.css?raw'
 import type { AuthSession } from './types/auth'
 import type { KitchenChannelHandlers } from './realtime/echo'
 
@@ -124,5 +126,35 @@ describe('App', () => {
         expect(screen.getByRole('heading', { name: /log in/i })).toBeInTheDocument()
       },
     )
+  })
+
+  // C-29: the app shell used to wrap every routed page in <main id="center">,
+  // and App.css set `place-items: center` on #center. That forced the routed
+  // page's root element (e.g. an antd <Layout>) to shrink-to-fit instead of
+  // stretching to fill the available width, collapsing nested text (like the
+  // Owner Table Layout page's "Floor Plan" heading) down to near-zero width.
+  // vitest is configured with `css: false` (see vite.config.ts), so computed
+  // styles from the real stylesheet aren't observable via jsdom -- these
+  // checks instead assert directly on the rendered DOM and the stylesheet
+  // source, which is what actually caused (and now prevents) the collapse.
+  describe('app shell layout (C-29 regression)', () => {
+    it('does not wrap the routed page in the old shrink-to-fit centering container', () => {
+      stubFetch(serverSession)
+
+      const { container } = renderApp('/kitchen')
+
+      expect(container.querySelector('#center')).not.toBeInTheDocument()
+    })
+
+    it('keeps App.css free of the dead Vite-starter rules that caused the collapse', () => {
+      expect(appCssSource).not.toMatch(/place-items\s*:\s*center/)
+      for (const deadSelector of ['#center', '.hero', '.base', '.framework', '.vite', '#next-steps', '#docs', '#spacer', '.ticks']) {
+        expect(appCssSource).not.toContain(deadSelector)
+      }
+    })
+
+    it('keeps #root free of the dead landing-page width constraint', () => {
+      expect(indexCssSource).not.toMatch(/width:\s*1126px/)
+    })
   })
 })

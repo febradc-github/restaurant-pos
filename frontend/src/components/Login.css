@@ -4,6 +4,10 @@
   align-items: center;
   min-height: 60vh;
   padding: 1rem;
+  /* Self-contained centering (C-29): previously relied on the app shell's
+     #root { text-align: center } landing-page leftover, which was removed
+     because it isn't appropriate for the rest of the (full-width) app. */
+  text-align: center;
 }
 
 .login__card {

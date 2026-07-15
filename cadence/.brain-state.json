@@ -46,9 +46,10 @@
     "decisions/adr-008-server-login-kitchen-pin-attendance": 1784010034709.801,
     "decisions/adr-009-frontend-redesign-before-digital-transformation": 1784014592910.8665,
     "decisions/adr-010-employee-deactivation-not-deletion": 1784030223376.6423,
+    "decisions/adr-011-patch-ant-design-in-place-over-rebuild": 1784089455999.955,
     "architecture/AR-chainable-query-scopes-for-analytics": 1784048518010.8723,
     "architecture/AR-dedicated-controllers-for-cross-cutting-concerns": 1784047130207.448,
-    "architecture/AR-frontend-design-system": 1784014631225.3057,
+    "architecture/AR-frontend-design-system": 1784089449200.9302,
     "architecture/AR-live-computed-suggestions-vs-snapshots": 1784047116571.411,
     "architecture/AR-POS-core": 1784033448886.1006,
     "architecture/AR-print-agent-polyglot": 1783975153848.2986,
@@ -126,8 +127,13 @@
     "code/deploy-setup-sh": 1783975238708.5974,
     "code/deploy-static-server-js": 1783975225027.4683,
     "code/frontend-src-api-kitchenclock-ts": 1784029294780.7188,
+    "code/frontend-src-app-css": 1784089404789.3694,
+    "code/frontend-src-app-test-tsx": 1784089413582.2632,
+    "code/frontend-src-app-tsx": 1784089469617.2246,
     "code/frontend-src-components-kitchenclocpad-test-tsx": 1784011589276.3623,
     "code/frontend-src-components-kitchenclocpad-tsx": 1784011587552.9292,
+    "code/frontend-src-components-login-css": 1784089472287.9507,
+    "code/frontend-src-index-css": 1784089407318.4727,
     "code/frontend-src-types-kitchenclock-ts": 1784029296700.2583,
     "code/index-html": 1784015512126.0376,
     "code/package-json": 1784049117333.7773,
@@ -215,5 +221,5 @@
     "code/tests-feature-timeentries-timeentrytest-php": 1784012223885.6804,
     "code/vite-config-ts": 1783967257898.6067
   },
-  "updatedAt": "2026-07-14T19:27:37.281Z"
+  "updatedAt": "2026-07-15T04:24:34.960Z"
 }

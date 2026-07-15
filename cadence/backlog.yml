@@ -44,4 +44,13 @@ items:
     created: 2026-07-14
     updated: 2026-07-14
 
+  - id: C-28
+    title: "Frontend GUI Quality & Consistency Pass"
+    type: epic
+    status: idea
+    points: 16
+    assignee: claude
+    created: 2026-07-15
+    updated: 2026-07-15
+
 

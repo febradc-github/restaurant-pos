@@ -104,7 +104,7 @@ function App() {
   return (
     <ConfigProvider theme={theme}>
       <AntdApp>
-        <main id="center">
+        <main className="app__main">
           <Routes>
             <Route path="/login" element={<LoginRoute session={session} onLogin={setSession} />} />
 

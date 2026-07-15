@@ -1,47 +1,57 @@
 sprint:
-  name: "Sprint 8"
-  number: 8
-  goal: "Ship the Owner Analytics Dashboard -- sales, best/worst-sellers, attendance, and inventory restock -- closing out C-23 and the original digital-transformation goal"
-  started: 2026-07-14
-  ends: 2026-07-28
+  name: "Sprint 9"
+  number: 9
+  goal: "Ship the Frontend GUI Quality & Consistency Pass -- fix the app-shell layout regression and audit/polish every screen against ui-ux-pro-max and Ant Design standards, closing out C-28"
+  started: 2026-07-15
+  ends: 2026-07-29
   status: active
 items:
-  - id: C-24
-    title: "Sales & Best-Seller Analytics API"
+  - id: C-29
+    title: "App Shell Regression Fix"
     type: story
-    parent: C-23
-    status: done
-    points: 5
-    assignee: claude
-    carryovers: 0
-    notes: "work pass 1: Order gained scopePaid/scopePaidBetween chainable local scopes (mirroring TimeEntry's pattern) instead of raw SQL. New AnalyticsController: GET /api/analytics/sales (revenue grouped by day, Paid orders only, dated by paid_at) and GET /api/analytics/menu-items (quantity_sold + revenue per item, sorted revenue desc by default, both fields present for re-sorting), both owner-gated. Revenue computed as quantity*menu_item.price summed as floats then number_format(...,2) to a string, mirroring PrintAgentClient::payloadFor()'s existing precedent for order totals rather than introducing bcmath. 12/12 new analytics tests, 203/203 full backend suite passing (572 assertions), Pint clean. Response shapes for C-26: sales=[{date, revenue}] ascending by date; menu-items=[{menu_item_id, name, quantity_sold, revenue}] descending by revenue by default."
-
-  - id: C-25
-    title: "Inventory Threshold & Restock API"
-    type: story
-    parent: C-23
-    status: done
-    points: 6
-    assignee: claude
-    carryovers: 0
-    notes: "work pass 1: threshold unsignedInteger column on inventory_items (default 0). New RestockController: index() returns combined live report per ingredient {id, name, stock, threshold, suggested_threshold, shortfall}, computed fresh per request (no caching/snapshot); suggested_threshold = ceil(trailing-30-day Paid-order consumption / 30), 0 for no history, non-Paid orders excluded (reuses Order::scopePaid from C-24). update() is a dedicated PATCH /api/inventory-items/{id}/threshold Owner-override endpoint, deliberately separate from the existing C-5 InventoryItemController (whose validation only accepts name/stock) so the override can't be smuggled through the general endpoint. 216/216 full backend suite passing (601 assertions, 13 new RestockTest cases), Pint clean. Response shapes for C-26 confirmed in notes."
-
-  - id: C-26
-    title: "Analytics Dashboard UI"
-    type: story
-    parent: C-23
-    status: done
-    points: 7
-    assignee: claude
-    carryovers: 0
-    notes: "work pass 1: Added Analytics as a 4th data-driven NAV_ENTRIES item in OwnerPage (no restructuring) with a new /owner/analytics route rendering AnalyticsDashboard. Sales trend is a hand-built SVG line chart (SalesTrendChart.tsx, geometry extracted to salesTrendChartMath.ts) -- 2px colorPrimary line, hairline gridlines, end-marker dot, pointermove crosshair+tooltip (date secondary/revenue bold, never series-colored text) -- no new charting dependency. Best/worst sellers and inventory restock are antd Tables (revenue-desc default sort; restock threshold overridden inline via editable-cell pattern mirroring MenuManager, PATCH response merged not replaced so suggested_threshold/shortfall survive). Attendance aggregates raw /api/time-entries rows client-side (attendanceAggregation.ts) into per-user total hours, showing user_id (no name in that endpoint), in-progress count for open entries, and auto_closed count as a warning Tag. Shared RangePicker (Today/7/30/90-day presets) scopes sales+sellers+attendance together; restock is unscoped, fetches once on mount. New: api/{analytics,restock,timeEntries}.ts + types + tests, components/{SalesTrendChart,AnalyticsDashboard,salesTrendChartMath,attendanceAggregation}. Added dayjs as an explicit dependency (was already transitive via antd's DatePicker). 150/150 full frontend suite passing serially (142/150 under parallel load -- 8 failures are the repo's pre-existing documented flaky-under-parallel-load tests, not regressions), tsc -b clean, oxlint clean. OwnerPage.test.tsx/App.test.tsx re-verified passing with the new nav entry. This is the final story of epic C-23 -- pending review, closes out the epic and the original digital-transformation goal."
-
-  - id: C-27
-    title: "Demo Data Seeder"
-    type: task
+    parent: C-28
     status: done
     points: 2
     assignee: claude
     carryovers: 0
-    added_mid_sprint: true
-    notes: "work pass 1: DatabaseSeeder rewritten to seed, in dependency order: 5 fixed-credential users (Owner/Cashier/Server via email+password, 2 Kitchen via PIN), all active, looked up firstOrCreate-style so re-running updates rather than duplicates; 4 menu categories/11 items; 6 inventory items linked via the menu_item_inventory_item pivot with realistic quantity_required (2 seeded below threshold for a visible restock shortfall, 4 above); 6 tables; a guarded one-time seed of 45 orders spread across the last 30 days (41 Paid across 20 distinct days, plus Pending/Ready/Cancelled -- Cancelled orders carry no paid_at) with 97 order items; 10 time_entries across Server/Cashier/both Kitchen users (closed shifts, one open, one auto_closed). Credentials printed to console via $this->command->info(). 223/223 backend tests passing (622 assertions, 7 new seeder tests), Pint clean. Ran php artisan db:seed twice for real against the locally configured DB, confirmed idempotent (unchanged counts on second run). Flagged: this machine's current DB connection resolves to sqlite (database.sqlite), not the pos_dev Postgres database prior tickets used -- env-config difference, not a seeder defect; seeder itself is DB-agnostic. Credentials: Owner owner@demo.pos/password, Cashier cashier@demo.pos/password, Server server@demo.pos/password, Kitchen One PIN 111111, Kitchen Two PIN 222222."
+    notes: "work pass 1: Removed dead Vite-starter CSS from App.css (kept only .app__session), replaced <main id=\"center\"> (which had place-items:center forcing shrink-to-fit on every routed page) with <main className=\"app__main\"> (flex:1, no align-items override). Removed #root's landing-page width:1126px/text-align:center/margin:auto constraint from index.css; moved text-align:center into Login.css since Login implicitly depended on #root's text-align. Added App.test.tsx regression tests (verified they fail against pre-fix code via git stash, then pass against the fix). 153/153 frontend tests passing, tsc -b clean, oxlint clean."
+
+  - id: C-30
+    title: "Login Page UI Audit & Fixes"
+    type: story
+    parent: C-28
+    status: todo
+    points: 2
+    assignee: claude
+    carryovers: 0
+    notes: ""
+
+  - id: C-31
+    title: "Owner Console UI Audit & Fixes"
+    type: story
+    parent: C-28
+    status: todo
+    points: 5
+    assignee: claude
+    carryovers: 0
+    notes: ""
+
+  - id: C-32
+    title: "Cashier & Take-Orders UI Audit & Fixes"
+    type: story
+    parent: C-28
+    status: todo
+    points: 4
+    assignee: claude
+    carryovers: 0
+    notes: ""
+
+  - id: C-33
+    title: "Kitchen UI Audit & Fixes"
+    type: story
+    parent: C-28
+    status: todo
+    points: 3
+    assignee: claude
+    carryovers: 0
+    notes: ""
