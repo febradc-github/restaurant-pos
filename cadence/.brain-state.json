@@ -165,8 +165,8 @@
     "code/src-components-cashierpage-test-tsx": 1784018324918.8528,
     "code/src-components-cashierpage-tsx": 1784018320099.3164,
     "code/src-components-checkout-css": 1784018342345.4321,
-    "code/src-components-checkout-test-tsx": 1784018345968.006,
-    "code/src-components-checkout-tsx": 1784027544461.7542,
+    "code/src-components-checkout-test-tsx": 1784091196167.2844,
+    "code/src-components-checkout-tsx": 1784091187702.432,
     "code/src-components-employeemanager-css": 1784032020174.8381,
     "code/src-components-employeemanager-test-tsx": 1784032024763.7466,
     "code/src-components-employeemanager-tsx": 1784032016678.2124,
@@ -230,5 +230,5 @@
     "code/tests-feature-timeentries-timeentrytest-php": 1784012223885.6804,
     "code/vite-config-ts": 1783967257898.6067
   },
-  "updatedAt": "2026-07-15T04:43:06.663Z"
+  "updatedAt": "2026-07-15T04:53:35.249Z"
 }

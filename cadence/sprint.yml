@@ -40,11 +40,11 @@ items:
     title: "Cashier & Take-Orders UI Audit & Fixes"
     type: story
     parent: C-28
-    status: todo
+    status: done
     points: 4
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Audited Checkout/CashierPage and OrderTaking/TakeOrdersPage against ui-ux-pro-max. Checkout fixed: added size=\"large\" to Confirm-payment button and payment-method Radio.Group (touch-target gap vs. established frontline convention); added loading/disabled state during checkout/cancel requests to prevent double-tap; wrapped Cancel order in a Popconfirm (previously fired immediately with no confirmation, mirroring EmployeeManager's Deactivate pattern). OrderTaking audited and found already fully compliant (size=\"large\" throughout, async loading/disabled state present, correct Alert role usage, Typography.Title headings, aria-labels on icon buttons) -- it was already the reference implementation cited by earlier tickets. Deferred: raw hex in OrderTaking.css judged consistent with the established neutral-border palette elsewhere, not an inconsistency. 162/162 frontend tests passing, tsc -b clean, oxlint clean."
 
   - id: C-33
     title: "Kitchen UI Audit & Fixes"

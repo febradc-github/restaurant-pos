@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, Col, Radio, Row, Space, Tag, Typography } from 'antd'
+import { Alert, Button, Card, Col, Popconfirm, Radio, Row, Space, Tag, Typography } from 'antd'
 import { CheckCircleOutlined } from '@ant-design/icons'
 import { createOrdersApi } from '../api/orders'
 import type { Order } from '../types/order'
@@ -45,9 +45,19 @@ function orderTotal(order: Order): string {
  * Rebuilt on Ant Design (C-17): one Card per open order in a responsive
  * grid -- cards scan faster than table rows for a "scan and act" checkout
  * flow, and give the payment buttons room for comfortable touch targets.
- * Confirm is a full-width primary button; Cancel is deliberately smaller
- * and visually subordinate (destructive-action separation) so it never
- * competes with Confirm.
+ * Confirm is a full-width, large primary button (this is a frontline,
+ * time-pressured screen, so it follows the same `size="large"` touch-target
+ * convention as OrderTaking/Login); Cancel is deliberately smaller and
+ * visually subordinate (destructive-action separation) so it never competes
+ * with Confirm.
+ *
+ * UI audit (C-32): Confirm/Cancel now track a per-order in-flight state so
+ * the acting button shows a spinner and both buttons on that order disable
+ * while the request is outstanding -- checkout and cancellation are real
+ * transactions, so a double-tap must not be able to fire the request twice.
+ * Cancel also sits behind a Popconfirm, matching the confirm-before-destroy
+ * pattern used for Deactivate in EmployeeManager, since cancelling a live
+ * order is destructive and irreversible from this screen.
  */
 export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
   const isCashier = Boolean(authToken)
@@ -57,6 +67,12 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
   const [error, setError] = useState<string | null>(null)
   const [paymentMethods, setPaymentMethods] = useState<Record<number, PaymentMethod>>({})
   const [printStatusByOrderId, setPrintStatusByOrderId] = useState<Record<number, PrintStatus>>({})
+  // Tracks which order (and which of its two actions) is mid-flight, so the
+  // Confirm/Cancel buttons can show a spinner and refuse a second tap while
+  // the request is in the air -- checkout is a real transaction, not
+  // something a double-tap should be able to fire twice.
+  const [pendingOrderId, setPendingOrderId] = useState<number | null>(null)
+  const [pendingAction, setPendingAction] = useState<'confirm' | 'cancel' | null>(null)
 
   useEffect(() => {
     if (!isCashier) return
@@ -78,22 +94,32 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
   async function handleConfirmPayment(order: Order) {
     setError(null)
     const method = paymentMethods[order.id] ?? 'cash'
+    setPendingOrderId(order.id)
+    setPendingAction('confirm')
     try {
       const { order: updated, print_status } = await api.checkout(order.id, method)
       setOrders((prev) => (prev ?? []).map((existing) => (existing.id === updated.id ? updated : existing)))
       setPrintStatusByOrderId((prev) => ({ ...prev, [order.id]: print_status }))
     } catch (err) {
       setError(errorMessage(err, 'Failed to confirm payment'))
+    } finally {
+      setPendingOrderId(null)
+      setPendingAction(null)
     }
   }
 
   async function handleCancel(order: Order) {
     setError(null)
+    setPendingOrderId(order.id)
+    setPendingAction('cancel')
     try {
       await api.cancel(order.id)
       setOrders((prev) => (prev ?? []).filter((existing) => existing.id !== order.id))
     } catch (err) {
       setError(errorMessage(err, 'Failed to cancel order'))
+    } finally {
+      setPendingOrderId(null)
+      setPendingAction(null)
     }
   }
 
@@ -121,6 +147,9 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
           {orders.map((order) => {
             const isPaid = order.status === 'paid'
             const printStatus = printStatusByOrderId[order.id]
+            const isBusy = pendingOrderId === order.id
+            const isConfirming = isBusy && pendingAction === 'confirm'
+            const isCancelling = isBusy && pendingAction === 'cancel'
             return (
               <Col key={order.id} xs={24} md={12} lg={8}>
                 <Card data-testid={`checkout-order-${order.id}`}>
@@ -154,6 +183,8 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
                       <Radio.Group
                         aria-label={`Payment method for ${order.table.label}`}
                         optionType="button"
+                        size="large"
+                        disabled={isBusy}
                         value={paymentMethods[order.id] ?? 'cash'}
                         onChange={(event) =>
                           setPaymentMethods((prev) => ({
@@ -168,18 +199,33 @@ export function Checkout({ apiBaseUrl, authToken = null }: CheckoutProps) {
                           </Radio.Button>
                         ))}
                       </Radio.Group>
-                      <Button type="primary" block onClick={() => handleConfirmPayment(order)}>
+                      <Button
+                        type="primary"
+                        size="large"
+                        block
+                        loading={isConfirming}
+                        disabled={isBusy}
+                        onClick={() => handleConfirmPayment(order)}
+                      >
                         Confirm payment
                       </Button>
-                      <Button
-                        danger
-                        type="text"
-                        size="small"
-                        className="checkout__cancel"
-                        onClick={() => handleCancel(order)}
+                      <Popconfirm
+                        title="Cancel this order?"
+                        okText="Yes, cancel"
+                        cancelText="No"
+                        onConfirm={() => handleCancel(order)}
                       >
-                        Cancel order
-                      </Button>
+                        <Button
+                          danger
+                          type="text"
+                          size="small"
+                          className="checkout__cancel"
+                          loading={isCancelling}
+                          disabled={isBusy}
+                        >
+                          Cancel order
+                        </Button>
+                      </Popconfirm>
                     </Space>
                   )}
                 </Card>

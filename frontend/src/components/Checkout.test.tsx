@@ -116,7 +116,7 @@ describe('Checkout', () => {
     expect(printWarning.className).not.toMatch(/ant-alert-error/)
   })
 
-  it('cancels an order, calling the cancel endpoint and removing it from the open list', async () => {
+  it('cancels an order, calling the cancel endpoint and removing it from the open list, after confirming', async () => {
     const user = userEvent.setup()
     vi.mocked(fetch)
       .mockResolvedValueOnce(jsonResponse([pendingOrder]))
@@ -126,11 +126,59 @@ describe('Checkout', () => {
 
     await screen.findByTestId('checkout-order-1')
     await user.click(screen.getByRole('button', { name: /cancel order/i }))
+    await user.click(await screen.findByRole('button', { name: /yes, cancel/i }))
 
     await waitFor(() => expect(screen.queryByTestId('checkout-order-1')).not.toBeInTheDocument())
 
     const [cancelUrl, cancelInit] = vi.mocked(fetch).mock.calls[1]
     expect(cancelUrl).toBe(`${BASE_URL}/api/orders/1/cancel`)
     expect(cancelInit).toMatchObject({ method: 'POST' })
+  })
+
+  it('requires confirmation before cancelling an order -- a bare tap does not cancel it', async () => {
+    const user = userEvent.setup()
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    await screen.findByTestId('checkout-order-1')
+    await user.click(screen.getByRole('button', { name: /cancel order/i }))
+
+    expect(await screen.findByText(/cancel this order\?/i)).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('checkout-order-1')).toBeInTheDocument()
+  })
+
+  it('renders a large Confirm payment button and payment method group for comfortable touch targets', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder]))
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-1')
+    expect(within(orderRow).getByRole('button', { name: /confirm payment/i })).toHaveClass('ant-btn-lg')
+    expect(within(orderRow).getByRole('radiogroup')).toHaveClass('ant-radio-group-large')
+  })
+
+  it('shows loading feedback and disables checkout actions on this order while confirming payment', async () => {
+    const user = userEvent.setup()
+    let resolveCheckout: (response: Response) => void = () => {}
+    const checkoutPromise = new Promise<Response>((resolve) => {
+      resolveCheckout = resolve
+    })
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse([pendingOrder])).mockReturnValueOnce(checkoutPromise)
+
+    render(<Checkout apiBaseUrl={BASE_URL} authToken="cashier-token" />)
+
+    const orderRow = await screen.findByTestId('checkout-order-1')
+    const confirmButton = within(orderRow).getByRole('button', { name: /confirm payment/i })
+    const cancelButton = within(orderRow).getByRole('button', { name: /cancel order/i })
+    await user.click(confirmButton)
+
+    expect(confirmButton).toHaveClass('ant-btn-loading')
+    expect(cancelButton).toBeDisabled()
+
+    resolveCheckout!(jsonResponse({ ...pendingOrder, status: 'paid', print_status: 'printed' }))
+    await waitFor(() => expect(within(orderRow).getByRole('status')).toHaveTextContent(/paid/i))
+    expect(within(orderRow).queryByRole('button', { name: /confirm payment/i })).not.toBeInTheDocument()
   })
 })
