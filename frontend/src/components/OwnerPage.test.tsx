@@ -144,4 +144,40 @@ describe('OwnerPage', () => {
 
     expect(await screen.findByRole('button', { name: /expand navigation/i })).toBeInTheDocument()
   })
+
+  // C-34: Layout.Sider defaulted to antd's built-in 200px width, sized for
+  // antd's 14px baseline font. This app's theme.ts sets fontSize: 16, so
+  // "Menu Management" (the longest nav label) no longer fit and antd's
+  // built-in menu-item ellipsis truncated it to "Menu Manage...".
+  describe('sidebar width (C-34 regression)', () => {
+    it('renders the full "Menu Management" label, untruncated, with the sidebar expanded', async () => {
+      renderOwnerPage('/owner')
+
+      const menuLabel = await screen.findByRole('menuitem', { name: /menu management/i })
+
+      expect(menuLabel.textContent).toBe('Menu Management')
+    })
+
+    it('widens the expanded sider beyond antd\'s 200px default so labels fit at this app\'s font size', async () => {
+      const { container } = renderOwnerPage('/owner')
+
+      await screen.findByRole('heading', { name: /floor plan/i })
+
+      const sider = container.querySelector('.ant-layout-sider') as HTMLElement
+      expect(sider).not.toBeNull()
+      expect(Number.parseInt(sider.style.width, 10)).toBeGreaterThan(200)
+    })
+
+    it('still shrinks to the collapsed icon-only width when collapsed', async () => {
+      const user = userEvent.setup()
+      const { container } = renderOwnerPage('/owner')
+
+      await screen.findByRole('heading', { name: /floor plan/i })
+
+      await user.click(screen.getByRole('button', { name: /collapse navigation/i }))
+
+      const sider = container.querySelector('.ant-layout-sider') as HTMLElement
+      expect(sider.style.width).toBe('80px')
+    })
+  })
 })

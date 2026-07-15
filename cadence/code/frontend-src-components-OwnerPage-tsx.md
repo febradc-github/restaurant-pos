@@ -4,7 +4,7 @@ tags: [code/frontend]
 aliases: ["frontend/src/components/OwnerPage.tsx"]
 created: 2026-07-15
 updated: 2026-07-15
-related: ["[[US-31]]"]
+related: ["[[US-31]]", "[[TK-34]]", "[[frontend-src-components-OwnerPage-test-tsx]]"]
 sources: []
 ---
 
@@ -19,6 +19,10 @@ Replaced the built-in antd `Layout.Sider` collapse trigger (a bare `<div onClick
 - `MenuFoldOutlined`/`MenuUnfoldOutlined` icons to indicate the action
 - Full keyboard accessibility and screen reader support
 - `Layout.Sider trigger={null}` to suppress the default inaccessible trigger
+
+## Changes (C-34)
+
+`<Layout.Sider>` now has an explicit `width={230}` (was implicitly antd's 200px default). Root cause of the truncation bug: antd's default 200px Sider width assumes antd's own 14px default font size, but this app's theme.ts sets fontSize:16, so the longest nav label "Menu Management" no longer fit and antd's built-in menu-item ellipsis truncated it to "Menu Manage...". The `collapsedWidth` remains antd's 80px default, so the collapsed icon-only state is unchanged.
 
 ## Exports
 - `OwnerPage` (component) -- admin console shell with accessible sider collapse

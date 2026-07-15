@@ -157,4 +157,31 @@ describe('App', () => {
       expect(indexCssSource).not.toMatch(/width:\s*1126px/)
     })
   })
+
+  // C-34: index.css still carries a pre-C-29 `@media (prefers-color-scheme:
+  // dark)` block that repaints `:root`'s background near-black whenever the
+  // OS is in dark mode. .app__session had no background of its own, so that
+  // near-black bled through behind antd's light-theme (dark) session text,
+  // making "Logged in as ..." unreadable in dark-mode OSes. vitest runs with
+  // `css: false` so the real dark-mode media query never fires in jsdom --
+  // this instead asserts the session bar carries its own explicit,
+  // theme-token-sourced background (an inline style, which IS observable in
+  // jsdom) so it no longer depends on whatever index.css paints behind it.
+  describe('session bar contrast (C-34 regression)', () => {
+    it('gives the session bar its own opaque background instead of relying on the page background', async () => {
+      stubFetch(serverSession)
+      const user = userEvent.setup()
+
+      renderApp('/login')
+      await logIn(user)
+
+      const logoutButton = await screen.findByRole('button', { name: /log out/i })
+      const sessionBar = logoutButton.closest('.app__session')
+
+      expect(sessionBar).not.toBeNull()
+      const background = (sessionBar as HTMLElement).style.backgroundColor
+      expect(background).not.toBe('')
+      expect(background).not.toBe('transparent')
+    })
+  })
 })

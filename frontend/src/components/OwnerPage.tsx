@@ -81,7 +81,14 @@ export function OwnerPage({ apiBaseUrl, authToken = null }: OwnerPageProps) {
 
   return (
     <Layout className="owner-page">
-      <Layout.Sider collapsible trigger={null} collapsed={collapsed} onCollapse={setCollapsed}>
+      {/* C-34: antd's Layout.Sider defaults to a 200px expanded width, sized
+          for antd's 14px baseline font. theme.ts sets fontSize: 16 app-wide,
+          so the longest nav label ("Menu Management") no longer fit and
+          antd's built-in menu-item ellipsis truncated it. 230px comfortably
+          fits that label plus its icon at this app's font size without
+          over-widening the sider; collapsedWidth is left at antd's default
+          (80px) so the collapsed icon-only behavior is unchanged. */}
+      <Layout.Sider collapsible trigger={null} collapsed={collapsed} onCollapse={setCollapsed} width={230}>
         <div className="owner-page__brand">{collapsed ? 'POS' : 'Owner Console'}</div>
         <Menu
           theme="dark"

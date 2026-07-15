@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import { App as AntdApp, Button, ConfigProvider, Typography } from 'antd'
+import { App as AntdApp, Button, ConfigProvider, theme as antdTheme, Typography } from 'antd'
 import { OwnerPage } from './components/OwnerPage'
 import { TakeOrdersPage } from './components/TakeOrdersPage'
 import { KitchenPage } from './components/KitchenPage'
@@ -24,9 +24,21 @@ interface SessionBarProps {
   onLogout: () => void
 }
 
+/**
+ * Wraps its content in an explicit, theme-token-sourced background (C-34) --
+ * index.css's leftover `@media (prefers-color-scheme: dark)` block repaints
+ * the page background near-black on dark-mode OSes, and this bar has no
+ * background of its own to shield it from that bleed-through, making the
+ * antd light-theme (dark) text unreadable. Follows this codebase's
+ * established pattern (see SalesTrendChart.tsx) of sourcing runtime-theme
+ * colors from `theme.useToken()` in TSX rather than CSS custom properties,
+ * since ConfigProvider doesn't enable antd's cssVar mode.
+ */
 function SessionBar({ session, onLogout }: SessionBarProps) {
+  const { token } = antdTheme.useToken()
+
   return (
-    <div className="app__session">
+    <div className="app__session" style={{ background: token.colorBgContainer }}>
       <Typography.Text>
         Logged in as {session.user.name} ({session.user.role})
       </Typography.Text>

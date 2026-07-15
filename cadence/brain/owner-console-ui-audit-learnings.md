@@ -4,7 +4,7 @@ tags: [code/frontend, ui/accessibility]
 aliases: ["C-31 learnings", "Owner Console audit findings"]
 created: 2026-07-15
 updated: 2026-07-15
-related: ["[[US-31]]", "[[EP-28]]"]
+related: ["[[US-31]]", "[[EP-28]]", "[[TK-34]]", "[[frontend-src-app-tsx]]"]
 sources: []
 ---
 
@@ -14,13 +14,21 @@ Architectural and design facts discovered during [[US-31]] that apply to C-32/C-
 
 ## ConfigProvider & Theme Tokens
 
-This app's ConfigProvider never enables antd's `cssVar` mode, which means plain .css files have no mechanism to reference theme.ts tokens at runtime. Components needing runtime-theme-aware color must use `theme.useToken()` in TSX instead (see SalesTrendChart.tsx pattern). Raw hex values in .css files (TableLayoutEditor.css, OwnerPage.css, OrderTaking.css) are an architectural fact of this codebase, not a per-page audit finding to "fix" without a broader theming-architecture decision first.
+This app's ConfigProvider never enables antd's `cssVar` mode, which means plain .css files have no mechanism to reference theme.ts tokens at runtime. Components needing runtime-theme-aware color must use `theme.useToken()` in TSX instead.
+
+**Established pattern** (now with two real usage sites):
+1. SalesTrendChart.tsx -- theme-aware chart color selection
+2. [[frontend-src-app-tsx]] SessionBar (C-34) -- theme-aware background color to prevent dark-mode `:root` bleed-through
+
+Raw hex values in .css files (TableLayoutEditor.css, OwnerPage.css, OrderTaking.css) are an architectural fact of this codebase, not a per-page audit finding to "fix" without a broader theming-architecture decision first.
 
 ## index.css Typography Trap
 
 index.css contains leftover boilerplate from the pre-C-29 landing-page template: `h1, h2 { font-family: var(--heading); color: var(--text-h); margin: 0 0 8px }`. This rule silently reskins any raw `<h2>` in the app that doesn't use antd's `Typography.Title`. It was never removed by C-29 (which only touched #root/#center/App.css, not this rule) and creates a latent trap: any future page/component reaching for a plain `<h2>` instead of `Typography.Title` will inherit this styling and bypass antd theming.
 
-Established pattern for owned/conforming pages: use `Typography.Title level={2}` instead of raw `<h2>`.
+The same index.css also contains a `@media (prefers-color-scheme: dark)` rule that paints `:root`/html near-black. This caused the SessionBar contrast bug in C-34: when `.app__session` had no background of its own, the near-black bled through, creating dark-on-near-black text.
+
+Established pattern for owned/conforming pages: use `Typography.Title level={2}` instead of raw `<h2>`, and use `theme.useToken()` for any component that needs to work correctly under both light and dark modes with no CSS-dependent backgrounds.
 
 ## Owner Console UI Density Pattern
 
