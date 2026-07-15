@@ -50,8 +50,8 @@ items:
     title: "Kitchen UI Audit & Fixes"
     type: story
     parent: C-28
-    status: todo
+    status: done
     points: 3
     assignee: claude
     carryovers: 0
-    notes: ""
+    notes: "work pass 1: Audited KitchenDisplay/KitchenClockPad against ui-ux-pro-max, preserving the deliberate large-touch-target/at-a-distance-readability design intent. Fixed: Mark ready had no loading/disabled feedback -- added per-order pending state (mirroring C-32's Checkout pattern) so only the card actually submitting shows a spinner, deliberately NOT disabling other orders' buttons (unlike Checkout) since blocking the whole board during one in-flight request would hurt busy-kitchen speed. Verified already compliant: no raw <h2> reskinning trap, correct Alert role usage (this is the original reference implementation that pattern was drawn from), touch targets, no emoji icons, no focus-ring overrides, sequential heading hierarchy, color+text status pairing. Deliberately NOT added: confirmation dialog on Mark ready (advances workflow forward, not destructive like Cancel/Deactivate; a Popconfirm on every tap would fight the at-speed design intent) and aria-expanded on the clock-pad toggle (no established convention elsewhere in the app; would be inconsistent to add here alone). 163/163 frontend tests passing, tsc -b clean, oxlint clean."

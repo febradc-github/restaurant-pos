@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { KitchenDisplay } from './KitchenDisplay'
 import type { Order } from '../types/order'
@@ -126,6 +126,32 @@ describe('KitchenDisplay', () => {
     const [url, init] = vi.mocked(fetch).mock.calls[1]
     expect(url).toBe(`${BASE_URL}/api/orders/1/ready`)
     expect(init).toMatchObject({ method: 'PATCH' })
+  })
+
+  it('shows loading feedback on the specific order being marked ready, without disabling other orders', async () => {
+    const user = userEvent.setup()
+    let resolveMarkReady: (response: Response) => void = () => {}
+    const markReadyPromise = new Promise<Response>((resolve) => {
+      resolveMarkReady = resolve
+    })
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse([pendingOrder, secondOrder]))
+      .mockReturnValueOnce(markReadyPromise)
+
+    render(<KitchenDisplay apiBaseUrl={BASE_URL} />)
+    const order1 = await screen.findByTestId('order-1')
+    const order2 = screen.getByTestId('order-2')
+    const markReadyButton1 = within(order1).getByRole('button', { name: /mark ready/i })
+    const markReadyButton2 = within(order2).getByRole('button', { name: /mark ready/i })
+
+    await user.click(markReadyButton1)
+
+    expect(markReadyButton1).toHaveClass('ant-btn-loading')
+    expect(markReadyButton2).toBeEnabled()
+
+    resolveMarkReady!(jsonResponse({ ...pendingOrder, status: 'ready' }))
+    await waitFor(() => expect(screen.queryByTestId('order-1')).not.toBeInTheDocument())
+    expect(screen.getByTestId('order-2')).toBeInTheDocument()
   })
 
   it('re-fetches pending orders on every mount, so a remount after a reconnect catches up on missed orders', async () => {

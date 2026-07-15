@@ -4,7 +4,7 @@ tags: [code/frontend]
 aliases: ["src/components/Checkout.tsx"]
 created: 2026-07-14
 updated: 2026-07-15
-related: ["[[src-components-checkout-css]]", "[[src-components-checkout-test-tsx]]", "[[src-components-cashierpage-tsx]]", "[[src-api-orders-ts]]", "[[src-types-checkout-ts]]", "[[src-types-order-ts]]", "[[antd-radio-button-pointer-events-gotcha]]", "[[antd-v6-space-component-deprecation]]", "[[owner-console-ui-audit-learnings]]", "[[US-7]]", "[[US-17]]", "[[US-32]]"]
+related: ["[[src-components-checkout-css]]", "[[src-components-checkout-test-tsx]]", "[[src-components-cashierpage-tsx]]", "[[src-api-orders-ts]]", "[[src-types-checkout-ts]]", "[[src-types-order-ts]]", "[[antd-radio-button-pointer-events-gotcha]]", "[[antd-v6-space-component-deprecation]]", "[[owner-console-ui-audit-learnings]]", "[[epic-c28-per-item-pending-state-scoping-patterns]]", "[[US-7]]", "[[US-17]]", "[[US-32]]"]
 sources: []
 ---
 
@@ -20,7 +20,7 @@ Three fixes added during C-32 audit (Cashier & Take-Orders UI Audit & Fixes):
 
 1. **Touch-target sizing**: Added `size="large"` to both "Confirm payment" Button and payment-method Radio.Group to match the app's established frontline-screen touch-target convention (44px minimum, see [[owner-console-ui-audit-learnings]]). This matches OrderTaking, KitchenClockPad, KitchenDisplay, and Login post-C-30 standards.
 
-2. **Per-order pending state tracking**: Added `pendingOrderId` and `pendingAction` state variables to track async operations per specific order. When a Confirm or Cancel request is in flight for a particular order, only that order's controls (Confirm button, Cancel button, payment-method Radio.Group) disable and show loading spinner. Prevents accidental double-submission and duplicate charges.
+2. **Per-order pending state tracking**: Added `pendingOrderId` and `pendingAction` state variables to track async operations per specific order. When a Confirm or Cancel request is in flight for a particular order, only that order's controls (Confirm button, Cancel button, payment-method Radio.Group) disable and show loading spinner. Prevents accidental double-submission and duplicate charges. See [[epic-c28-per-item-pending-state-scoping-patterns]] for the design framework: this is same-item mutual exclusion (deliberately different from KitchenDisplay's cross-item independence).
 
 3. **Destructive action confirmation**: Wrapped "Cancel order" Button in antd `Popconfirm` modal ("Cancel this order?"/"Yes, cancel"/"No") since it previously fired immediately with no confirmation despite being a destructive action against an active order. Mirrors the existing Deactivate-employee Popconfirm pattern in [[frontend-src-components-EmployeeManager-tsx|EmployeeManager.tsx]].
 

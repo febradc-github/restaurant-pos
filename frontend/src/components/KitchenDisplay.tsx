@@ -42,12 +42,22 @@ function upsertPendingOrder(orders: Order[], order: Order): Order[] {
  * components over density. One large Card per pending order in a responsive
  * grid, a big `Typography.Title` for the table label (not small text), a
  * status Tag, and a full-width `size="large"` Mark ready button.
+ *
+ * C-33 audit: Mark ready tracks its in-flight order via `markingReadyId`, so
+ * only the card actually submitting shows the loading spinner and disables
+ * itself -- other pending orders stay fully tappable, since blocking the
+ * whole board on one in-flight request would slow down a busy kitchen. No
+ * confirmation dialog on Mark ready: unlike Checkout's Cancel or
+ * EmployeeManager's Deactivate, it advances an order forward through its
+ * normal workflow rather than destroying anything, and a Popconfirm on every
+ * tap would fight the at-speed design intent of this screen.
  */
 export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
   const api = useMemo(() => createOrdersApi({ baseUrl: apiBaseUrl }), [apiBaseUrl])
 
   const [orders, setOrders] = useState<Order[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [markingReadyId, setMarkingReadyId] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -79,11 +89,14 @@ export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
 
   async function handleMarkReady(order: Order) {
     setError(null)
+    setMarkingReadyId(order.id)
     try {
       const updated = await api.markReady(order.id)
       setOrders((prev) => upsertPendingOrder(prev ?? [], updated))
     } catch (err) {
       setError(errorMessage(err, 'Failed to mark order ready'))
+    } finally {
+      setMarkingReadyId(null)
     }
   }
 
@@ -115,7 +128,14 @@ export function KitchenDisplay({ apiBaseUrl }: KitchenDisplayProps) {
                     </li>
                   ))}
                 </ul>
-                <Button type="primary" size="large" block onClick={() => handleMarkReady(order)}>
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  loading={markingReadyId === order.id}
+                  disabled={markingReadyId === order.id}
+                  onClick={() => handleMarkReady(order)}
+                >
                   Mark ready
                 </Button>
               </Card>
