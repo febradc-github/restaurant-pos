@@ -4,17 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "92f8a9a77753b652",
+        "id": "90f1d39b19084e60",
         "type": "tabs",
         "children": [
           {
-            "id": "30459afbc829be8c",
+            "id": "8bf6275cdb09030b",
             "type": "leaf",
             "state": {
-              "type": "graph",
+              "type": "empty",
               "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -176,11 +176,42 @@
       "bases:Create new base": false
     }
   },
-  "active": "30459afbc829be8c",
+  "active": "8bf6275cdb09030b",
   "lastOpenFiles": [
-    "code/database-factories-orderfactory-php.md",
-    "code/app-http-controllers-api-inventoryitemcontroller-php.md",
-    "brain/reverb-hardcoded-host-deployment-bug.md",
-    "code/deploy-readme-md.md"
+    "code/backend-database-migrations-2026-07-17-000001-add-notes-to-order-items-table-php.md",
+    "backlog.yml.tmp.22108.dc474ea872ff",
+    "sprint.yml.tmp.22108.563f8330695a",
+    "sprint.yml.tmp.22108.57dd4bce9bf9",
+    "brain/c35-dark-theme-redesign-epic-completion.md",
+    "brain/responsive-breakpoint-pattern-divergence-c37-vs-c39.md",
+    "brain/c39-kitchen-notes-order-vs-line-item-modeling.md",
+    "code/frontend-src-components-ordertaking-css.md",
+    "code/frontend-src-components-ordertaking-test-tsx.md",
+    "code/frontend-src-components-takeorderspage-tsx.md",
+    "code/frontend-src-components-ordertaking-tsx.md",
+    "sprint.yml.tmp.22108.3e937e1d936c",
+    "sprint.yml.tmp.22108.8f06c6edca41",
+    "backlog.yml.tmp.22108.e497292688cd",
+    "sprint.yml.tmp.22108.d20720c5c9d3",
+    "sprints/sprint-10.yml",
+    "sprints/sprint-10.yml.tmp.22108.ea3af32be37e",
+    "sprint.yml.tmp.22108.774269d2038e",
+    "brain/shared-cross-component-utils-directory-pattern.md",
+    "brain/eloquent-serialization-check-before-backend-change.md",
+    "brain/philippines-peso-currency-audit-needed.md",
+    "code/frontend-src-api-orders-ts.md",
+    "code/frontend-src-components-checkout-test-tsx.md",
+    "code/frontend-src-components-checkout-css.md",
+    "code/frontend-src-components-checkouthelpers-ts.md",
+    "code/frontend-src-utils-currency-ts.md",
+    "code/frontend-src-types-order-ts.md",
+    "code/frontend-src-components-checkout-tsx.md",
+    "tasks/TK-40.md",
+    "code/frontend-src-components-tableZoneGrouping-test-ts.md",
+    "brain/table-orders-new-relation-c37.md",
+    "brain/c37-browser-screenshot-testing-gap.md",
+    "brain/c37-scope-amendment-reserved-state-deferred.md",
+    "code/backend-database-migrations-2026-07-16-000001-add-zone-to-tables-table-php.md",
+    "code/backend-app-models-table-php.md"
   ]
 }
